@@ -7,19 +7,13 @@ slug: /server-side-rendering
 
 # Server-Side Rendering (SSR) with Stencil
 
-Stencil provides server-side rendering (SSR) support for React and Vue output targets. If you're using
-frameworks like [Vite](https://vite.dev/), [Remix](https://remix.run/), [Next.js](https://nextjs.org/)
-or [Nuxt](https://nuxt.com/), Stencil automatically enhances these frameworks to render components on
-the server using a [Declarative Shadow DOM](https://web.dev/articles/declarative-shadow-dom) or in
-[scoped mode](/docs/styling#scoped-css).
+Stencil provides server-side rendering (SSR) support for React and Vue Output Targets. If you're using frameworks like [Vite](https://vite.dev/), [Remix](https://remix.run/), [Next.js](https://nextjs.org/) or [Nuxt](https://nuxt.com/), Stencil automatically enhances these frameworks to render components on the server using a [Declarative Shadow DOM](https://web.dev/articles/declarative-shadow-dom) or in [scoped mode](/docs/styling#scoped-css).
 
 The first step to enable server side rendering is to generate a hydrate module of your components.
 
 ## Hydrate Module
 
-The Hydrate Module is a standalone bundle of all your components that uses a JavaScript implementation of
-various HTML and DOM standards, to render Stencil components in a Node.js environment. To create this
-bundle you have to add `dist-hydrate-script` to your Stencil configuration:
+The Hydrate Module is a standalone bundle of all your components that uses a JavaScript implementation of various HTML and DOM standards to render Stencil components in a Node.js environment. To create this bundle you have to add `dist-hydrate-script` to your Stencil configuration:
 
 ```tsx title="stencil.config.ts"
 import { Config } from '@stencil/core';
@@ -57,25 +51,21 @@ This will create the Hydrate Module which you can export separately via:
 
 ## Enable SSR for StencilJS
 
-For serializing Stencil components on the server, Stencil uses a package called `@stencil/ssr` which
-you can install via:
+For serializing Stencil components on the server, Stencil uses a package called `@stencil/ssr` which you can install via:
 
 ```sh
 npm install --save-dev @stencil/ssr
 ```
 
-It exports compiler plugins for Vite based projects, e.g. Remix or Webpack based ones like Next.js.
-The plugin requires the following options:
+It exports compiler plugins for Vite based projects, e.g. Remix or Webpack based ones like Next.js. The plugin requires the following options:
 
 #### `module`
 
-The import of the package that exports all your Stencil React components. It helps the package to
-understand which components can be server side rendered.
+The import of the package that exports all your Stencil React components. It helps the package to understand which components can be server side rendered.
 
 #### `from`
 
-The name of the package that exports all your Stencil React components. Stencil will look up all imports
-from that package and transforms the statement to use a server side rendered version of the component.
+The name of the package that exports all your Stencil React components. Stencil will look up all imports from that package and transforms the statement to use a server side rendered version of the component.
 
 #### `hydrateModule`
 
@@ -87,8 +77,7 @@ Your generated hydrate module that gives the package the primitives to serialize
 
 **default: __declarative-shadow-dom__**
 
-Configurations on how the components should be rendered on the server, e.g. as Declarative Shadow DOM, as
-scoped components or as a mixture of both.
+Configurations on how the components should be rendered on the server, e.g. as Declarative Shadow DOM, as scoped components or as a mixture of both.
 
 ### Vite
 
@@ -147,8 +136,7 @@ export default defineConfig({
 
 ### Next.js
 
-If you are using Next.js, you can enable SSR for Stencil components by wrapping your Next.js configuration
-as following:
+If you are using Next.js, you can enable SSR for Stencil components by wrapping your Next.js configuration as following:
 
 ```js title="next.config.js"
 import stencilSSR from '@stencil/ssr/next';
@@ -173,8 +161,7 @@ __Note:__ the import path for the Next.js integration is `@stencil/ssr/next`.
 
 ### Nuxt
 
-If you are building a Vue application in Nuxt you don't need the `@stencil/ssr/next`, instead
-just reference the Hydrate Module in your options for the Vue Output Target, e.g.:
+If you are building a Vue application in Nuxt you don't need the `@stencil/ssr/next`, instead just reference the Hydrate Module in your options for the Vue Output Target, e.g.:
 
 ```ts title="stencil.config.ts"
 import { Config } from '@stencil/core';
@@ -195,19 +182,15 @@ export const config: Config = {
 };
 ```
 
-That's it! Your Nuxt application should now render a Declarative Shadow DOM on the server side
-which will get automatically hydrated once the Vue runtime initiates.
+That's it! Your Nuxt application should now render a Declarative Shadow DOM on the server side which will get automatically hydrated once the Vue runtime initiates.
 
 ## Limitations
 
-When server-side rendering Stencil components, there are a few potential pitfalls and limitatiobs
-you might encounter. To help you avoid these issues, here are some key tips and best practices.
+When server-side rendering Stencil components, there are a few potential pitfalls and limitations you might encounter. To help you avoid these issues, here are some key tips and best practices.
 
 ### Performance
 
-By default Stencil server-side renders a component into a [Declarative Shadow DOM](https://web.dev/articles/declarative-shadow-dom),
-which includes all structural information and styles. While this ensures accurate rendering, it can
-significantly increase document size if not managed carefully.
+By default Stencil server-side renders a component into a [Declarative Shadow DOM](https://web.dev/articles/declarative-shadow-dom), which includes all structural information and styles. While this ensures accurate rendering, it can significantly increase document size if not managed carefully.
 
 For example, consider a button component:
 
@@ -243,9 +226,7 @@ button {
 }
 ```
 
-When SSR is performed, the entire CSS (including imports) is bundled with the component's declarative
-shadow DOM. Rendering multiple instances of this button in SSR can lead to repeated inclusion of styles,
-bloating the document size and delaying [First Contentful Paint (FCP)](https://web.dev/articles/fcp).
+When SSR is performed, the entire CSS (including imports) is bundled with the component's declarative shadow DOM. Rendering multiple instances of this button in SSR can lead to repeated inclusion of styles, bloating the document size and delaying [First Contentful Paint (FCP)](https://web.dev/articles/fcp).
 
 Here are some ways to mitigate this:
 
@@ -254,15 +235,9 @@ Here are some ways to mitigate this:
 - **Optimize Component-Specific CSS**: Only include the necessary styles for each component.
 - **Limit SSR Scope**: In Next.js, apply `use client` to sections that don't need SSR to reduce unnecessary rendering.
 
-Compared to many other web-component frameworks Stencil understands to render a component as actual web
-component as well as a scoped component. A scoped component doesn't use a Shadow DOM and style encapsulation
-is emulated. This provides an advantage in the SSR context as you don't have to ship the same style multiple
-times when you render specific components in different places.
+Compared to many other web-component frameworks Stencil understands to render a component as actual web component as well as a scoped component. A scoped component doesn't use a Shadow DOM and style encapsulation is emulated. This provides an advantage in the SSR context as you don't have to ship the same styles multiple times when you render specific components in different places.
 
-With the `serializeShadowRoot` of the `@stencil/ssr` package you can define which components should be rendered
-as actual web-component in a declarative shadow DOM and which should be rendered as a scoped component. You can
-define certain components that appear a lot in your initial DOM as scoped components to avoid sending duplicate
-styles for them, e.g.:
+With the `serializeShadowRoot` of the `@stencil/ssr` package you can define which components should be rendered as actual web-component in a declarative shadow DOM and which should be rendered as a scoped component. You can define certain components that appear a lot in your initial DOM as scoped components to avoid sending duplicate styles for them, e.g.:
 
 ```js title="next.config.js"
 import stencilSSR from '@stencil/ssr/next';
@@ -313,12 +288,9 @@ return (
 )
 ```
 
-While this approach works fine in the browser, it poses challenges for SSR. Stencil **does not support**
-the serialization of complex objects within parameters, so the footer items may not render on the server.
+While this approach works fine in the browser, it poses challenges for SSR. Stencil **does not support** the serialization of complex objects within parameters, so the footer items may not render on the server.
 
-A better approach is to structure dynamic content as part of the component's light DOM rather than passing
-it as props. This ensures that the framework can fully render the component during SSR, avoiding hydration
-issues. Here’s an improved version of the example:
+A better approach is to structure dynamic content as part of the component's light DOM rather than passing it as props. This ensures that the framework can fully render the component during SSR, avoiding hydration issues. Here’s an improved version of the example:
 
 ```tsx
 const menu = {
@@ -346,9 +318,7 @@ By rendering the menu directly in the light DOM, SSR can produce a complete, rea
 
 ### Cross-Component State Handling
 
-When propagating state between parent and child components, patterns like reducers or context providers
-(as in React) are often used. However, this can be problematic with SSR in frameworks like Next.js, where
-each component is rendered independently.
+When propagating state between parent and child components, patterns like reducers or context providers (as in React) are often used. However, this can be problematic with SSR in frameworks like Next.js, where each component is rendered independently.
 
 Consider the following structure:
 
@@ -358,8 +328,7 @@ Consider the following structure:
 </ParentComponent>
 ```
 
-When ParentComponent is rendered on the server, Stencil will attempt to stringify its children (e.g.,
-ChildComponent) for the light DOM. The intermediate markup may look like this:
+When ParentComponent is rendered on the server, Stencil will attempt to stringify its children (e.g., ChildComponent) for the light DOM. The intermediate markup may look like this:
 
 ```jsx
 <ParentComponent>
@@ -371,9 +340,6 @@ ChildComponent) for the light DOM. The intermediate markup may look like this:
 </ParentComponent>
 ```
 
-At this stage, ParentComponent can access and manipulate its children. However, when ChildComponent is
-rendered in isolation, it won't have access to the parent's state or context, potentially leading to
-inconsistencies.
+At this stage, ParentComponent can access and manipulate its children. However, when ChildComponent is rendered in isolation, it won't have access to the parent's state or context, potentially leading to inconsistencies.
 
-To prevent this, ensure that components rendered on the server don't depend on external state or context.
-If the component relies on data fetched at runtime, it's better to display a loading placeholder during SSR.
+To prevent this, ensure that components rendered on the server don't depend on external state or context. If the component relies on data fetched at runtime, it's better to display a loading placeholder during SSR.
