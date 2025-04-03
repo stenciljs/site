@@ -395,13 +395,13 @@ export default App;
 
 ## API
 
-### esModule
+### outDir
 
-**Optional**
+**Required**
 
-**Type: `boolean`**
+**Type: `string`**
 
-If `true`, the output target will generate a separate ES module for each React component wrapper. Defaults to `false`.
+The directory where the React components will be generated. Accepts a relative path from the Stencil project's root directory.
 
 ### excludeComponents
 
@@ -411,29 +411,23 @@ If `true`, the output target will generate a separate ES module for each React c
 
 An array of component tag names to exclude from the React output target. Useful if you want to prevent certain web components from being in the React library.
 
-### experimentalUseClient
-
-**Optional**
-
-**Type: `boolean`**
-
-If `true`, the generated output target will include the [use client;](https://react.dev/reference/react/use-client) directive.
-
-### outDir
-
-**Required**
-
-**Type: `string`**
-
-The directory where the React components will be generated. Accepts a relative path from the Stencil project's root directory.
-
 ### stencilPackageName
 
 **Optional**
 
 **Type: `string`**
 
-The name of the package that exports the Stencil components. Defaults to the package.json detected by the Stencil compiler.
+The name of the package that exports the Stencil components. Defaults to the `package.json` detected by the Stencil compiler.
+
+### customElementsDir
+
+**Optional**
+
+**Type: `string`**
+
+The directory where the custom elements are saved.
+
+This value is automatically detected from the Stencil configuration file for the dist-custom-elements output target. If you are working in an environment that uses absolute paths, consider setting this value manually.
 
 ### hydrateModule
 
@@ -476,6 +470,42 @@ Allows users to exclude a list of components from server side rendering by Next.
 frameworks. This may be useful if you would like to generally ignore some components from being
 rendered on the server or if you like roll out SSR support for your design system one component at
 a time.
+
+### esModules
+
+**Optional**
+
+**Default: `true`** 
+
+**Type: `boolean`**
+
+If `true`, the output target will generate a separate ES module for each React component wrapper. Defaults to `false`.
+
+### serializeShadowRoot
+
+**Optional**
+
+**Default: `'declarative-shadow-dom'`** 
+
+**Type: `'declarative-shadow-dom' | 'scoped' | { 'declarative-shadow-dom'?: string[]; scoped?: string[]; }**
+
+Configure how Stencil serializes the components shadow root.
+- If set to `declarative-shadow-dom` the component will be rendered within a Declarative Shadow DOM.
+- If set to `scoped` Stencil will render the contents of the shadow root as a `scoped: true` component
+  and the shadow DOM will be created during client-side hydration.
+- Alternatively you can mix and match the two by providing an object with `declarative-shadow-dom` and `scoped` keys,
+the value arrays containing the tag names of the components that should be rendered in that mode.
+
+**Examples:**
+
+- `{ 'declarative-shadow-dom': ['my-component-1', 'another-component'], default: 'scoped' }`
+Render all components as `scoped` apart from `my-component-1` and `another-component`
+-  `{ 'scoped': ['an-option-component'], default: 'declarative-shadow-dom' }`
+Render all components within `declarative-shadow-dom` apart from `an-option-component`
+- `'scoped'` Render all components as `scoped`
+- `false` disables shadow root serialization
+
+*NOTE* `true` has been deprecated in favor of `declarative-shadow-dom` and `scoped`
 
 ## FAQ's
 

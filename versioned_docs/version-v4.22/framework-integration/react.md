@@ -393,7 +393,7 @@ export default App;
 
 ## API
 
-### esModule
+### esModules
 
 **Optional**
 

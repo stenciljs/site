@@ -459,7 +459,7 @@ Please be aware of the following limitations when working with server side rende
 
 ## API
 
-### esModule
+### esModules
 
 **Optional**
 
