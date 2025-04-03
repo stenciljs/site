@@ -487,7 +487,7 @@ If `true`, the output target will generate a separate ES module for each React c
 
 **Default: `'declarative-shadow-dom'`** 
 
-**Type: `'declarative-shadow-dom' | 'scoped' | { 'declarative-shadow-dom'?: string[]; scoped?: string[]; }**
+**Type: `'declarative-shadow-dom' | 'scoped' | { 'declarative-shadow-dom'?: string[]; scoped?: string[]; } | boolean`**
 
 Configure how Stencil serializes the components shadow root.
 - If set to `declarative-shadow-dom` the component will be rendered within a Declarative Shadow DOM.
