@@ -192,7 +192,15 @@ If set to `true` it removes any abundant HTML comments. Stencil still requires t
 
 __Type:__ `(document: Document, url: URL) => <void> | Promise<void>`
 
-Allows to modify the document and all its containing components to be modified before the hydration process starts.
+Allows to modify the document and all its containing components to be modified before the hydration process starts. This allows e.g. to assign properties to the components dynamically:
+
+```ts
+await renderToString(response.body, {
+    beforeHydrate: (doc: Document) => {
+      doc.querySelector(`my-component`).someComplexThing = new Map(...)
+   },
+})
+```
 
 ##### `afterHydrate`
 
