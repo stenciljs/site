@@ -113,6 +113,18 @@ The following primitives can be imported from the `@stencil/core` package and us
 
 - [**h()**](./templating-and-jsx.md): It's used within the `render()` to turn the JSX into Virtual DOM elements.
 
+- **render()**: a utility method to render a virtual DOM created by `h()` into a container.
+
+  __Type:__ `(vnode: VNode, container: Element) => void`
+  __Example:__
+  ```tsx
+  import { render } from '@stencil/core'
+  const vdom = (
+    <div className="m-2">Hello World!</div>
+  )
+  render(vdom, document.body)
+  ```
+
 - [**readTask()**](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing): Schedules a DOM-read task. The provided callback will be executed in the best moment to perform DOM reads without causing layout thrashing.
 
   __Type:__ `(task: Function) => void`

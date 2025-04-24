@@ -38,6 +38,7 @@ transpiles
 transpiling
 unshift
 usingtheplatform
+vnode
 webapps
 wdio
 webdriverio
