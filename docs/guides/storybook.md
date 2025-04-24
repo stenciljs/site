@@ -5,21 +5,27 @@ description: Storybook Integration
 slug: /storybook
 ---
 
-[Storybook](https://storybook.js.org/) is a frontend workshop for building UI components and pages in isolation. Thousands of teams use it for UI development, testing, and documentation. It's open source and free.
+# Using Storybook with Stencil
 
-Using a Stencil version `v2.30.0` or higher you can now edit and develop your Stencil components within Storybook.
+[Storybook](https://storybook.js.org/) is a powerful tool for developing, testing, and documenting UI components in isolation. It's open-source, widely adopted, and integrates seamlessly with modern frontend frameworks—including Stencil (v2.30.0 and above).
 
-## Setup
+With the latest Stencil version, you can now build and preview your components directly in Storybook.
 
-There is currently a pending pull request to natively integrate bootstrapping a Storybook project with Stencil through the Storybook CLI. Until this lands please follow the following setup guide.
+## Getting Started
 
-First, let's install all required Storybook dependencies:
+> 🔧 Note: Native support for Stencil in the Storybook CLI is currently in progress ([see pull request](https://github.com/storybookjs/storybook/pull/31205)). In the meantime, follow this manual setup guide.
+
+### Install Dependencies
+
+Add the necessary dev dependencies to your project:
 
 ```sh
 npm install --save-dev storybook @storybook/addon-essentials @storybook/addon-links @storybook/addon-interactions @stencil/core@latest @stencil/storybook-plugin
 ```
 
-Next, create a `.storybook/main.ts` file in your project with the following contents:
+### Configure Storybook
+
+Create a `.storybook/main.ts` file with the following configuration:
 
 ```ts
 const config = {
@@ -31,39 +37,40 @@ const config = {
   ],
   framework: {
     name: "@stencil/storybook-plugin"
-  }
+  },
 };
 
 export default config;
 ```
 
-Lastly, add the following script to your `package.json`:
+### Add a Script
+
+In your `package.json`, add the following Storybook script:
 
 ```json
-{
-    "name": "my-component-lib",
-    ...
-    "scripts": {
-        ...
-        "storybook": "storybook dev -p 6006 --no-open",
-        ...
-    }
+"scripts": {
+  "storybook": "storybook dev -p 6006 --no-open"
 }
 ```
 
-That's it, you can now develop your components with Storybook.
+## Creating Your First Story
 
-## Usage
+It's recommended to place your story file next to your component for better co-location and discoverability. For example:
 
-Let's add our first Storybook story to our project. For example you can add a `src/components/my-component/my-component.story.tsx` file with the following content:
+```bash
+src/components/my-component/my-component.stories.tsx
+```
+
+If you prefer a different structure, that's perfectly fine—just make sure your `stories` pattern in `.storybook/main.ts` includes the correct paths.
+
+Here’s an example story for a `MyComponent`:
 
 ```tsx
 import type { Meta, StoryObj } from '@stencil/storybook-plugin';
 import { h } from '@stencil/core';
-
 import { MyComponent } from './my-component';
 
-const meta = {
+const meta: Meta<MyComponent> = {
   title: 'MyComponent',
   component: MyComponent,
   parameters: {
@@ -75,9 +82,10 @@ const meta = {
     middle: { control: 'text' },
   },
   args: { first: 'John', last: 'Doe', middle: 'Michael' },
-} satisfies Meta<MyComponent>;
+};
 
 export default meta;
+
 type Story = StoryObj<MyComponent>;
 
 export const Primary: Story = {
@@ -86,11 +94,12 @@ export const Primary: Story = {
     last: 'Doe',
     middle: 'Michael',
   },
-  render: (props) => {
-    return <my-component {...props} />;
-  }
+  render: (props) => <my-component {...props} />,
 };
 
+/**
+ * Storybook story without custom render function
+ */
 export const Secondary: Story = {
   args: {
     first: 'Jane',
@@ -100,12 +109,16 @@ export const Secondary: Story = {
 };
 ```
 
-To start Storybook, run your new script:
+## Running Storybook
+
+To launch Storybook, simply run:
 
 ```sh
 npm run storybook
 ```
 
-And just like that, your Stencil component is now available in Storybook at http://localhost:6006 🎉
+Then open [http://localhost:6006](http://localhost:6006) in your browser to view your Stencil component in action 🎉
 
-For more information please refer to the [storybook documentation](https://storybook.js.org/docs).
+## Learn More
+
+For additional features and customization options, visit the [official Storybook documentation](https://storybook.js.org/docs).
