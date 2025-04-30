@@ -43,6 +43,32 @@ const config = {
 export default config;
 ```
 
+By default, the Stencil Storybook plugin registers the component specified via the `component` property in your story. However, if your component depends on other custom elements from your Stencil library, you'll want to ensure those are available too.
+
+To do this, you can embed the [Stencil Loader](/docs/next/distribution#loader) in the Storybook preview script to **lazily register all components** globally:
+
+```ts
+// .storybook/preview.tsx
+import { defineCustomElements } from '../loader/index.js';
+
+/**
+ * Registers all custom elements in the Storybook preview.
+ * This is useful if your components rely on other nested Stencil components.
+ */
+defineCustomElements();
+```
+
+### Adding Global Styles
+
+If your components rely on global stylesheets (e.g., a design system or component library), you can include them using a `preview-head.html` file. This file will be injected into the `<head>` of the Storybook preview iframe:
+
+```html
+<!-- .storybook/preview-head.html -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@8/css/ionic.bundle.css" />
+```
+
+This ensures all your components render correctly with the required styles in place.
+
 ### Add a Script
 
 In your `package.json`, add the following Storybook script:
