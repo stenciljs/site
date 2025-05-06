@@ -10,9 +10,9 @@ The [Stencil site](https://stenciljs.com/) is the place for documentation on how
 The documentation content is formatted in markdown and can be found in the [docs directory](https://github.com/ionic-team/stencil-site/tree/master/docs). Easiest way to make edits is to navigate to the markdown file to be updated, and click the Edit button in the top right (the pencil icon). After making the edit, submitting the changes will create a Pull Request (PR) for reviewed. Please feel free to ask any questions within the [discord channel](https://chat.stenciljs.com/), we're happy to help.
 
 
-## Building the Site
+## Running Locally
 
-To build the site from the source, ensure you're using the most recent versions of Node and Npm, and pull the latest from master. Next, run `npm install`, `npm run docs` to build the docs files and `npm start` to launch the site in development mode.
+To run the site locally, ensure you're using the most recent versions of Node and npm, and pull the latest from master. Next, run `npm install` to install the dependencies, then run `npm start` to launch the site in development mode.
 
 
 ## Related

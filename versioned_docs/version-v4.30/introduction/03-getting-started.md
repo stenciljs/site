@@ -213,6 +213,57 @@ Declaring private functions like `getText` helps pull logic out of the `render()
 Any property decorated with `@Prop()` is also automatically watched for changes.
 If a user of our component were to change the element's `first`, `middle`, or `last` properties, our component would fire its `render()` function again, updating the displayed content.
 
+
+## Local Development
+
+After creating your Stencil components, you'll likely want to use them in an existing application. There are multiple approaches for local development depending on your project setup.
+
+### Framework Integration
+
+If you want to integrate your Stencil components directly into an existing application built with frameworks like React, Angular, or Vue, refer to the [Framework Integrations](../framework-integration/01-overview.md) guide for specific integration instructions.
+
+### Using Component Library in Another Project
+
+If you're building a standalone component library and want to use it in another project during development, you have two main options:
+
+### Using Script Tags
+
+For applications that don't use npm or for simple HTML pages, you can include your components directly with a script tag:
+
+```bash
+# First, build your Stencil project
+cd my-first-stencil-project
+npm run build
+```
+
+This creates a `dist` folder containing your compiled components. Copy this folder to your application, then add a script tag that points to the ESM bundle:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Import your Stencil namespace -->
+  <script type="module" src="path/to/dist/my-first-stencil-project/my-first-stencil-project.esm.js"></script>
+</head>
+<body>
+  <!-- Now you can use your components -->
+  <my-component first="Stencil" middle="'Don't call me a framework'" last="JS"></my-component>
+</body>
+</html>
+```
+
+> **Note:** When using script tags, your application must be served from a web server rather than opened as a local file. You can use tools like [http-server](https://www.npmjs.com/package/http-server) or your IDE's built-in server.
+
+When you update your Stencil components, remember to rebuild the project and update the files in your consuming application.
+
+Both approaches allow you to develop and test your components in the context of a real application, making it easier to refine their design and functionality.
+
+
+### Using npm link
+
+For npm-based projects, `npm link` creates a symbolic link between your Stencil component library and the consuming application. However, linking to a Stencil component this way can still be a little tricky. [Angular](../framework-integration/angular.md), [React](../framework-integration/react.md), and [Vue](../framework-integration/vue.md) each have their own documentation which includes `npm link` and it's recommended you follow those integration guides.
+
+
 ## Updating Stencil
 
 To get the latest version of @stencil/core you can run:
