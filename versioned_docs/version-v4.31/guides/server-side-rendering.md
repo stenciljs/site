@@ -39,8 +39,8 @@ This will create the Hydrate Module which you can export separately via:
     ...
     "./hydrate": {
       "types": "./hydrate/index.d.ts",
-      "import": "./hydrate/index.js",
-      "require": "./hydrate/index.cjs.js",
+      "import": "./hydrate/index.mjs",
+      "require": "./hydrate/index.js",
       "default": "./hydrate/index.js"
     },
     ...
