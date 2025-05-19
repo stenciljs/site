@@ -20,45 +20,17 @@ When server-side rendering Stencil components, there are a few potential pitfall
 When building components, it's common to pass complex data structures like objects to components as props. For example, a footer menu could be structured as an object rather than as separate components for each menu item:
 
 ```tsx
-const menu = {
-    'Overview': ['Introduction', 'Getting Started', 'Component API', 'Guides', 'FAQ'],
-    'Docs': ['Framework Integrations', 'Static Site Generation', 'Config', 'Output Targets', 'Testing', 'Core Compiler API'],
-    'Community': ['Blog', 'GitHub', 'X', 'Discord']
-}
+const menu = generateMenuData({ ... })
 return (
-    <nav>
-        <footer-navigation items={menu} />
-    </nav>
+  <nav>
+    <footer-navigation items={menu} />
+  </nav>
 )
 ```
 
-While this approach works fine in the browser, it poses challenges for SSR. Stencil **does not support** the serialization of complex objects within parameters, so the footer items may not render on the server.
+While this approach works fine in the browser, it poses challenges for SSR. While Stencil generally **supports** the serialization of complex objects within parameters, it can't resolve the value of any function calls, e.g. here `generateMenuData(...)` during the SSR process (except when using runtime based SSR within Next.js applications).
 
-A better approach is to structure dynamic content as part of the component's light DOM rather than passing it as props. This ensures that the framework can fully render the component during SSR, avoiding hydration issues. Here’s an improved version of the example:
-
-```tsx
-const menu = {
-    'Overview': ['Introduction', 'Getting Started', 'Component API', 'Guides', 'FAQ'],
-    'Docs': ['Framework Integrations', 'Static Site Generation', 'Config', 'Output Targets', 'Testing', 'Core Compiler API'],
-    'Community': ['Blog', 'GitHub', 'X', 'Discord']
-}
-return (
-    <nav>
-        <footer-navigation>
-            {Object.entries(menu).map(([section, links]) => (
-                <footer-navigation-section>
-                    <h2>{section}</h2>
-                    {links.map(link => (
-                        <footer-navigation-entry href="#/">{link}</footer-navigation-entry>
-                    ))}
-                </footer-navigation-section>
-            ))}
-        </footer-navigation>
-    </nav>
-)
-```
-
-By rendering the menu directly in the light DOM, SSR can produce a complete, ready-to-render markup.
+We recommend to __not__ depend on external data structures when it comes to rendering Stencil components.
 
 ### Cross-Component State Handling
 
