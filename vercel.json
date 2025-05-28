@@ -87,11 +87,6 @@
       "statusCode": 301
     },
     {
-      "source": "/:version(next|(?:v[\\d]+(?:\\.[\\dx]+)?))?/server-side-rendering",
-      "destination": "/docs/:version/static-site-generation-server-side-rendering-ssr",
-      "statusCode": 301
-    },
-    {
       "source": "/:version(next|(?:v[\\d]+(?:\\.[\\dx]+)?))?/prerendering",
       "destination": "/docs/:version/static-site-generation",
       "statusCode": 301
