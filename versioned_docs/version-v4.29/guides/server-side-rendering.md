@@ -136,14 +136,111 @@ export default defineConfig({
 
 ### Next.js
 
-If you are using Next.js, you can enable SSR for Stencil components by wrapping your Next.js configuration as following:
+When using Stencil with Next.js, you can server-side render (SSR) components in two ways: **at runtime** or **at compile time**. Each approach has its trade-offs, and the best choice depends on your component architecture.
+
+* If your components rely heavily on **slots**, the **compiler-based** SSR approach is generally more reliable.
+* If your components use **dynamically computed attributes**, the **runtime-based** SSR approach is more flexible.
+
+#### Runtime-Based SSR
+
+In this method, Stencil serializes the component to a **Declarative Shadow DOM** during runtime, as Next.js renders the component on the server. Since Next.js supports asynchronous server components, this allows Stencil to perform serialization as part of the render process.
+
+To enable runtime SSR, set the `hydrateModule` option in your React output target:
+
+```ts
+import { Config } from '@stencil/core';
+import { reactOutputTarget } from '@stencil/react-output-target';
+
+export const config: Config = {
+  namespace: 'component-library',
+  outputTargets: [
+    reactOutputTarget({
+      outDir: '../component-library-react/src',
+      hydrateModule: 'component-library/hydrate',
+      serializeShadowRoot: { /* options */ },
+    }),
+  ],
+};
+```
+
+This will generate:
+
+* `components.ts` — for use on the client
+* `components.server.ts` — for server-side rendering
+
+If you distribute your React wrapper as a separate package, consider exposing the server entry point via a custom export path in your `package.json`:
+
+```json
+{
+  "name": "component-library-react",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "node": "./dist/components.server.js"
+    },
+    "./server": {
+      "types": "./dist/components.server.d.ts",
+      "import": "./dist/components.server.js"
+    }
+  }
+}
+```
+
+Now you can use the server-optimized components in your Next.js app:
+
+```tsx title="/src/app/page.tsx"
+import { MyComponent } from 'component-library-react/server';
+
+export default function Home() {
+  return (
+    <>
+      ...
+      <MyComponent first="Max" last="Mustermann" />
+    </>
+  );
+}
+```
+
+##### ✅ Advantages
+
+* All component props are available with their **resolved values** at runtime.
+* Props can be **computed dynamically** or retrieved from functions:
+
+```tsx
+const value = getValueFromAPI();
+return <MyStencilComponent prop={value} />;
+```
+
+##### ⚠️ Disadvantages
+
+* **Nested Stencil components** may fail to render correctly on the server.
+* Child components might not appear until the Stencil runtime hydrates on the client:
+
+```tsx
+// ❌ Nested children may be missing on initial SSR
+return (
+  <MyStencilList>
+    <MyStencilListItem>Foo</MyStencilListItem>
+    <MyStencilListItem>Bar</MyStencilListItem>
+  </MyStencilList>
+);
+```
+
+#### Compiler-Based SSR
+
+With this approach, the `@stencil/ssr` package pre-processes your application during the build step to wrap and serialize Stencil components for server-side rendering.
+
+To enable it, wrap your Next.js configuration using the `stencilSSR()` helper:
 
 ```js title="next.config.js"
 import stencilSSR from '@stencil/ssr/next';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // ...
+  // your base config
 };
 
 export default stencilSSR({
@@ -157,7 +254,27 @@ export default stencilSSR({
 })(nextConfig);
 ```
 
-__Note:__ the import path for the Next.js integration is `@stencil/ssr/next`.
+> 📌 **Note:** The integration import path is `@stencil/ssr/next`.
+
+##### ✅ Advantages
+
+* More **reliable SSR** for Stencil components rendered in the **light DOM**.
+* Avoids hydration mismatch issues commonly seen with client-heavy components.
+
+##### ⚠️ Disadvantages
+
+* Since components are pre-rendered at **build time**, **runtime values** (e.g. function calls or dynamic props) are not available:
+
+```tsx
+// ✅ Static objects are fine
+const staticProp = { key: 'value' };
+
+// ❌ Dynamic values will not be resolved
+const runtimeValue = computeAtRuntime();
+return <MyStencilComponent prop1={staticProp} prop2={runtimeValue} />;
+```
+
+* Components using **slots** may render incorrectly due to internal Next.js behavior, such as injected `<template>` elements that break expected slot structure.
 
 ### Nuxt
 
@@ -276,45 +393,17 @@ For example, a footer menu could be structured as an object rather than as separ
 item:
 
 ```tsx
-const menu = {
-    'Overview': ['Introduction', 'Getting Started', 'Component API', 'Guides', 'FAQ'],
-    'Docs': ['Framework Integrations', 'Static Site Generation', 'Config', 'Output Targets', 'Testing', 'Core Compiler API'],
-    'Community': ['Blog', 'GitHub', 'X', 'Discord']
-}
+const menu = generateMenuData({ ... })
 return (
-    <nav>
-        <footer-navigation items={menu} />
-    </nav>
+  <nav>
+    <footer-navigation items={menu} />
+  </nav>
 )
 ```
 
-While this approach works fine in the browser, it poses challenges for SSR. Stencil **does not support** the serialization of complex objects within parameters, so the footer items may not render on the server.
+While this approach works fine in the browser, it poses challenges for SSR. While Stencil generally **supports** the serialization of complex objects within parameters, it can't resolve the value of any function calls, e.g. here `generateMenuData(...)` during the SSR process (except when using runtime based SSR within Next.js applications).
 
-A better approach is to structure dynamic content as part of the component's light DOM rather than passing it as props. This ensures that the framework can fully render the component during SSR, avoiding hydration issues. Here’s an improved version of the example:
-
-```tsx
-const menu = {
-    'Overview': ['Introduction', 'Getting Started', 'Component API', 'Guides', 'FAQ'],
-    'Docs': ['Framework Integrations', 'Static Site Generation', 'Config', 'Output Targets', 'Testing', 'Core Compiler API'],
-    'Community': ['Blog', 'GitHub', 'X', 'Discord']
-}
-return (
-    <nav>
-        <footer-navigation>
-            {Object.entries(menu).map(([section, links]) => (
-                <footer-navigation-section>
-                    <h2>{section}</h2>
-                    {links.map(link => (
-                        <footer-navigation-entry href="#/">{link}</footer-navigation-entry>
-                    ))}
-                </footer-navigation-section>
-            ))}
-        </footer-navigation>
-    </nav>
-)
-```
-
-By rendering the menu directly in the light DOM, SSR can produce a complete, ready-to-render markup.
+We recommend to __not__ depend on external data structures when it comes to rendering Stencil components.
 
 ### Cross-Component State Handling
 
