@@ -186,7 +186,7 @@ src/
     app.css
 ```
 
-The global style config takes a file path as a string. The output from this build will go to the `buildDir`. In this example it would be saved to `www/build/app.css`.
+The global style config takes a file path as a string. The output from this build will go to the `buildDir`. In this example it would be saved to `www/build/app.css`. Additionally, these global styles are automatically applied to all components with shadow roots via constructable stylesheets, allowing you to style shadow DOM components directly.
 
 ```tsx
 globalStyle: 'src/global/app.css'
