@@ -11,13 +11,13 @@ slug: /styling
 
 ### What is the Shadow DOM?
 
-The [shadow DOM](https://developers.google.com/web/fundamentals/web-components/shadowdom) is an API built into the browser that allows for DOM encapsulation and style encapsulation. It is a core aspect of the Web Component standards. The shadow DOM shields a component’s styles, markup, and behavior from its surrounding environment. This means that we do not need to be concerned about scoping our CSS to our component, nor worry about a component’s internal DOM being interfered with by anything outside the component.
+The [shadow DOM](https://developers.google.com/web/fundamentals/web-components/shadowdom) is an API built into the browser that allows for DOM encapsulation and style encapsulation. It is a core aspect of the Web Component standards. The shadow DOM shields a component's styles, markup, and behavior from its surrounding environment. This means that we do not need to be concerned about scoping our CSS to our component, nor worry about a component's internal DOM being interfered with by anything outside the component.
 
-When talking about the shadow DOM, we use the term "light DOM" to refer to the “regular” DOM. The light DOM encompasses any part of the DOM that does not use the shadow DOM.
+When talking about the shadow DOM, we use the term "light DOM" to refer to the "regular" DOM. The light DOM encompasses any part of the DOM that does not use the shadow DOM.
 
 ### Shadow DOM in Stencil
 
-The shadow DOM hides and separates the DOM of a component in order to prevent clashing styles or unwanted side effects. We can use the shadow DOM in our Stencil components to ensure our components won’t be affected by the applications in which they are used.
+The shadow DOM hides and separates the DOM of a component in order to prevent clashing styles or unwanted side effects. We can use the shadow DOM in our Stencil components to ensure our components won't be affected by the applications in which they are used.
 
 To use the Shadow DOM in a Stencil component, you can set the `shadow` option to `true` in the component decorator.
 
@@ -126,7 +126,7 @@ h1 {
 
 ### Customizing Components with Custom Properties
 
-CSS custom properties can allow the consumers of a component to customize a component’s styles from the light DOM. Consider a `shadow-card` component that uses a custom property for the color of the card heading.
+CSS custom properties can allow the consumers of a component to customize a component's styles from the light DOM. Consider a `shadow-card` component that uses a custom property for the color of the card heading.
 
 ```css
 :host {
@@ -152,7 +152,7 @@ shadow-card {
 
 ## CSS Parts
 
-CSS custom properties can be helpful for customizing components from the light DOM, but they are still a little limiting as they only allow a user to modify specific properties. For situations where users require a higher degree of flexibility, we recommend using the [CSS `::part()` pseudo-element](https://developer.mozilla.org/en-US/docs/Web/CSS/::part). You can define parts on elements of your component with the “part” attribute.
+CSS custom properties can be helpful for customizing components from the light DOM, but they are still a little limiting as they only allow a user to modify specific properties. For situations where users require a higher degree of flexibility, we recommend using the [CSS `::part()` pseudo-element](https://developer.mozilla.org/en-US/docs/Web/CSS/::part). You can define parts on elements of your component with the "part" attribute.
 
 ```tsx
 @Component({
@@ -336,3 +336,37 @@ This file must be manually imported in the `index.html` of your application.
 ```html
 <link rel="stylesheet" href="/build/app.css" />
 ```
+
+### Constructable Stylesheets
+
+In addition to being available in the light DOM, global styles are automatically registered to every shadow root via [constructable stylesheets](https://web.dev/constructable-stylesheets/). This means that your global styles can target and style shadow DOM components directly.
+
+This allows you to apply styles to specific component types using the `:host()` pseudo-class with a tag name selector. For example, you can target all instances of a specific component:
+
+```css
+/* In your global stylesheet */
+:host(my-button) {
+  --button-border-radius: 8px;
+  display: inline-block;
+}
+
+:host(my-card) {
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 16px 0;
+}
+
+/* You can also use attribute selectors */
+:host(my-input[type="password"]) {
+  --input-font-family: monospace;
+}
+```
+
+The `:host()` function allows you to select the host element of a component when it matches the given selector. This is particularly useful for:
+
+- Setting default CSS custom properties for specific component types
+- Applying consistent spacing or layout styles across all instances of a component
+- Theming components based on their tag names or attributes
+
+:::note
+The `:host()` selector in global styles will only affect components that use shadow DOM. For scoped components, you should use regular tag selectors in your global styles.
+:::
