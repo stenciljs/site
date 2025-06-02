@@ -59,6 +59,10 @@ npx stencil docs
 ```
 Running `stencil docs` will generate documentation for [all documentation output targets](./01-overview.md), not just `docs-readme`.
 
+:::info
+The `npx stencil docs` command runs with dev mode enabled, which does not run a full build. As a result, documentation that needs to be built first, like CSS styles, will not be generated. You will need to run `npx stencil build --docs` to generate documentation that requires building.
+:::
+
 ## README Sections
 
 Most generated markdown content will automatically be generated without requiring any additional configuration.
