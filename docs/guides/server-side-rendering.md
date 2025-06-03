@@ -301,6 +301,72 @@ export const config: Config = {
 
 That's it! Your Nuxt application should now render a Declarative Shadow DOM on the server side which will get automatically hydrated once the Vue runtime initiates.
 
+## Custom Config Wrapper
+
+When building distributed design systems, you should encapsulate all Stencil-related dependencies within your component library rather than requiring consuming applications to install them directly. This approach maintains clean separation of concerns and simplifies adoption.
+
+You can create wrapper functions that encapsulate the SSR configuration for each framework.
+
+```typescript title="packages/react/src/next.ts"
+// e.g. export custom SSR setup for Next.js applications
+import stencilConfig from '@stencil/ssr/next'
+
+type StencilConfigFunction = typeof stencilConfig;
+type NextConfig = ReturnType<ReturnType<StencilConfigFunction>>
+export const withSSR = (nextConfig: NextConfig): NextConfig => {
+  return stencilConfig({
+    from: '@placid/react',
+    module: import('./components.js'),
+    hydrateModule: import('@placid/core/hydrate'),
+  })(nextConfig)
+}
+```
+
+Then expose framework-specific helpers through clean export paths:
+
+```json title="packages/react/package.json"
+{
+  "name": "@your-company/react",
+  "exports": {
+    ".": {
+      "import": "./dist/components.js",
+      "types": "./dist/components.d.ts"
+    },
+    "./next": {
+      "import": "./dist/next.js",
+      "types": "./dist/next.d.ts"
+    },
+    "./vite": {
+      "import": "./dist/vite.js",
+      "types": "./dist/vite.d.ts"
+    },
+    "./server": {
+      "import": "./dist/components.server.js",
+      "types": "./dist/components.server.d.ts"
+    }
+  },
+  "dependencies": {
+    "@your-company/core": "workspace:*",
+    "@stencil/react-output-target": "^1.0.3",
+    "@stencil/ssr": "^0.1.1"
+  }
+}
+```
+
+__Note:__ the exports path `./next` and `./vite` export above example for either Vite or Next.js based setups. 
+
+With this approach, consumers have a much cleaner experience:
+
+```javascript title="next.config.mjs"
+import { withSSR } from '@your-company/react/next';
+
+const nextConfig = {
+  // your existing Next.js configuration
+};
+
+export default withSSR(nextConfig);
+```
+
 ## Limitations
 
 When server-side rendering Stencil components, there are a few potential pitfalls and limitations you might encounter. To help you avoid these issues, here are some key tips and best practices.
