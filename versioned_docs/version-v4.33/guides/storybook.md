@@ -13,14 +13,20 @@ With the latest Stencil version, you can now build and preview your components d
 
 ## Getting Started
 
-> 🔧 Note: Native support for Stencil in the Storybook CLI is currently in progress ([see pull request](https://github.com/storybookjs/storybook/pull/31205)). In the meantime, follow this manual setup guide.
+> 🔧 **Note:** Native support for Stencil in the Storybook CLI is currently in progress ([see pull request](https://github.com/storybookjs/storybook/pull/31205)).
+>
+> In the meantime, follow this manual setup guide for Storybook Version 8, then optionally run the following command to migrate to Storybook Version 9:
+>
+> ```sh
+> npx storybook@latest upgrade
+> ```
 
 ### Install Dependencies
 
 Add the necessary dev dependencies to your project:
 
 ```sh
-npm install --save-dev storybook @storybook/addon-essentials @storybook/addon-links @storybook/addon-interactions @stencil/core@latest @stencil/storybook-plugin
+npm install --save-dev storybook@8 @storybook/addon-essentials@8 @storybook/addon-links@8 @storybook/addon-interactions@8 @stencil/core@latest @stencil/storybook-plugin
 ```
 
 ### Configure Storybook
@@ -137,7 +143,7 @@ export const Secondary: Story = {
 
 ## Running Storybook
 
-To launch Storybook, simply run:
+To launch Storybook, first make sure your Stencil project is built, then simply run:
 
 ```sh
 npm run storybook
