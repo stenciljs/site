@@ -410,7 +410,6 @@ const componentModels: ComponentModelConfig[] = [
   {
     elements: ['my-input', 'my-textarea'],
     event: 'v-on-change',
-    externalEvent: 'on-change',
     targetAttr: 'value',
   },
 ];
