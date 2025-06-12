@@ -339,7 +339,7 @@ This file must be manually imported in the `index.html` of your application.
 
 ### Constructable Stylesheets
 
-In addition to being available in the light DOM, global styles are automatically registered to every shadow root via [constructable stylesheets](https://web.dev/constructable-stylesheets/). This means that your global styles can target and style shadow DOM components directly.
+In addition to being available in the light DOM, global styles are automatically registered to every shadow root via [constructable stylesheets](https://web.dev/constructable-stylesheets/). This means that your global styles can target and style shadow DOM components directly. 
 
 This allows you to apply styles to specific component types using the `:host()` pseudo-class with a tag name selector. For example, you can target all instances of a specific component:
 
@@ -370,3 +370,5 @@ The `:host()` function allows you to select the host element of a component when
 :::note
 The `:host()` selector in global styles will only affect components that use shadow DOM. For scoped components, you should use regular tag selectors in your global styles.
 :::
+
+This behavior can be turned off via the [`extras.addGlobalStyleToComponents`](../config/extras.md#addGlobalStyleToComponents) flag. 
