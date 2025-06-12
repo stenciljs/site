@@ -371,4 +371,4 @@ The `:host()` function allows you to select the host element of a component when
 The `:host()` selector in global styles will only affect components that use shadow DOM. For scoped components, you should use regular tag selectors in your global styles.
 :::
 
-This behavior can be turned off via the [`extras.addGlobalStyleToComponents`](/config/extras.md#addGlobalStyleToComponents) flag. 
+This behavior can be turned off via the [`extras.addGlobalStyleToComponents`](/docs/config/extras.md#addGlobalStyleToComponents) flag. 
