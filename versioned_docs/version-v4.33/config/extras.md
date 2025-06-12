@@ -142,7 +142,7 @@ For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot i
 
 ### addGlobalStyleToComponents
 
-By default, when using the [`globalStyle`](https://stenciljs.com/docs/config#globalstyle) config setting, any assigned stylesheet will also be added as a [constructable stylesheet](https://stenciljs.com/docs/styling#constructable-stylesheets) to each component in the published library. 
+By default, when using the [`globalStyle`](./config#globalstyle) config setting, any assigned stylesheet will also be added as a [constructable stylesheet](../components/styling#constructable-stylesheets) to each component in the published library. 
 
 You can turn this behaviour off by setting this flag to `false`.
 
