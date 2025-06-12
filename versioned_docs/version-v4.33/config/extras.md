@@ -144,5 +144,5 @@ For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot i
 
 By default, when using the [`globalStyle`](./01-overview.md#globalstyle) config setting, any assigned stylesheet will also be added as a [constructable stylesheet](../components/styling.md#constructable-stylesheets) to each component in the published library. 
 
-You can turn this behaviour off by setting this flag to `false`.
+You can turn this behavior off by setting this flag to `false`.
 
