@@ -990,12 +990,12 @@ export class GetSetProps {
     // A read-only prop
     private internalValue = 'should not change';
     @Prop()
-    get readOnlyProp { return this.internalValue; }
+    get readOnlyProp () { return this.internalValue; }
 
     // A validated prop
     private safeValue: 'this' | 'or maybe this' = 'this';
     @Prop()
-    get validatedProp {
+    get validatedProp () {
       return this.safeValue;
     }
     set validatedProp (incomingDodgyValue: any) {
@@ -1007,7 +1007,7 @@ export class GetSetProps {
     private dateValue: Date = new Date();
     // A transformed prop
     @Prop()
-    get transformedProp {
+    get transformedProp () {
       return this.dateValue;
     }
     set transformedProp (incomingStringVal: string) {
