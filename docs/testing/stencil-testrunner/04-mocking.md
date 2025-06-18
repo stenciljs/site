@@ -81,7 +81,7 @@ jest.mock('./helpers/utils', () => ({
 	getRandomInt: () => 42,
 }));
 
-import { foo } from './services/foo';
+import { bar } from './services/foo';
 
 describe('Foo', () => {
   it('bar()', () => {
