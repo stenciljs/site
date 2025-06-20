@@ -21,6 +21,42 @@ By default, the slot polyfill does not update `appendChild()` so that it appends
 
 By default, the runtime does not polyfill `cloneNode()` when cloning a component that uses the slot polyfill. This is an opt-in polyfill for those who need it.
 
+### tagNameTransform
+
+The `tagNameTransform` option in the `extras` config enables support for customizing the tag names of your Stencil components at runtime. This is especially useful if you want to add a prefix, suffix, or otherwise modify the tag names when registering your custom elements, for example to avoid naming conflicts.
+
+When `tagNameTransform` is enabled in your `stencil.config.ts`:
+
+```typescript
+extras: {
+  tagNameTransform: true
+}
+```
+
+You can use the `transformTagName` function when calling `defineCustomElements` in your consuming project:
+
+```typescript
+import { defineCustomElements } from 'my-button/loader';
+
+defineCustomElements(window, {
+  transformTagName: (tagName: string) => `${tagName}`
+} as never);
+```
+
+In this example, the function simply returns the original tag name, but you can customize it as needed. For example, to add a prefix:
+
+```typescript
+defineCustomElements(window, {
+  transformTagName: (tagName: string) => `${tagName}-v1`
+} as never);
+```
+
+With this configuration, a component originally named `<my-button>` would be registered as `<my-button-v1>`.
+
+**Note:**  
+- The `tagNameTransform` option in your Stencil config enables this feature at build time.
+- The `transformTagName` function is used at runtime when registering the components.
+
 ### enableImportInjection
 
 In some cases, it can be difficult to lazily load Stencil components in a separate project that uses a bundler such as
