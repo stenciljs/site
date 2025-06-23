@@ -171,6 +171,26 @@ export default function() { // or export default async function()
 The exported function can also be `async` but be aware that this can have implications on the performance of your application as all rendering operations will be deferred until after the global script finishes.
 :::
 
+Imported methods from Stencil, such as `setMode`, `BUILD` and others, can only be accessed within the function exported by the script. They will not be available in the global scope outside of this function.
+
+```javascript
+import { setMode, BUILD } from '@stencil/core';
+
+// ❌ This won't work as Stencil primitives are not initialized at this point
+// console.log('Build mode:', BUILD.isDev);
+
+export default function() {
+  // ✅ This works - Stencil methods are available within the exported function
+  if (BUILD.isDev) {
+    console.log('Development mode detected');
+    setMode((elm) => elm.getAttribute('mode') || 'dev');
+  } else {
+    console.log('Production mode');
+    setMode((elm) => elm.getAttribute('mode') || 'prod');
+  }
+}
+```
+
 ## globalStyle
 
 Stencil is traditionally used to compile many components into an app, and each component comes with its own compartmentalized styles. However, it's still common to have styles which should be "global" across all components and the website. A global CSS file is often useful to set [CSS Variables](../components/styling.md).
