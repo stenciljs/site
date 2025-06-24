@@ -10,8 +10,6 @@ import TabItem from '@theme/TabItem';
 
 # Angular Integration
 
-**Supports: Angular 12+ • TypeScript 4.0+ • Stencil v2.9.0+**
-
 Stencil can generate Angular component wrappers for your web components. This allows your Stencil components to be used within
 an Angular application. The benefits of using Stencil's component wrappers over the standard web components include:
 
@@ -19,6 +17,15 @@ an Angular application. The benefits of using Stencil's component wrappers over 
 - Web component events will be converted to RxJS observables to align with Angular's `@Output()` and will not emit across component boundaries.
 - Optionally, form control web components can be used as control value accessors with Angular's reactive forms or `[ngModel]`.
 - It is not necessary to include the [Angular `CUSTOM_ELEMENTS_SCHEMA`](https://angular.io/api/core/CUSTOM_ELEMENTS_SCHEMA) in all modules consuming your Stencil components.
+
+## Supported Angular Versions
+
+The following table shows the compatibility between `@stencil/angular-output-target` versions and Angular versions:
+
+| @stencil/angular-output-target | Angular |
+| ------------------------------ | ------- |
+| 0.10.2                         | v18.x and lower |
+| 1.0.0                          | v19.x and above |
 
 ## Setup
 
