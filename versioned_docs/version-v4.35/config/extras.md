@@ -43,7 +43,7 @@ defineCustomElements(window, {
 } as never);
 ```
 
-In this example, the function simply returns the original tag name, but you can customize it as needed. For example, to add a prefix:
+In this example, the function simply returns the original tag name, but you can customize it as needed. For example, to add a suffix:
 
 ```typescript
 defineCustomElements(window, {
