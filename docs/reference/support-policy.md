@@ -134,14 +134,20 @@ compatibility tables to describe the interoperability requirements of these piec
 
 ### Testing Libraries
 
+#### Jest with [Jest Stencil Runner](https://github.com/stenciljs/jest-stencil-runner)
+
+| Stencil Version | Jest v30 *  |
+|:---------------:|:-----------:|
+|       V4        |   &#9989;   |
+
 #### Jest
 
-| Stencil Version | Jest v24-26 | Jest v27 | Jest v28 * | Jest v29 *  |
-|:---------------:|:-----------:|:--------:|:----------:|:-----------:|
-|       V4        |   &#9989;   | &#9989;  |  &#9989;   |   &#9989;   |
-|       V3        |   &#9989;   | &#9989;  |  &#10060;  |  &#10060;   |
-|       V2        |   &#9989;   | &#9989;  |  &#10060;  |  &#10060;   |
-|       V1        |   &#9989;   | &#10060; |  &#10060;  |  &#10060;   |
+| Stencil Version | Jest v24-26 | Jest v27 | Jest v28 * | Jest v29 *  | Jest v30 * |
+|:---------------:|:-----------:|:--------:|:----------:|:-----------:|:----------:|
+|       V4        |   &#9989;   | &#9989;  |  &#9989;   |   &#9989;   |  &#10060;  |
+|       V3        |   &#9989;   | &#9989;  |  &#10060;  |  &#10060;   |  &#10060;  |
+|       V2        |   &#9989;   | &#9989;  |  &#10060;  |  &#10060;   |  &#10060;  |
+|       V1        |   &#9989;   | &#10060; |  &#10060;  |  &#10060;   |  &#10060;  |
 
 \* Support for Jest 28 & 29 has been included since Stencil v4.7.0.
 

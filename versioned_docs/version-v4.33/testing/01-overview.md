@@ -29,9 +29,10 @@ expects to receive the event `Z`.
 
 Stencil currently supports the following tools for testing components:
 
-- [Stencil Test Runner](./stencil-testrunner/01-overview.md): a built-in test runner based on Jest for unit and end-to-end testing with Puppeteer to run within an actual browser in order to provide more realistic results.
+- [Stencil Test Runner](./stencil-testrunner/01-overview.md): a built-in test runner based on Jest v27 - v29 for unit and end-to-end testing with Puppeteer to run within an actual browser in order to provide more realistic results.
 - [WebdriverIO](./webdriverio/01-overview.md): a browser and mobile automation test framework for Node.js that allows you to run component and end-to-end tests across all browsers.
 - [Playwright](./playwright/01-overview.md): an automated end-to-end testing framework that can run across all major browsers
+- [Jest v30+](./04-jest.md): successor of the Stencil Test Runner for unit testing support in Jest v30 and up.
 
 :::info
 

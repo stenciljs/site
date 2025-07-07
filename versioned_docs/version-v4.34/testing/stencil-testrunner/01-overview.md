@@ -11,6 +11,12 @@ If you created a project using `npm init stencil`, these libraries were installe
 
 To view current version support for both Jest and Puppeteer, please see the  [Stencil support policy for testing libraries](../../reference/support-policy.md#testing-libraries).
 
+:::note
+
+For users wanting to use Jest v30+, please refer to the [Jest v30+ documentation](../04-jest.md) for setup and configuration instructions.
+
+:::
+
 ## Testing Commands
 
 Stencil tests are run using the command `stencil test`, followed by one or more optional flags:
