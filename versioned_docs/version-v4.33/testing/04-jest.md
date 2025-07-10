@@ -18,7 +18,7 @@ Stencil provides a Jest runner specifically designed for testing Stencil compone
 - 🔧 **TypeScript Support** - Full TypeScript support with proper type definitions
 - 🎨 **Custom Matchers** - Additional Jest matchers for HTML and component testing
 - 📱 **Component Testing** - Test Stencil components in isolation with `newSpecPage()`
-- 📸 **Shadow DOM Testing** - Full support for testing and snapshotting Shadow DOM content
+- 📸 **Shadow DOM Testing** - Full support for testing and capturing Shadow DOM snapshots
 
 ## Installation
 

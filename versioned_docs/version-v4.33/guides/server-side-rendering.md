@@ -49,6 +49,94 @@ This will create the Hydrate Module which you can export separately via:
 }
 ```
 
+## Two SSR Approaches
+
+Stencil provides two distinct strategies for server-side rendering, each designed to solve different challenges and use cases. These approaches emerged from the complex nature of rendering Web Components on the server, where traditional browser APIs don't exist.
+
+### Strategy 1: The Compiler Approach (Universal SSR)
+
+The compiler-based approach, implemented in the `@stencil/ssr` package, works as a build-time plugin that intercepts your code and performs AST (Abstract Syntax Tree) transformations. It transforms components at compile time.
+
+#### How It Works
+
+1. **Build-time interception**: The plugin (Vite or Webpack) receives your JSX code after transformation
+2. **AST analysis**: Parses JavaScript into an Abstract Syntax Tree to identify Stencil components
+3. **Prop analysis**: Analyzes the props being passed to each component
+4. **Pre-rendering**: Calls Stencil's hydrate module to render the component server-side
+5. **Code replacement**: Replaces the original component with a wrapper containing pre-rendered HTML
+
+#### When to Use Compiler-Based SSR
+
+✅ **Multiple framework support**: Need to support Vite, Remix, Next.js, and other meta-frameworks  
+✅ **Performance critical applications**: Where response speed is paramount  
+✅ **Predictable props**: Components with static or build-time determinable data  
+✅ **"Set it and forget it" solutions**: Want minimal runtime complexity  
+
+#### Advantages
+
+- **Universal compatibility**: Works with any React meta-framework
+- **Zero runtime overhead**: No server processing during requests
+- **Handles deep nesting**: Excellent at rendering complex component compositions
+- **Clean separation**: Clear distinction between build-time and runtime concerns
+- **Consistent performance**: Predictable response times
+
+#### Disadvantages
+
+- **Static props only**: Cannot resolve dynamic props at compile time (e.g., `prop={calculateValue()}`)
+- **Build-time configuration required**: Needs plugin setup
+- **Hydration mismatches**: Still prone to occasional client/server differences
+
+### Strategy 2: The Runtime Approach (Next.js Server Components)
+
+The runtime approach leverages Next.js Server Components to perform real-time SSR. When the server encounters a Stencil component, it renders it on-demand during the request cycle.
+
+#### How It Works
+
+1. **Component interception**: Next.js hits a Stencil component during server rendering
+2. **Prop serialization**: Uses `serializeProperty` to handle complex objects, Maps, Sets, and even `Infinity`
+3. **Children transformation**: Attempts to transform React children into strings using `react-dom/server`
+4. **Async rendering**: Calls Stencil's `renderToString` (Promise-based) on the server
+5. **React node recreation**: Parses resulting HTML back into React nodes using `html-react-parser`
+
+#### When to Use Runtime-Based SSR
+
+✅ **Next.js commitment**: When you're fully invested in the Next.js ecosystem  
+✅ **Dynamic values**: Props that are highly dynamic or computed at runtime  
+✅ **Light DOM access**: Need to include children in server rendering  
+
+#### Advantages
+
+- **Full prop access**: All props available with resolved values at runtime
+- **Light DOM inclusion**: Can include children during serialization
+- **Dynamic value support**: Handles runtime-computed values perfectly
+- **True isomorphic rendering**: Complete server-client parity
+- **Complex object handling**: Built-in serialization for advanced data types
+
+#### Disadvantages
+
+- **Next.js only**: Requires Server Components support
+- **Dual component management**: Must maintain both client and server wrappers
+- **Performance overhead**: Runtime serialization adds latency
+- **Additional Setup**: Requires importing components from a separate export path, e.g. `my-react-components/next`
+
+### Choosing Your Strategy
+
+Here's the battle-tested decision tree from real-world implementation:
+
+#### Use the Compiler Approach when:
+- You need to support multiple frameworks beyond Next.js
+- Performance is your top priority
+- Your components have predictable, static props
+- You want a "set it and forget it" solution
+- You're building a content-focused site (marketing, docs, blogs)
+
+#### Use the Runtime Approach when:
+- You're committed to Next.js and Server Components
+- You need full Light DOM access for complex compositions
+- Your props are highly dynamic or computed at runtime
+- You're okay with additional complexity for more rendering power
+- You're building highly interactive, data-driven applications
+
 ## Enable SSR for StencilJS
 
 For serializing Stencil components on the server, Stencil uses a package called `@stencil/ssr` which you can install via:
@@ -155,8 +243,18 @@ export const config: Config = {
   namespace: 'component-library',
   outputTargets: [
     reactOutputTarget({
+      /**
+       * tell Stencil where to generate the `components.ts` and `components.server.ts` files
+       */
       outDir: '../component-library-react/src',
+      /**
+       * give Stencil the import name of the hydrate module
+       */
       hydrateModule: 'component-library/hydrate',
+      /**
+       * tell the server component where it would import the client version of the components
+       */
+      clientModule: 'component-library-react',
       serializeShadowRoot: { /* options */ },
     }),
   ],
@@ -181,7 +279,7 @@ If you distribute your React wrapper as a separate package, consider exposing th
       "import": "./dist/index.js",
       "node": "./dist/components.server.js"
     },
-    "./server": {
+    "./next": {
       "types": "./dist/components.server.d.ts",
       "import": "./dist/components.server.js"
     }
@@ -192,7 +290,7 @@ If you distribute your React wrapper as a separate package, consider exposing th
 Now you can use the server-optimized components in your Next.js app:
 
 ```tsx title="/src/app/page.tsx"
-import { MyComponent } from 'component-library-react/server';
+import { MyComponent } from 'component-library-react/next';
 
 export default function Home() {
   return (
@@ -217,17 +315,7 @@ return <MyStencilComponent prop={value} />;
 ##### ⚠️ Disadvantages
 
 * **Nested Stencil components** may fail to render correctly on the server.
-* Child components might not appear until the Stencil runtime hydrates on the client:
-
-```tsx
-// ❌ Nested children may be missing on initial SSR
-return (
-  <MyStencilList>
-    <MyStencilListItem>Foo</MyStencilListItem>
-    <MyStencilListItem>Bar</MyStencilListItem>
-  </MyStencilList>
-);
-```
+* Components using slots may confuse Next.js's `BAILOUT_TO_CLIENT_SIDE_RENDERING` template tags as entries
 
 #### Compiler-Based SSR
 
