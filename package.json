@@ -21,6 +21,7 @@
   "dependencies": {
     "@docusaurus/remark-plugin-npm2yarn": "~3.5.0",
     "@ionic-docs/preset-classic": "^1.3.0",
+    "@signalwire/docusaurus-plugin-llms-txt": "^1.2.1",
     "clsx": "^2.0.0",
     "docusaurus-theme-github-codeblock": "^2.0.2",
     "prism-react-renderer": "^2.3.0",
