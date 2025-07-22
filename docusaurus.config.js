@@ -67,6 +67,24 @@ const config = {
     ],
   ],
 
+  plugins: [
+    [
+      '@signalwire/docusaurus-plugin-llms-txt',
+      {
+        siteTitle: 'StencilJS',
+        siteDescription:
+          'Stencil is a library for building reusable, scalable component libraries. Generate small, blazing fast Web Components that run everywhere.',
+        depth: 2,
+        content: {
+          includeBlog: false,
+          includePages: true,
+          enableMarkdownFiles: true,
+          enableLlmsFullTxt: true,
+        },
+      },
+    ],
+  ],
+
   themes: ['docusaurus-theme-github-codeblock'],
 
   themeConfig:
