@@ -426,6 +426,13 @@ export const config: Config = {
 };
 ```
 
+By default, v-model value is taken from event's `detail.${targetAttr}` property.
+This behavior can be overridden by setting `eventAttr` property on the `ComponentModelConfig`:
+```tsx
+eventAttr: 'detail.nested.value'
+```
+In this example, if event emits a custom structure like `{ detail: { nested: { value: 'some value' } } }`, the `v-model` will be set to `'some value'`.
+
 ### customElementsDir
 
 **Optional**
