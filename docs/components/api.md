@@ -217,18 +217,18 @@ The following primitives can be imported from the `@stencil/core` package and us
   ```
   __Example:__
   ```ts
-  import { Mixin, Component, h } from '@stencil/core'
+  import { Mixin, Component, h, Prop, State } from '@stencil/core'
 
   const aFactory = (Base) => {
-    class A extends Base { propA = A };
+    class A extends Base { private propA = 'A' };
     return A;
   }
   const bFactory = (Base) => {
-    class B extends Base { propB = B };
+    class B extends Base { @Prop() propB = 'B' };
     return B;
   }
   const cFactory = (Base) => {
-    class C extends Base { propC = C };
+    class C extends Base { @State() propC = 'C' };
     return C;
   }
 
