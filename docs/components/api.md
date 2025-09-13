@@ -207,3 +207,37 @@ The following primitives can be imported from the `@stencil/core` package and us
   }
   ```
 
+- **Mixin()**: Compose multiple classes into a single constructor using factory functions.
+
+  __Type:__
+  ```ts
+  <TMixins extends readonly MixinFactory[]>(
+    ...mixinFactories: TMixins
+  ): abstract new (...args: any[]) => UnionToIntersection<InstanceType<ReturnType<TMixins[number]>>>;
+  ```
+  __Example:__
+  ```ts
+  import { Mixin, Component, h, Prop, State } from '@stencil/core'
+
+  const aFactory = (Base) => {
+    class A extends Base { private propA = 'A' };
+    return A;
+  }
+  const bFactory = (Base) => {
+    class B extends Base { @Prop() propB = 'B' };
+    return B;
+  }
+  const cFactory = (Base) => {
+    class C extends Base { @State() propC = 'C' };
+    return C;
+  }
+
+  @Component({
+    tag: 'its-mixing-time',
+  })
+  export class X extends Mixin(aFactory, aFactory, cFactory) {
+    render() {
+      return <div>{this.propA} {this.propB} {this.propC}</div>
+    }
+  }
+  ```
