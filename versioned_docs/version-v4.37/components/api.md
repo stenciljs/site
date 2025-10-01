@@ -220,7 +220,7 @@ The following primitives can be imported from the `@stencil/core` package and us
   import { Mixin, Component, h, Prop, State } from '@stencil/core'
 
   const aFactory = (Base) => {
-    class A extends Base { private propA = 'A' };
+    class A extends Base { propA = 'A' };
     return A;
   }
   const bFactory = (Base) => {
