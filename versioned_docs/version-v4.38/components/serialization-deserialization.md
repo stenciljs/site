@@ -7,7 +7,7 @@ slug: /serialization
 
 # Serialization & Deserialization
 
-Custom elements interact with the DOM either via HTML [attributes](https://open-wc.org/guides/knowledge/attributes-and-properties/#attributes) (always strings) or JavaScript [properties](https://open-wc.org/guides/knowledge/attributes-and-properties/#properties). Stencil automatically tries to keep properties and attributes in-sync via **serialization** (turning properties into strings) and **deserialization** (turning strings back into properties).
+Custom elements interact with the DOM either via HTML [attributes](https://open-wc.org/guides/knowledge/attributes-and-properties/#attributes) (always strings) or JavaScript [properties](https://open-wc.org/guides/knowledge/attributes-and-properties/#properties). Stencil automatically tries to keep properties and attributes in-sync when possible via **serialization** (turning properties into strings) and **deserialization** (turning strings back into properties).
 
 For example, if you have a component defined like this:
 
@@ -16,7 +16,9 @@ For example, if you have a component defined like this:
   tag: 'my-component',
 })
 export class MyComponent {
-  @Prop({ reflect: true }) myNumber: number; // Stencil 'sees' this as a number type
+  // Stencil 'sees' this as a number type. 
+  // Numbers are easy to convert to/from strings
+  @Prop({ reflect: true }) myNumber: number; 
 }
 ```
 
@@ -51,7 +53,7 @@ Stencil will automatically deserialize the attribute back to the property:
 console.log(myComponent.myNumber); // 43
 ```
 
-Most of the time Stencil's automatic serialization and deserialization is enough, however there are cases where you might want to customize this behavior, especially when dealing with complex data.
+Most of the time Stencil's automatic serialization and deserialization is enough - especially with primitive data types, however there are cases where you might want to customize this behavior, especially when dealing with complex data.
 
 
 ## The PropSerializer Decorator (`@PropSerializer()`)
