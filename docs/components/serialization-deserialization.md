@@ -56,12 +56,12 @@ console.log(myComponent.myNumber); // 43
 Most of the time Stencil's automatic serialization and deserialization is enough - especially with primitive data types, however there are cases where you might want to customize this behavior, especially when dealing with complex data.
 
 
-## The PropSerializer Decorator (`@PropSerializer()`)
+## The PropSerialize Decorator (`@PropSerialize()`)
 
-The `@PropSerializer()` decorator allows you to define custom serialization logic; converting a JavaScript property to a attribute string. The decorator accepts a single argument; the name of the class member `@Prop()` it is associated with. A method decorated with `@PropSerializer()` will automatically run when its associated property changes.
+The `@PropSerialize()` decorator allows you to define custom serialization logic; converting a JavaScript property to a attribute string. The decorator accepts a single argument; the name of the class member `@Prop()` it is associated with. A method decorated with `@PropSerialize()` will automatically run when its associated property changes.
 
 ```tsx
-import { Component, Prop, PropSerializer } from '@stencil/core';
+import { Component, Prop, PropSerialize } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
@@ -69,7 +69,7 @@ import { Component, Prop, PropSerializer } from '@stencil/core';
 export class MyComponent {
   @Prop() aStringArray: string[];
 
-  @PropSerializer('aStringArray')
+  @PropSerialize('aStringArray')
   serializeStringArray(value: string[]) {
     try {
       return JSON.stringify(value); // must return a string
@@ -93,12 +93,12 @@ Becomes:
 <my-component a-string-array='["Hello","World"]'></my-component>
 ```
 
-## The AttrDeserializer Decorator (`@AttrDeserializer()`)
+## The AttrDeserialize Decorator (`@AttrDeserialize()`)
 
-The `@AttrDeserializer()` decorator allows you to define custom deserialization logic; converting an attribute string to a JavaScript property. The decorator accepts a single argument; the name of the class member `@Prop()` it is associated with. A method decorated with `@AttrDeserializer()` will automatically run when its associated attribute changes.
+The `@AttrDeserialize()` decorator allows you to define custom deserialization logic; converting an attribute string to a JavaScript property. The decorator accepts a single argument; the name of the class member `@Prop()` it is associated with. A method decorated with `@AttrDeserialize()` will automatically run when its associated attribute changes.
 
 ```tsx
-import { Component, Prop, AttrDeserializer } from '@stencil/core';
+import { Component, Prop, AttrDeserialize } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
@@ -106,7 +106,7 @@ import { Component, Prop, AttrDeserializer } from '@stencil/core';
 export class MyComponent {
   @Prop() aStringArray: string[];
 
-  @AttrDeserializer('aStringArray')
+  @AttrDeserialize('aStringArray')
   deserializeStringArray(value: string): string[] | null {
     try {
       return JSON.parse(value);
@@ -132,13 +132,13 @@ const myComponent = document.querySelector('my-component');
 console.log(myComponent.aStringArray); // ['Hello', 'World']
 ```
 
-## Practical uses of PropSerializer
+## Practical uses of PropSerialize
 
-Practically speaking, there is little disadvantage in using a `@AttrDeserializer()` on a complex property; it just adds another method for users to provide data to your component.
+Practically speaking, there is little disadvantage in using a `@AttrDeserialize()` on a complex property; it just adds another method for users to provide data to your component.
 
-The use-cases around using `@PropSerializer()` is slightly less obvious as in general, [it is not considered best practice to reflect complex data (like objects or arrays) as attributes](https://web.dev/articles/custom-elements-best-practices#aim-to-only-accept-rich-data-objects,-arrays-as-properties.) 
+The use-cases around using `@PropSerialize()` is slightly less obvious as in general, [it is not considered best practice to reflect complex data (like objects or arrays) as attributes](https://web.dev/articles/custom-elements-best-practices#aim-to-only-accept-rich-data-objects,-arrays-as-properties.) 
 
-The following example illustrates a practical use case for `@PropSerializer()` using the [hydrate script output](../guides/hydrate-app.md) on a server we can fetch and serialize complex data to an attribute. When the same component loads in a browser, the component can de-serialize the data immediately without having to do another fetch. 
+The following example illustrates a practical use case for `@PropSerialize()` using the [hydrate script output](../guides/hydrate-app.md) on a server we can fetch and serialize complex data to an attribute. When the same component loads in a browser, the component can de-serialize the data immediately without having to do another fetch. 
 
 ```tsx
 import { AttrDeserialize, Build, Component, h, Prop, PropSerialize } from '@stencil/core';
