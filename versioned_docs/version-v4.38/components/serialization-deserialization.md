@@ -51,7 +51,7 @@ Stencil will automatically deserialize the attribute back to the property:
 console.log(myComponent.myNumber); // 43
 ```
 
-Most of the time Stencil's automatic serialization and deserialization is enough, however there are cases where you might want to customize this behaviour, especially when dealing with complex data.
+Most of the time Stencil's automatic serialization and deserialization is enough, however there are cases where you might want to customize this behavior, especially when dealing with complex data.
 
 
 ## The PropSerializer Decorator (`@PropSerializer()`)
