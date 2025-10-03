@@ -12,14 +12,6 @@ allows Stencil components to participate in a rich way in HTML forms,
 integrating with native browser features for validation and accessibility while
 maintaining encapsulation and control over their styling and presentation.
 
-:::caution
-Browser support for the APIs that this feature depends on is still not
-universal[^1] and the Stencil team has no plans at present to support or
-incorporate any polyfills for the browser functionality. Before you ship
-form-associated Stencil components make sure that the browsers you need to
-support have shipped the necessary APIs.
-:::
-
 ## Creating a Form-Associated Component
 
 A form-associated Stencil component is one which sets the new [`formAssociated`](./component.md#formassociated)
@@ -295,4 +287,3 @@ subject](https://web.dev/articles/more-capable-form-controls#restoring-form-stat
 - [ElementInternals and Form-Associated Custom Elements](https://webkit.org/blog/13711/elementinternals-and-form-associated-custom-elements/) from the WebKit blog
 - [Web.dev post detailing how form-associated lifecycle callbacks work](https://web.dev/articles/more-capable-form-controls#lifecycle_callbacks)
 
-[^1]: See https://caniuse.com/?search=attachInternals for up-to-date adoption estimates.

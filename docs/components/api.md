@@ -23,6 +23,8 @@ Once all the metadata has been collected, all the decorators are removed from th
 - [@Method()](./methods.md) declares an exposed public method
 - [@Event()](./events.md#event-decorator) declares a DOM event the component might emit
 - [@Listen()](./events.md#listen-decorator) listens for DOM events
+- [@AttrDeserialize()](./serialization-deserialization.md#the-attrdeserialize-decorator-attrdeserialize) declares a hook that translates a component's attribute string to a JS property
+- [@PropSerialize()](./serialization-deserialization.md#the-propserialize-decorator-propserialize) declares a hook that translates a component's JS property to an attribute string
 
 
 ## Lifecycle hooks
