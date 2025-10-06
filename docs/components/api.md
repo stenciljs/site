@@ -243,3 +243,8 @@ The following primitives can be imported from the `@stencil/core` package and us
     }
   }
   ```
+
+:::caution
+If your Stencil component library uses `Mixin()` (or `extends`) and *might* be used by other Stencil component libraries, ensure that all mixed-in factories are imported directly and **not** via barrel files. 
+The static-analysis that Stencil uses to find mixed-in classes does not work within 3rd party (node_module) barrel files.
+:::
