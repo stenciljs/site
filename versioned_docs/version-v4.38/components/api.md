@@ -219,17 +219,17 @@ The following primitives can be imported from the `@stencil/core` package and us
   ```
   __Example:__
   ```ts
-  import { Mixin, MixinFactory, Component, h, Prop, State } from '@stencil/core'
+  import { Mixin, MixedInCtor, Component, h, Prop, State } from '@stencil/core'
 
-  const aFactory: MixinFactory = (Base) => {
+  const aFactory: <B extends MixedInCtor>(Base: B) => {
     class A extends Base { propA = 'A' };
     return A;
   }
-  const bFactory: MixinFactory = (Base) => {
+  const bFactory: <B extends MixedInCtor>(Base: B) => {
     class B extends Base { @Prop() propB = 'B' };
     return B;
   }
-  const cFactory: MixinFactory = (Base) => {
+  const cFactory: <B extends MixedInCtor>(Base: B) => {
     class C extends Base { @State() propC = 'C' };
     return C;
   }
@@ -245,6 +245,6 @@ The following primitives can be imported from the `@stencil/core` package and us
   ```
 
 :::caution
-If your Stencil component library uses `Mixin()` (or `extends`) and *might* be used by other Stencil component libraries, ensure that all mixed-in factories are imported directly and **not** via barrel files. 
+If your Stencil component library uses `Mixin()` (or `extends`) and *might* be used by other Stencil component libraries, ensure that all mixed-in factories are imported directly and **not** via [barrel files](https://basarat.gitbook.io/typescript/main-1/barrel). 
 The static-analysis that Stencil uses to find mixed-in classes does not work within 3rd party (node_module) barrel files.
 :::
