@@ -35,14 +35,10 @@ Create a `.storybook/main.ts` file with the following configuration:
 
 ```ts
 const config = {
-  stories: ["../src/**/*.stories.@(js|jsx|ts|tsx)"],
-  addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-interactions",
-  ],
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-interactions'],
   framework: {
-    name: "@stencil/storybook-plugin"
+    name: '@stencil/storybook-plugin',
   },
 };
 
@@ -74,6 +70,61 @@ If your components rely on global stylesheets (e.g., a design system or componen
 ```
 
 This ensures all your components render correctly with the required styles in place.
+
+### Auto-Generate Props Documentation
+
+Storybook can automatically generate comprehensive props tables, method documentation, event listings, slots, shadow parts, and CSS variables for your Stencil components. This is done by leveraging Stencil's documentation generation capabilities.
+
+#### Configure Documentation Output
+
+First, add the `docs-json` output target to your `stencil.config.ts`:
+
+```ts
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  // ... other config options
+  outputTargets: [
+    // ... other output targets
+    {
+      type: 'docs-json',
+      file: './custom-elements.json',
+    },
+  ],
+};
+```
+
+After building your Stencil project, this will generate a `custom-elements.json` file containing detailed metadata about all your components.
+
+#### Load the Component Manifest
+
+Update your `.storybook/preview.tsx` to load and register this manifest:
+
+```ts
+// .storybook/preview.tsx
+import { defineCustomElements } from '../loader/index.js';
+import { setCustomElementsManifest } from '@stencil/storybook-plugin';
+import customElements from '../custom-elements.json';
+
+/**
+ * Registers all custom elements in the Storybook preview.
+ */
+defineCustomElements();
+
+/**
+ * Loads and registers component metadata for Storybook.
+ * This enables automatic generation of props, methods, events, slots, shadow parts, and CSS variables tables.
+ */
+setCustomElementsManifest(customElements);
+```
+
+This configuration will automatically:
+
+- Generate props documentation with descriptions
+- Auto-assign appropriate controls for simple types (string, number, boolean)
+- Display available methods, events, slots, shadow parts, and CSS custom properties
+
+For advanced control customization, you can still manually specify `argTypes` in your story definitions to override or extend the automatic configuration.
 
 ### Add a Script
 
