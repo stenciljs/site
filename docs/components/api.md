@@ -221,15 +221,15 @@ The following primitives can be imported from the `@stencil/core` package and us
   ```ts
   import { Mixin, MixedInCtor, Component, h, Prop, State } from '@stencil/core'
 
-  const aFactory: <B extends MixedInCtor>(Base: B) => {
+  const aFactory = <B extends MixedInCtor>(Base: B) => {
     class A extends Base { propA = 'A' };
     return A;
   }
-  const bFactory: <B extends MixedInCtor>(Base: B) => {
+  const bFactory = <B extends MixedInCtor>(Base: B) => {
     class B extends Base { @Prop() propB = 'B' };
     return B;
   }
-  const cFactory: <B extends MixedInCtor>(Base: B) => {
+  const cFactory = <B extends MixedInCtor>(Base: B) => {
     class C extends Base { @State() propC = 'C' };
     return C;
   }
