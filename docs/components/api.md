@@ -208,6 +208,28 @@ The following primitives can be imported from the `@stencil/core` package and us
     stencilComponent.componentOnReady().then(() => { ... })
   }
   ```
+  
+- **resolveVar()**: returns the string value of a given variable at compile time. For use within decorators.
+
+  __Type:__ `(variable: T) => string`<br />
+  __Example:__
+  ```tsx
+  import { Listen, Event, resolveVar } from '@stencil/core`
+  
+  const COMPONENT_A_EVENT: string = "componentAEvent";
+  const EVENTS = {
+    COMPONENT_B_EVENT: "componentBEvent"
+  };
+
+  // inside Component A
+
+  @Event({ eventName: COMPONENT_A_EVENT }) myEvent;
+  
+  @Listen(EVENTS.COMPONENT_B_EVENT)
+  listenHandler(){
+  
+  }
+  ```
 
 - **Mixin()**: Compose multiple classes into a single constructor using factory functions.
 
