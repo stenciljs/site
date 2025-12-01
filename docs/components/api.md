@@ -223,9 +223,9 @@ The following primitives can be imported from the `@stencil/core` package and us
 
   // inside Component A
 
-  @Event({ eventName: COMPONENT_A_EVENT }) myEvent;
+  @Event({ eventName: resolveVar(COMPONENT_A_EVENT) }) myEvent;
   
-  @Listen(EVENTS.COMPONENT_B_EVENT)
+  @Listen(resolveVar(EVENTS.COMPONENT_B_EVENT))
   listenHandler(){
   
   }
