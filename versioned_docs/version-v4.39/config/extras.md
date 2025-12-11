@@ -174,7 +174,7 @@ It is possible to assign data to the actual `<script>` element's `data-opts` pro
 
 ### slotChildNodesFix
 
-For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled to simulate the same behavior. However, the host element's `childNodes` and `children` getters are not patched to only show the child nodes and elements of the default slot. Defaults to `false`.
+For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled to simulate the same behavior. The host element's `childNodes` and `children` getters are patched to only show the child nodes and elements of the default slot. Defaults to `false`.
 
 ### addGlobalStyleToComponents
 
