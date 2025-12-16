@@ -298,7 +298,7 @@ This approach ensures your components are adaptable and can dynamically switch b
 
 ## Global styles
 
-While most styles are usually scoped to each component, sometimes it's useful to have styles that are available to all the components in your project. To create styles that are globally available, start by creating a global stylesheet. For example, you can create a folder in your `src` directory called `global` and create a file called `global.css` within that. Most commonly, this file is used to declare CSS custom properties on the root element via the `:root` pseudo-class. This is because styles provided via the `:root` pseudo-class can pass through the shadow boundary. For example, you can define a primary color that all your components can use.
+While most styles are usually scoped to each component, sometimes it's useful to have styles that are available to all the components in your project. To create styles that are globally available, start by creating a global stylesheet. For example, you can create a folder in your `src` directory called `global` and create a file called `global.css` within that. Most commonly, this file is used to declare CSS custom properties on the root element via the `:root` pseudo-class. For example, you can define a primary color that all your components can use.
 
 ```css
 :root {
@@ -371,4 +371,10 @@ The `:host()` function allows you to select the host element of a component when
 The `:host()` selector in global styles will only affect components that use shadow DOM. For scoped components, you should use regular tag selectors in your global styles.
 :::
 
-This behavior can be turned off via the [`extras.addGlobalStyleToComponents`](../config/extras.md#addglobalstyletocomponents) flag. 
+This feature enables components that use global styles to be distributed as a single component script. Since the styles are embedded, a user can import the component to a project without needing the `global.css`.
+
+Constructible Stylesheets can be turned off via the [`extras.addGlobalStyleToComponents`](../config/extras.md#addglobalstyletocomponents) flag. 
+
+:::note
+When using Server Side Rendering, Constructible Stylesheets cannot be applied until components are hydrated on the client. This may cause a flash of unstyled content when the page is first displayed to the user. 
+:::
