@@ -70,7 +70,9 @@ This is useful for validation or the handling of side effects.
 
 :::info
 By default, the `@Watch()` decorator does not fire when a component initially loads.
-Use `@Watch('propName', {immediate: true})` to have the decorated method fire when the component first loads.
+Use `@Watch('propName', {immediate: true})` to have the decorated method fire when the component first loads. 
+`immediate` watchers will be invoked before the component's first render, so be careful when trying to access DOM elements
+that may not yet be available.
 :::
 
 ### Watching Native HTML Attributes

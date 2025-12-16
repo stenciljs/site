@@ -63,14 +63,17 @@ In the example above, there are four `@Watch()` decorators.
 The first decorates `watchPropHandler`, which will fire when the class member `activated` changes.
 The second decorates `watchStateHandler`, which will fire when the class member `busy` changes.
 The third and fourth decorators both decorate `watchMultiple`, which will fire when either `activated` or `busy` change.
-Passing `{immediate: true}` as the second argument to `@Watch()` causes the decorated method to fire when the component initially loads, in addition to when the watched member changes.
+Passing `{immediate: true}` as the second argument to `@Watch()` causes the decorated 
+method to fire when the component initially loads, in addition to when the watched member changes.
 
 When fired, the decorated method will receive the old and new values of the prop/state.
 This is useful for validation or the handling of side effects.
 
 :::info
 By default, the `@Watch()` decorator does not fire when a component initially loads.
-Use `@Watch('propName', {immediate: true})` to have the decorated method fire when the component first loads.
+Use `@Watch('propName', {immediate: true})` to have the decorated method fire when the component first loads. 
+`immediate` watchers will be invoked before the component's first render, so be careful when trying to access DOM elements
+that may not yet be available.
 :::
 
 ### Watching Native HTML Attributes
