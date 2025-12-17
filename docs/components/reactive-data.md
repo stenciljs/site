@@ -59,11 +59,13 @@ export class LoadingIndicator {
 }
 ```
 
-In the example above, there are four `@Watch()` decorators.
-The first decorates `watchPropHandler`, which will fire when the class member `activated` changes.
-The second decorates `watchStateHandler`, which will fire when the class member `busy` changes.
-The third and fourth decorators both decorate `watchMultiple`, which will fire when either `activated` or `busy` change.
-Passing `{immediate: true}` as the second argument to `@Watch()` causes the decorated method to fire when the component initially loads, in addition to when the watched member changes.
+In the example above, there are four `@Watch()` decorators:
+- The first decorates `watchPropHandler`, which will fire when the class member `activated` changes.
+- The second decorates `watchStateHandler`, which will fire when the class member `busy` changes.
+- The third and fourth decorators both decorate `watchMultiple`, which will fire when either `activated` or `busy` change. 
+
+Passing `{immediate: true}` as the second argument to `@Watch()` causes the decorated 
+method to fire when the component initially loads, in addition to when the watched member changes.
 
 When fired, the decorated method will receive the old and new values of the prop/state.
 This is useful for validation or the handling of side effects.
