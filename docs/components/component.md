@@ -184,7 +184,7 @@ export class TodoList {
 
 **Optional**
 
-**Type: `boolean | { delegatesFocus: boolean }`**
+**Type: `boolean | { delegatesFocus?: boolean, slotAssignment?: 'manual' | 'named' }`**
 
 **Default: `false`**
 
@@ -200,6 +200,10 @@ When `delegatesFocus` is set to `true`, the component will have `delegatesFocus:
 When `delegatesFocus` is `true` and a non-focusable part of the component is clicked:
 - the first focusable part of the component is given focus
 - the component receives any available `focus` styling
+
+When `slotAssignment` is set to `'manual'` or `'named'`, the component will have `slotAssignment` added to its shadow DOM.
+
+`slotAssignment: 'manual'` enables [manual slot assignment](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/slotAssignment) (otherwise known as [imperative slot assignment](https://github.com/WICG/webcomponents/blob/gh-pages/proposals/Imperative-Shadow-DOM-Distribution-API.md)) for the component.
 
 If `shadow` is set to `false`, the component will not use native shadow DOM encapsulation.
 
