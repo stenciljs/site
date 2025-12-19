@@ -393,4 +393,4 @@ The `my-parent-component` includes a reference to the `my-embedded-component` in
 
 ## Component Architecture Patterns
 
-Stencil supports advanced component architecture patterns including class inheritance and composition. Learn more about organizing component logic with controllers in the [Extends & Mixins](./extends.md) guide.
+Stencil supports advanced component architecture patterns including class inheritance and composition. Learn more about organizing component logic with controllers in the [Extends & Mixins](../guides/extends.md) guide.

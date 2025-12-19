@@ -302,7 +302,7 @@ If your Stencil component library uses `Mixin()` (or `extends`) and *might* be u
 The static-analysis that Stencil uses to find mixed-in classes does not work within 3rd party (node_module) barrel files.
 :::
 
-For detailed guidance on using `Mixin()` and `extends` for component architecture, including when to use inheritance vs composition patterns, see the [Extends & Mixins](./extends.md) guide.
+For detailed guidance on using `Mixin()` and `extends` for component architecture, including when to use inheritance vs composition patterns, see the [Extends & Mixins](../guides/extends.md) guide.
 
 ### [**setTagTransformer()** and **tagTransform()**](../guides/tag-transformation.md): 
 
