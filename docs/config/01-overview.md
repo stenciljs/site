@@ -108,6 +108,20 @@ Stencil will cache build results in order to speed up rebuilds. To disable this 
 enableCache: true
 ```
 
+## excludeComponents
+
+*default: `[]`*
+
+An array of component tag names to exclude from production builds.
+Useful to remove test, demo or experimental components from final output.
+
+Supports glob patterns for matching multiple components:
+- `['demo-*']` - Excludes all components starting with "demo-"
+- `['*-test', '*-demo']` - Excludes components ending with "-test" or "-demo"
+- `['my-component']` - Excludes a specific component
+
+Components matching these patterns will be completely excluded from all output targets when *not* using the `--dev` flag.
+
 ## extras
 
 Please see the [Extras docs](./extras.md).
