@@ -119,7 +119,7 @@ The following primitives can be imported from the `@stencil/core` package and us
 
 ### [**h()**](./templating-and-jsx.md): 
 
-Turns JSX syntax into Virtual DOM elements. Read more on the [Templating and JSX](./templating-and-jsx.md#h) page.
+Turns JSX syntax into Virtual DOM elements. Read more on the [Templating and JSX](./templating-and-jsx.md#the-h-and-fragment-functions) page.
 
 ### **render()**: 
 
