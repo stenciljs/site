@@ -42,3 +42,4 @@ vnode
 webapps
 wdio
 webdriverio
+hyperscript
