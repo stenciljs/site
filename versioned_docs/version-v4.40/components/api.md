@@ -303,6 +303,6 @@ The static-analysis that Stencil uses to find mixed-in classes does not work wit
 :::
 
 
-### [**setTagTransformer()** and **tagTransform()**](../guides/tag-transformation.md): 
+### [**setTagTransformer()** and **transformTag()**](../guides/tag-transformation.md): 
 
 Manage tag name transformation at runtime. Refer to the [Tag Transformation](../guides/tag-transformation.md) page for usage info.
