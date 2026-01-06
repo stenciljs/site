@@ -119,9 +119,11 @@ The following primitives can be imported from the `@stencil/core` package and us
 
 ### [**h()**](./templating-and-jsx.md): 
 
-It's used within the `render()` to turn the JSX into Virtual DOM elements.
+Turns JSX syntax into Virtual DOM elements. Read more on the [Templating and JSX](./templating-and-jsx.md#the-h-and-fragment-functions) page.
 
-- **render()**: a utility method to render a virtual DOM created by `h()` into a container.
+### **render()**: 
+
+A utility method to render a virtual DOM created by `h()` into a container.
 
   __Type:__ `(vnode: VNode, container: Element) => void`
   __Example:__
@@ -304,6 +306,6 @@ The static-analysis that Stencil uses to find mixed-in classes does not work wit
 
 For detailed guidance on using `Mixin()` and `extends` for component architecture, including when to use inheritance vs composition patterns, see the [Extends & Mixins](../guides/extends.md) guide.
 
-### [**setTagTransformer()** and **tagTransform()**](../guides/tag-transformation.md): 
+### [**setTagTransformer()** and **transformTag()**](../guides/tag-transformation.md): 
 
 Manage tag name transformation at runtime. Refer to the [Tag Transformation](../guides/tag-transformation.md) page for usage info.

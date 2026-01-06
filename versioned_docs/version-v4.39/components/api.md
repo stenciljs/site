@@ -304,6 +304,6 @@ The static-analysis that Stencil uses to find mixed-in classes does not work wit
 
 For detailed guidance on using `Mixin()` and `extends` for component architecture, including when to use inheritance vs composition patterns, see the [Extends & Mixins](../guides/extends.md) guide.
 
-### [**setTagTransformer()** and **tagTransform()**](../guides/tag-transformation.md): 
+### [**setTagTransformer()** and **transformTag()**](../guides/tag-transformation.md): 
 
 Manage tag name transformation at runtime. Refer to the [Tag Transformation](../guides/tag-transformation.md) page for usage info.
