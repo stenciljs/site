@@ -292,7 +292,7 @@ Compose multiple classes into a single constructor using factory functions.
   @Component({
     tag: 'its-mixing-time',
   })
-  export class X extends Mixin(aFactory, aFactory, cFactory) {
+  export class X extends Mixin(aFactory, bFactory, cFactory) {
     render() {
       return <div>{this.propA} {this.propB} {this.propC}</div>
     }
