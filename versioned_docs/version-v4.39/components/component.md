@@ -390,3 +390,7 @@ export class MyParentComponent {
 ```
 
 The `my-parent-component` includes a reference to the `my-embedded-component` in the `render()` function.
+
+## Component Architecture Patterns
+
+Stencil supports advanced component architecture patterns including class inheritance and composition. Learn more about organizing component logic with controllers in the [Extends & Mixins](../guides/extends.md) guide.
