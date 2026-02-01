@@ -68,8 +68,8 @@ The generated docs JSON data will in the type of `JsonDocs` which consists of ma
 | `events`    | Array of metadata objects for each usage of the [`@Event` decorator](../components/events.md#event-decorator) on the current component. |
 | `listeners`    | Array of metadata objects for each usage of the [`@Listen` decorator](../components/events.md#listen-decorator) on the current component. |
 | `styles`    | Array of objects documenting annotated [CSS variables](./docs-json.md#css-variables) used in the current component's CSS. |
-| `slots`    | Array of objects documenting [slots](./docs-json.md#slots) which are tagged with `@slot` in the current component's JSDoc comment. |
-| `parts`    |  Array of objects derived from `@part` tags in the current component's JSDoc comment. |
+| `slots`    | Array of objects documenting [slots](./docs-json.md#slots-and-parts) which are tagged with `@slot` in the current component's JSDoc comment. |
+| `parts`    |  Array of objects documenting [CSS Parts](./docs-json.md#slots-and-parts) which are derived from `@part` tags in the current component's JSDoc comment. |
 | `dependents`    |  Array of components where current component is used  |
 | `dependencies`    |  Array of components which is used in current component  |
 | `dependencyGraph`    | Describes a tree of components coupling |

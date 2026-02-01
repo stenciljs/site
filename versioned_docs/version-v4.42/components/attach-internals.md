@@ -12,7 +12,7 @@ This allows you to leverage features such as [Custom States](https://developer.m
 
 ## Form Association
 
-Read the dedicated guide on [Form Associated Components](./form-associated) and how to use `@AttachInternals` there.
+Read the dedicated guide on [Form Associated Components](./form-associated.md) and how to use `@AttachInternals` there.
 
 ## Custom States
 
