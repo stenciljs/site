@@ -153,12 +153,13 @@ latter you'll need to have the
 and configured.
 :::
 
-## Slots
+## Slots and CSS Parts
 
 If one of your Stencil components makes use of
 [slots](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot) for
-rendering children you can document them by using the `@slot` JSDoc tag in the
-component's comment.
+rendering children or [CSS Parts](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) for styling, 
+you can document them by using the `@slot` and `@part` JSDoc tags in the
+component's comments.
 
 For instance, if you had a `my-button` component with a slot you might document
 it like so:
@@ -168,6 +169,8 @@ import { Component, h } from '@stencil/core';
 
 /**
  * @slot buttonContent - Slot for the content of the button
+ * 
+ * @part button - The button element
  */
 @Component({
   tag: 'my-button',
@@ -176,7 +179,7 @@ import { Component, h } from '@stencil/core';
 })
 export class MyButton {
   render() {
-    return <button><slot name="buttonContent"></slot></button>
+    return <button part="button"><slot name="buttonContent"></slot></button>
   }
 }
 ```
@@ -187,7 +190,13 @@ This would show up in the generated JSON file like so:
 "slots": [
   {
     "name": "buttonContent",
-    "description": "Slot for the content of the button"
+    "docs": "Slot for the content of the button"
+  }
+],
+"parts": [
+  {
+    "name": "button",
+    "docs": "The button element"
   }
 ]
 ```

@@ -9,6 +9,7 @@ slug: /doc-generation
 
 - [`docs-readme`: Documentation readme files formatted in markdown](./docs-readme.md)
 - [`docs-json`: Documentation data formatted in JSON](./docs-json.md)
+- [`docs-custom-elements-manifest`: Custom Elements Manifest (CEM) format](./docs-custom-elements-manifest.md)
 - [`docs-custom`: Custom documentation generation](./docs-custom.md)
 - [`docs-vscode`: Documentation generation for VS Code](./docs-vscode.md)
 - [`stats`: Stats about the compiled files](./docs-stats.md)
