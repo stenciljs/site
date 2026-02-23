@@ -219,6 +219,7 @@ In your project's `stencil.config.ts`, add the `reactOutputTarget` configuration
 
 ```ts title="stencil.config.ts"
 import { reactOutputTarget } from '@stencil/react-output-target';
+import { Config } from "@stencil/core";
 
 export const config: Config = {
   namespace: 'stencil-library',
