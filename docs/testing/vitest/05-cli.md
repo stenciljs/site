@@ -104,7 +104,7 @@ The `stencil-test` CLI supports most Stencil CLI options and all Vitest CLI opti
 | `--serve` | Start a dev server alongside tests |
 | `--port <number>` | Specify the dev server port |
 
-For full Stencil CLI options, see the [Stencil CLI documentation](../../core/cli.md).
+For full Stencil CLI options, see the [Stencil CLI documentation](../../config/cli.md).
 
 ### Vitest Options
 
