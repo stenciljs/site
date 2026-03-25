@@ -16,11 +16,7 @@ Add the following scripts to your `package.json`:
 ```json title="package.json"
 {
   "scripts": {
-    "test": "stencil-test",
-    "test:watch": "stencil-test --watch",
-    "test:e2e": "stencil-test --project browser",
-    "test:spec": "stencil-test --project spec",
-    "test:coverage": "stencil-test --coverage"
+    "test": "stencil-test"
   }
 }
 ```
@@ -36,9 +32,6 @@ stencil-test
 # Watch mode (rebuilds on component changes, interactive Vitest)
 stencil-test --watch
 
-# Watch mode with dev server
-stencil-test --watch --serve
-
 # Production build before testing
 stencil-test --prod
 
@@ -50,21 +43,6 @@ stencil-test button.spec.ts
 
 # Test specific project
 stencil-test --project browser
-```
-
-### Running Specific Test Projects
-
-If you have multiple test projects configured (unit, spec, browser), you can run them individually:
-
-```bash
-# Run only spec tests
-stencil-test --project spec
-
-# Run only browser tests
-stencil-test --project browser
-
-# Run only unit tests
-stencil-test --project unit
 ```
 
 ### Watch Mode
@@ -96,24 +74,7 @@ stencil-test --prod
 
 The `stencil-test` CLI supports most Stencil CLI options and all Vitest CLI options.
 
-### Stencil Options
-
-| Option | Description |
-| ------ | ----------- |
-| `--prod` | Run a production build before testing |
-| `--serve` | Start a dev server alongside tests |
-| `--port <number>` | Specify the dev server port |
-
 For full Stencil CLI options, see the [Stencil CLI documentation](../../config/cli.md).
-
-### Vitest Options
-
-| Option | Description |
-| ------ | ----------- |
-| `--watch` | Enable watch mode |
-| `--coverage` | Enable code coverage |
-| `--project <name>` | Run specific test project |
-| `--reporter <name>` | Specify test reporter |
 
 For full Vitest CLI options, see the [Vitest CLI documentation](https://vitest.dev/guide/cli.html).
 
@@ -166,30 +127,10 @@ Add to your `tsconfig.json` for type definitions:
 
 ## CI/CD Integration
 
-### GitHub Actions Example
-
-```yaml title=".github/workflows/test.yml"
-name: Tests
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run test -- --coverage
-      - uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage/lcov.info
-```
-
 ### Running Browser Tests in CI
 
-For browser tests, ensure you have the necessary browser dependencies:
+For browser tests, ensure you have the necessary browser dependencies. 
+For example, to run Playwright with Chromium in GitHub Actions:
 
 ```yaml
 jobs:
@@ -202,5 +143,5 @@ jobs:
           node-version: '20'
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: npm run test -- --project browser
 ```

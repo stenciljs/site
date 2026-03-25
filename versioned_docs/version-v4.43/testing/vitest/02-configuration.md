@@ -100,6 +100,7 @@ For spec tests, you can choose between different DOM implementations using `envi
     environmentOptions: {
       stencil: {
         // Options: 'mock-doc' (default), 'jsdom', 'happy-dom'
+        // *note: jsdom and happy-dom require additional dependencies*
         domEnvironment: 'jsdom'
       },
     },
