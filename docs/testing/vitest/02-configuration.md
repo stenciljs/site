@@ -99,7 +99,7 @@ For spec tests, you can choose between different DOM implementations using `envi
     environment: 'stencil',
     environmentOptions: {
       stencil: {
-        // Options: 'mock-doc' (default), 'jsdom', 'happy-dom'
+        // *note: jsdom and happy-dom require additional dependencies*
         domEnvironment: 'jsdom'
       },
     },
@@ -165,8 +165,8 @@ export {};
 Depending on your Stencil configuration, you may need to adjust how components are loaded:
 
 - **Default (lazy-load)**: Works with the standard dev build
-- **Production build**: Use `--prod` flag or set `buildDist: true` in your stencil.config to generate production bundles
-- **Custom elements**: If using the `dist-custom-elements` output target, adjust the import path accordingly
+- **Production build**: Use `--prod` flag to generate production bundles
+- **Custom elements**: If using the `dist-custom-elements` output target, adjust the setup file accordingly. If you wish to test this output in `--watch` mode, set `buildDist: true` in your stencil.config
 
 ## TypeScript Configuration
 

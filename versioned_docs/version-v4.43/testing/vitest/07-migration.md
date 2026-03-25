@@ -268,7 +268,7 @@ await import('./dist/test-components/test-components.esm.js');
 
 ### JSX-Based Rendering
 
-Use JSX directly instead of HTML strings:
+Use JSX directly instead of HTML strings (though HTML strings are still supported):
 
 ```tsx
 // Before

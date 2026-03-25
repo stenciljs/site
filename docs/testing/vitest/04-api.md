@@ -11,7 +11,7 @@ Complete reference for the `@stencil/vitest` testing utilities.
 
 ## Render Function
 
-### `render(VNode)`
+### `render(VNode, options?)`
 
 Renders a Stencil component for testing.
 
@@ -21,7 +21,42 @@ import { render, h } from '@stencil/vitest';
 const result = await render(<my-component name="World" />);
 ```
 
-**Returns:**
+### Options
+
+| Option | Type | Default | Description |
+| ------ | ---- | ------- | ----------- |
+| `waitForReady` | `boolean` | `true` | Wait for component hydration before returning |
+| `spyOn` | `SpyOnOptions` | - | Configure spies for methods, props, and lifecycle hooks |
+
+#### `waitForReady`
+
+By default, `render()` waits for components to be fully hydrated before returning. It detects when Stencil applies the hydrated flag (class or attribute) to your component, respecting your `stencil.config` settings.
+
+```tsx
+// Default behavior - waits for hydration
+const { root } = await render(<my-component />);
+
+// Skip hydration wait (useful for pre-ready states)
+const { root } = await render(<my-component />, { waitForReady: false });
+```
+
+#### `spyOn`
+
+Configure spies for component methods, props, and lifecycle hooks. See the [Mocking & Spying](./05-mocking.md) guide for comprehensive documentation.
+
+```tsx
+const { root, spies } = await render(<my-component />, {
+  spyOn: {
+    methods: ['handleClick'],
+    props: ['variant'],
+    lifecycle: ['componentDidLoad'],
+  },
+});
+
+expect(spies?.methods.handleClick).toHaveBeenCalled();
+```
+
+### Return Values
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
@@ -30,6 +65,35 @@ const result = await render(<my-component name="World" />);
 | `setProps` | `(props: object) => Promise<void>` | Update props and wait for changes |
 | `unmount` | `() => void` | Remove the component from the DOM |
 | `spyOnEvent` | `(eventName: string) => EventSpy` | Create a spy for custom events |
+| `spies` | `ComponentSpies \| undefined` | Spy objects when using `spyOn` option |
+
+### Example
+
+```tsx
+import { render, h } from '@stencil/vitest';
+
+const { root, waitForChanges, setProps, unmount, spyOnEvent } = await render(
+  <my-component name="World" />
+);
+
+// Access the element
+expect(root.textContent).toContain('World');
+
+// Update props directly
+root.name = 'Stencil';
+await waitForChanges();
+
+// Or update props via setProps
+await setProps({ name: 'Vitest' });
+
+// Spy on events
+const eventSpy = spyOnEvent('myEvent');
+root.click();
+expect(eventSpy).toHaveReceivedEvent();
+
+// Unmount component
+unmount();
+```
 
 ## Custom Matchers
 
