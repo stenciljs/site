@@ -178,9 +178,13 @@ For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot i
 
 ### addGlobalStyleToComponents
 
-By default, when using the [`globalStyle`](./01-overview.md#globalstyle) config setting, any assigned stylesheet will also be added as a [constructable stylesheet](../components/styling.md#constructable-stylesheets) to each component in the published library. 
+By default, when using the [`globalStyle`](./01-overview.md#globalstyle) config setting, any assigned stylesheet will also be added as a [constructable stylesheet](../components/styling.md#constructable-stylesheets) to each client-rendered component in the published library.
 
-You can turn this behavior off by setting this flag to `false`.
+If you want to also add the `globalStyle` to each component when rendering on the server
+then set this to `true`. If your `globalStyle` sheet is large then doing this may bloat the size
+of your SSR output when using [`declarative-shadow-dom`](../guides/server-side-rendering.md#serializeShadowRoot).
+
+Setting this to `false` will stop `globalStyle` from being added to any component.
 
 ### additionalTagTransformers
 
