@@ -5,17 +5,33 @@ sidebar_label: Overview
 
 # Overview
 
+:::danger Deprecated
+
+**The Stencil Test Runner is deprecated as of Stencil v4.43 and will be removed in Stencil v5.**
+
+We recommend migrating to [@stencil/vitest](../vitest/01-overview.md) for all new and existing projects. See the [migration guide](../vitest/07-migration.md) for detailed instructions on updating your tests.
+
+**Why is this being removed?**
+
+The integrated testing setup, while convenient in 2016 when setting up testing was difficult, has become increasingly problematic:
+
+- **Maintenance burden**: Stencil core needs to offer a different, custom Jest setup for every major version of Jest. This became too burdensome to maintain, which is why users are currently locked to Jest v29.
+- **Spec test limitations**: The `--spec` tests do a "compile lite" on-the-fly for a given component class, then bootstrap it in Stencil's integrated node-dom (MockDoc). This reaches into Stencil's internals, is prone to error, is difficult to make work with classes that use `extends` and is fundamentally not representative of the final output. It also doesn't give you the option to use your node-dom of choice (e.g., happy-dom, jsdom).
+- **E2E test limitations**: The `--e2e` tests are hard-baked to use Puppeteer, which doesn't have the same DevX around browser testing as newer options like Playwright.
+
+**Migration pathway:**
+
+- For `--spec` style tests, migrate to [@stencil/vitest](../vitest/01-overview.md)
+- For `--e2e` style tests that are really component tests, use [@stencil/vitest](../vitest/01-overview.md) with browser mode
+- For true e2e tests (routing, full applications, proper onload initialization), use [@stencil/playwright](../playwright/01-overview.md)
+
+:::
+
 Stencil has a built-in test runner that uses [Jest](https://jestjs.io/) and [Puppeteer](https://pptr.dev/) as its testing libraries, and allows developers to install both libraries using their preferred package manager.
 
 If you created a project using `npm init stencil`, these libraries were installed for you. Depending on when your project was created, you may or may not have the latest supported version installed.
 
-To view current version support for both Jest and Puppeteer, please see the  [Stencil support policy for testing libraries](../../reference/support-policy.md#testing-libraries).
-
-:::note
-
-For users wanting to use Jest v30+, please refer to the [Jest v30+ documentation](../04-jest.md) for setup and configuration instructions.
-
-:::
+To view current version support for both Jest and Puppeteer, please see the [Stencil support policy for testing libraries](../../reference/support-policy.md#testing-libraries).
 
 ## Testing Commands
 

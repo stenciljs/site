@@ -7,35 +7,20 @@ slug: /testing-overview
 
 # Testing
 
-In order to ensure that your Stencil components work the way you expect, Stencil provides testing support out of the
-box. Stencil offers both unit testing and end-to-end testing capabilities.
-
-## Unit Testing vs. End-to-end Testing
-
-Testing within Stencil is broken up into two distinct types: Unit tests and End-to-end (e2e) tests.
-
-There are several philosophies on how testing should be done, and how to differentiate what should be considered a unit
-test versus an end-to-end test. Stencil takes an opinionated stance so developers have a description of each to better
-choose when to use each type of testing:
-
-**Unit tests** focus on testing a component's methods in isolation. For example, when a method is given the argument
-`X`, it should return `Y`.
-
-**End-to-end tests** focus on how the components are rendered in the DOM and how the individual components work
-together. For example, when `my-component` has the `X` attribute, the child component then renders the text `Y`, and
-expects to receive the event `Z`.
+In order to ensure that your Stencil components work in the way you expect, Stencil supports a number of tools enabling unit, spec, component and end-to-end testing.
 
 ## Library Support
 
-Stencil currently supports the following tools for testing components:
+Stencil supports the following for testing components:
 
-- [Stencil Test Runner](./stencil-testrunner/01-overview.md): a built-in test runner based on Jest v27 - v29 for unit and end-to-end testing with Puppeteer to run within an actual browser in order to provide more realistic results.
-- [WebdriverIO](./webdriverio/01-overview.md): a browser and mobile automation test framework for Node.js that allows you to run component and end-to-end tests across all browsers.
-- [Playwright](./playwright/01-overview.md): an automated end-to-end testing framework that can run across all major browsers
-- [Jest v30+](./04-jest.md): successor of the Stencil Test Runner for unit testing support in Jest v30 and up.
+- [@stencil/vitest](./vitest/01-overview.md): First-class testing utilities for Stencil components powered by Vitest. Supports unit tests, spec tests with your choice of node DOM (jsdom, happy-dom, mock-doc), and browser tests with screenshot capabilities. **This is the recommended testing solution for most Stencil projects.**
+- [@stencil/playwright](./playwright/01-overview.md): An automated end-to-end testing framework that can run across all major browsers. Use this for full application testing, routing tests, and scenarios requiring proper browser initialization.
+- [Stencil Test Runner](./stencil-testrunner/01-overview.md) *(Deprecated)*: The legacy built-in test runner based on Jest v27-v29 and Puppeteer. This will be removed in Stencil v5. See the [migration guide](#migrating-from-stencil-test-runner) below.
 
-:::info
+## Migrating from Stencil Test Runner
 
-We are actively working to support a wider range of testing tools, including Playwright. Stay tuned for updates!
+The integrated Stencil Test Runner is deprecated as of Stencil v4.43 and will be removed in Stencil v5. We recommend migrating to the new testing tools:
 
-:::
+- **For `--spec` style tests**: Migrate to [@stencil/vitest](./vitest/01-overview.md). It has a similar API to the current Jest integration but gives you far greater control. You can test against different bundles/outputs, test in a real browser (for accessibility tests, visual regressions, etc.), or pick your node-dom of choice (jsdom, happy-dom, or mock-doc). See the [migration guide](./vitest/07-migration.md) for detailed instructions.
+
+- **For `--e2e` style tests**: Many library authors actually want "component" tests—isolated testing of components that run in a browser. For this, use [@stencil/vitest](./vitest/01-overview.md) with browser mode. For true end-to-end tests (routing, full applications, proper onload initialization), use [@stencil/playwright](./playwright/01-overview.md).
