@@ -11,8 +11,6 @@ slug: /testing-vitest-writing-tests
 
 ## Rendering Components
 
-### Basic Rendering
-
 Use the `render` function to render a component for testing:
 
 ```tsx
@@ -20,52 +18,18 @@ import { render, h, describe, it, expect } from '@stencil/vitest';
 
 describe('my-component', () => {
   it('renders', async () => {
-    const { root } = await render(<my-component name="World" />);
+    const { root, waitForChanges } = await render(<my-component name="World" />);
     expect(root.textContent).toContain('World');
+
+    // Update props and wait for re-render
+    root.name = 'Stencil';
+    await waitForChanges();
+    expect(root.textContent).toContain('Stencil');
   });
 });
 ```
 
-### Render Return Values
-
-The `render` function returns an object with utilities for interacting with the rendered component:
-
-```tsx
-const { root, waitForChanges, setProps, unmount, spyOnEvent } = await render(<my-component />);
-```
-
-| Property | Description |
-| -------- | ----------- |
-| `root` | The rendered component element |
-| `waitForChanges` | Wait for component re-renders after state/prop changes |
-| `setProps` | Update component props and wait for changes |
-| `unmount` | Remove the component from the DOM |
-| `spyOnEvent` | Create a spy for custom events |
-
-### Updating Props
-
-There are two ways to update component props:
-
-```tsx
-const { root, waitForChanges, setProps } = await render(<my-component name="World" />);
-
-// Option 1: Direct property assignment
-root.name = 'Stencil';
-await waitForChanges();
-
-// Option 2: Using setProps
-await setProps({ name: 'Stencil' });
-```
-
-### Unmounting
-
-Clean up by unmounting the component:
-
-```tsx
-const { unmount } = await render(<my-component />);
-// ... run tests
-unmount();
-```
+For the complete render function API including all return values and options, see the [API Reference](./04-api.md#render-function).
 
 ## Event Testing
 

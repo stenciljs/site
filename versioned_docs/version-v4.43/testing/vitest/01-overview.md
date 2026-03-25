@@ -132,4 +132,4 @@ Add the following scripts to your `package.json`:
 
 ## Migration from Stencil Test Runner
 
-If you're migrating from the Stencil Test Runner, see the [Migration Guide](./06-migration.md) for detailed instructions on updating your tests.
+If you're migrating from the Stencil Test Runner, see the [Migration Guide](./07-migration.md) for detailed instructions on updating your tests.
