@@ -27,12 +27,12 @@ However at the time of writing [vendor adoption is limited](https://caniuse.com/
 
 Until scoped custom element registries are more widely supported, Stencil provides runtime tag transformation utilities for use when authoring and consuming web components.
 
-## `setTagTransformer` and `tagTransform`
+## `setTagTransformer` and `transformTag`
 
 As of Stencil v4.39, Stencil makes available two utilities to help manage dynamic tag names:
 
 1) `setTagTransformer` allows application developers (your component library consumers) to assign a tag transformer function.
-2) `tagTransform` is mainly used *within* your component libraries - transforming any static string tag names using the tag transformer function assigned via `setTagTransformer` (Alternatively, you can auto apply `tagTransform` to all tag names via the [`extras.additionalTagTransformers` config option](#extrasadditionaltagtransformers).)
+2) `transformTag` is mainly used *within* your component libraries - transforming any static string tag names using the tag transformer function assigned via `setTagTransformer` (Alternatively, you can auto apply `transformTag` to all tag names via the [`extras.additionalTagTransformers` config option](#extrasadditionaltagtransformers).)
 
 
 ### Using `setTagTransformer`
@@ -124,14 +124,14 @@ return await renderToStringV2(
 ).html;
 ```
 
-### Using `tagTransform`
+### Using `transformTag`
 
 If you make `setTagTransformer` available, 
-Stencil also exports `tagTransform` which you can use within your component code; 
+Stencil also exports `transformTag` which you can use within your component code; 
 transforming static tag names via any assigned tag transformer function.
 
 ```tsx
-import { h, Component, Element, tagTransform } from '@stencil/core';
+import { h, Component, Element, transformTag } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
@@ -141,8 +141,8 @@ export class MyComponent {
   @Element() host: HTMLElement;
 
   connectedCallback() {
-    const ele = this.host.querySelector(tagTransform('my-other-element'));
-    const anotherEle = document.createElement(tagTransform('my-another-element'));
+    const ele = this.host.querySelector(transformTag('my-other-element'));
+    const anotherEle = document.createElement(transformTag('my-another-element'));
     ...
   }
 
@@ -207,22 +207,22 @@ export class MyComponent {
 ## `extras.additionalTagTransformers`
 
 Setting the experimental `extras.additionalTagTransformers` configuration option to `true` (or `prod` to only apply to production builds) 
-will auto-wrap `tagTransform(...)` to most static tag names within your component library (including CSS selectors!).
+will auto-wrap `transformTag(...)` to most static tag names within your component library (including CSS selectors!).
 
 Examples of auto-transformations include:
 
 ```js
 document.createElement('my-element');
 // becomes
-document.createElement(tagTransform('my-element'));
+document.createElement(transformTag('my-element'));
 
 document.querySelectorAll('my-element');
 // becomes
-document.querySelectorAll(tagTransform('my-element'));
+document.querySelectorAll(transformTag('my-element'));
 
 document.createElement('my-element');
 // becomes
-document.createElement(tagTransform('my-element'));
+document.createElement(transformTag('my-element'));
 ```
 
 Incoming CSS like:
@@ -238,9 +238,9 @@ my-element.active:hover {}
 Is transformed for use at runtime to:
 
 ```ts
-`:host ${tagTransform('my-element')} {}
+`:host ${transformTag('my-element')} {}
 
-${tagTransform('my-element')}::before {}
+${transformTag('my-element')}::before {}
 
-${tagTransform('my-element')}.active:hover {}
+${transformTag('my-element')}.active:hover {}
 ```

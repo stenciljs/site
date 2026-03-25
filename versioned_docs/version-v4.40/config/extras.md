@@ -184,5 +184,5 @@ You can turn this behavior off by setting this flag to `false`.
 
 ### additionalTagTransformers
 
-Auto-apply `tagTransform` to most static tag names within your component library (including CSS selectors).
+Auto-apply `transformTag` to most static tag names within your component library (including CSS selectors).
 Refer to the [Tag Transformation](../guides/tag-transformation.md) page for more information.
