@@ -9,7 +9,7 @@ sidebar_label: Overview
 
 **The Stencil Test Runner is deprecated as of Stencil v4.43 and will be removed in Stencil v5.**
 
-We recommend migrating to [@stencil/vitest](../vitest/01-overview.md) for all new and existing projects. See the [migration guide](../vitest/07-migration.md) for detailed instructions on updating your tests.
+We recommend migrating to [@stencil/vitest](../vitest/01-overview.md) for all new and existing projects. See the [migration guide](../vitest/06-migration.md) for detailed instructions on updating your tests.
 
 **Why is this being removed?**
 
