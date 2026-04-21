@@ -244,3 +244,162 @@ ${transformTag('my-element')}::before {}
 
 ${transformTag('my-element')}.active:hover {}
 ```
+
+## Framework integrations
+
+The tag transformation also works for the Stencil framework integrations but requires a bit of extra setup that is framework specific.
+
+### React
+
+Adding `transformTag: true` to the output:
+
+```ts
+reactOutputTarget({
+    ...
+    transformTag: true,
+}),
+```
+
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your React lib. It generates a new file called `tag-transformer.ts`. This file depends on the `setTagTransformer` exported from the index file in your main web components package. So make sure you export that as described in the sections above. To export the tag-transformer to your consumers you need to add an export in the package.json of your React package.
+
+```json
+ "exports": {
+    ...
+    "./tag-transformer": {
+      "types": "./dist/tag-transformer.d.ts",
+      "import": "./dist/tag-transformer.js"
+    }
+  },
+```
+
+Application users can then import the tag transformer and set their own custom tag.
+
+It's important to bear in mind, that if any of the React application's initializing modules import any components from your React wrapper library (`import { MyButton } from 'component-library-react'`), they will immediately define before the transformer is registered and so not be applied. So it is very important that `setTagTransformer` is called before any components are imported.
+
+One approach to solve this is that the React app creates a file that includes a side effect call to `setTagTransformer` that is then imported before the root `App.tsx`. An example setup:
+
+```jsx
+//initTagTransformer.ts
+
+import { setTagTransformer } from "component-library-react/tag-transformer";
+
+setTagTransformer((tag) => {
+  if (tag.startsWith("my-component-lib-")) {
+    return tag.replace("my-component-lib-", "my-component-lib-v2-");
+  }
+
+  return tag;
+});
+```
+
+```tsx
+//main.tsx
+
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import "./initTagTransformer.ts"; // This has to come before the import of App.tsx
+import App from "./App.tsx";
+
+const rootElement = document.getElementById("root");
+
+const queryClient = new QueryClient();
+
+createRoot(rootElement).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+```
+
+```jsx
+// App.tsx
+import { MyComponentLibButton } from "component-library-react";
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  const handleIncreaseCount = () => setCount(count + 1);
+
+  return (
+    <div>
+      <h1>My React app</h1>
+      {/* Should render my-component-lib-v2-button in the DOM */}
+      <MyComponentLibButton onClick={handleIncreaseCount}>Increase count</MyComponentLibButton>
+    </div>
+  );
+}
+
+export default App;
+```
+
+**Note** some linters re-organize imports as they see fit which might cause `import "./initTagTransformer.ts";` to be placed after `import App from "./App.tsx";`. Though most linters do not move side effect imports, so hopefully this shouldn't be an issue. But something to keep in mind if you notice that the tag transformation doesn't work like it should.
+
+### Vue
+
+Adding `transformTag: true` to the output:
+
+```ts
+vueOutputTarget({
+    ...
+    transformTag: true,
+}),
+```
+
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Vue lib. It generates a new file called `tag-transformer.ts`. This file depends on the `setTagTransformer` exported from the index file in your main web components package. So make sure you export that as described in the sections above. To export the tag-transformer to your consumers you need to add an export in the package.json of your Vue package.
+
+```json
+ "exports": {
+    ...
+    "./tag-transformer": {
+      "types": "./dist/tag-transformer.d.ts",
+      "import": "./dist/tag-transformer.js"
+    }
+  },
+```
+
+Application users can then import add a transformer. e.g.
+
+```ts
+// main.ts
+import { setTagTransformer } from 'component-library-vue/tag-transformer'
+
+setTagTransformer((tag: string) => tag.startsWith('my-transform-') ? `v1-${tag}` : tag)
+
+const app = createApp(App)
+```
+
+It's important to bear in mind, that if any of the Vue application's initializing modules import any components from your vue wrapper library (`import { MyButton } from 'component-library-vue'`), they will immediately define before the transformer is registered and so not be applied.
+
+
+### Angular
+
+Adding `transformTag: true` to the output:
+
+```ts
+angularOutputTarget({
+    ...
+    transformTag: true,
+}),
+```
+
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Angular lib. It generates a new file called `tag-transformer.ts`. This file depends on the `setTagTransformer` exported from the index file in your main web components package. So make sure you export that as described in the sections above.
+
+Because Angular has no hooks for template compilation (e.g. in an Angular template, <my-button>, cannot be intercepted and re-written at runtime to be <my-button-v1>) the output to produces a build-time script which consumers can use as a postinstall script for example. Make sure to make it available via:
+
+```json
+"bin": {
+    "patch-transform-selectors": "./scripts/patch-transform-selectors.mjs"
+  },
+```
+
+in your Angular wrapper package.json.
+
+Applications consumers set a tag-transformer by adding a `tag-transformer.config.mjs` to the root of their project:
+```ts
+export default (tag) => {
+  return tag.replace('my-button', 'my-button-v1');
+}
+```
+
+The transformer will then be applied at buildtime to Angular selectors and at runtime.
