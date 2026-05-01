@@ -385,7 +385,7 @@ angularOutputTarget({
 
 Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Angular lib. It generates a new file called `tag-transformer.ts`. This file depends on the `setTagTransformer` exported from the index file in your main web components package. So make sure you export that as described in the sections above.
 
-Because Angular has no hooks for template compilation (e.g. in an Angular template, <my-button>, cannot be intercepted and re-written at runtime to be <my-button-v1>) the output to produces a build-time script which consumers can use as a postinstall script for example. Make sure to make it available via:
+Because Angular has no hooks for template compilation (e.g. in an Angular template, `<my-button>`, cannot be intercepted and re-written at runtime to be `<my-button-v1>`) the output to produces a build-time script which consumers can use as a postinstall script for example. Make sure to make it available via:
 
 ```json
 "bin": {
