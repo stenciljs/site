@@ -182,7 +182,7 @@ By default, when using the [`globalStyle`](./01-overview.md#globalstyle) config 
 
 If you want to also add the `globalStyle` to each component when rendering on the server
 then set this to `true`. If your `globalStyle` sheet is large then doing this may bloat the size
-of your SSR output when using [`declarative-shadow-dom`](../guides/server-side-rendering.md#serializeShadowRoot).
+of your SSR output when using [`declarative-shadow-dom`](../guides/server-side-rendering.md#serializeshadowroot).
 
 Setting this to `false` will stop `globalStyle` from being added to any component.
 
