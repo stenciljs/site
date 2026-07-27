@@ -475,7 +475,7 @@ a time.
 
 **Optional**
 
-**Default: `true`** 
+**Default: `false`** 
 
 **Type: `boolean`**
 
