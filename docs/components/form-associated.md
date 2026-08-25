@@ -14,24 +14,22 @@ maintaining encapsulation and control over their styling and presentation.
 
 ## Creating a Form-Associated Component
 
-A form-associated Stencil component is one which sets the new [`formAssociated`](./component.md#formassociated)
-option in the argument to the `@Component`
-decorator to `true`, like so:
+A form-associated Stencil component is one that uses the [`@AttachInternals()` decorator](./attach-internals.md), like so:
 
 ```tsx
-import { Component } from '@stencil/core';
+import { Component, AttachInternals } from '@stencil/core';
 
 @Component({
   tag: 'my-face',
-  formAssociated: true,
 })
 export class MyFACE {
+  @AttachInternals() internals: ElementInternals;
 }
 ```
 
-This element will now be marked as a form-associated custom element via the
+Decorating a property with `@AttachInternals()` automatically marks the element as form-associated via the
 [`formAssociated`](https://html.spec.whatwg.org/#custom-elements-face-example)
-static property, but by itself this is not terribly useful.
+static property — there's no separate `@Component()` option to set. (To attach `ElementInternals` for something like [Custom States](./attach-internals.md#custom-states) *without* form association, use `@AttachInternals({ formAssociated: false })`.) By itself, though, this is not terribly useful.
 
 In order to meaningfully interact with a `<form>` element that is an ancestor
 of our custom element we'll need to get access to an
@@ -59,8 +57,7 @@ import { Component, h, AttachInternals, State } from '@stencil/core';
 
 @Component({
   tag: 'custom-text-input',
-  shadow: true,
-  formAssociated: true
+  encapsulation: { type: 'shadow' },
 })
 export class CustomTextInput {
   @State() value: string;
@@ -135,7 +132,6 @@ import { Component, h, AttachInternals } from '@stencil/core';
 
 @Component({
   tag: 'form-associated',
-  formAssociated: true,
 })
 export class FormAssociatedCmp {
   @AttachInternals()
@@ -157,13 +153,13 @@ This is called whenever the `disabled` state on the element _changes_. This
 could be used to keep a CSS class in sync with the disabled state, like so:
 
 ```tsx title='src/components/form-disabled-cb.tsx'
-import { Component, h, State } from '@stencil/core';
+import { Component, h, State, AttachInternals } from '@stencil/core';
 
 @Component({
   tag: 'form-disabled-cb',
-  formAssociated: true,
 })
 export class MyComponent {
+  @AttachInternals() internals: ElementInternals;
   @State() cssClass: string = "";
 
   formDisabledCallback(disabled: boolean) {
@@ -191,7 +187,6 @@ import { Component, h, AttachInternals } from '@stencil/core';
 
 @Component({
   tag: 'form-reset-cb',
-  formAssociated: true,
 })
 export class MyComponent {
   @AttachInternals()
@@ -237,7 +232,6 @@ import { Component, h, State, AttachInternals } from '@stencil/core';
 
 @Component({
   tag: 'fa-date-picker',
-  formAssociated: true,
 })
 export class MyDatePicker {
   @State() value: string = "";

@@ -175,7 +175,7 @@ import { Component, h } from '@stencil/core';
 @Component({
   tag: 'my-button',
   styleUrl: 'my-button.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyButton {
   render() {
@@ -225,7 +225,7 @@ import { Component, h, AttachInternals } from '@stencil/core';
 @Component({
   tag: 'my-element',
   styleUrl: 'my-element.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyElement {
   @AttachInternals({
@@ -311,7 +311,7 @@ import { Component, h } from '@stencil/core';
 @Component({
   tag: 'my-button',
   styleUrl: 'my-button.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyButton {
   render() {

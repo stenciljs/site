@@ -325,7 +325,7 @@ import { MyHttpService } from '../MyHttpService';
 @Component({
    tag: 'todo-list',
    styleUrl: 'todo-list.css',
-   shadow: true,
+   encapsulation: { type: 'shadow' },
 })
 export class ToDoList {
    private httpService = new MyHttpService();
@@ -379,7 +379,7 @@ import { MyHttpService } from '../MyHttpService';
 @Component({
    tag: 'todo-list',
    styleUrl: 'todo-list.css',
-   shadow: true,
+   encapsulation: { type: 'shadow' },
 })
 export class ToDoList {
    private labels = ['non-urgent', 'weekend-only'];

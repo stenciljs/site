@@ -145,7 +145,7 @@ Something to beware of is that Styling the `<Host>` element when using shadow DO
 @Component({
   tag: 'my-cmp',
   styleUrl: 'my-cmp.css',
-  shadow: true
+  encapsulation: { type: 'shadow' },
 })
 ...
 ```

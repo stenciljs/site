@@ -19,18 +19,18 @@ When talking about the shadow DOM, we use the term "light DOM" to refer to the "
 
 The shadow DOM hides and separates the DOM of a component in order to prevent clashing styles or unwanted side effects. We can use the shadow DOM in our Stencil components to ensure our components won't be affected by the applications in which they are used.
 
-To use the Shadow DOM in a Stencil component, you can set the `shadow` option to `true` in the component decorator.
+To use the Shadow DOM in a Stencil component, set `encapsulation` to `{ type: 'shadow' }` in the component decorator.
 
 ```tsx
 @Component({
   tag: 'shadow-component',
   styleUrl: 'shadow-component.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class ShadowComponent {}
 ```
 
-If you'd like to learn more about enabling and configuring the shadow DOM, see the [shadow field of the component api](./component.md#component-options).
+If you'd like to learn more about enabling and configuring the shadow DOM, see the [`encapsulation` field of the component api](./component.md#encapsulation).
 
 By default, components created with the [`stencil generate` command](../config/cli.md#stencil-generate) use the shadow DOM.
 
@@ -64,7 +64,7 @@ import { Component, Element } from '@stencil/core';
 @Component({
   tag: 'shadow-component',
   styleUrl: 'shadow-component.css',
-  shadow: true
+  encapsulation: { type: 'shadow' },
 })
 export class ShadowComponent {
 
@@ -93,13 +93,13 @@ In browsers which do not support the shadow DOM we fall back to scoped CSS. This
 
 ### Scoped CSS
 
-An alternative to using the shadow DOM is using scoped components. You can use scoped components by setting the `scoped` option to `true` in the component decorator.
+An alternative to using the shadow DOM is using scoped components. You can use scoped components by setting `encapsulation` to `{ type: 'scoped' }` in the component decorator.
 
 ```tsx
 @Component({
   tag: 'scoped-component',
   styleUrl: 'scoped-component.css',
-  scoped: true,
+  encapsulation: { type: 'scoped' },
 })
 export class ScopedComponent {}
 ```
@@ -158,7 +158,7 @@ CSS custom properties can be helpful for customizing components from the light D
 @Component({
   tag: 'shadow-card',
   styleUrl: 'shadow-card.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class ShadowCard {
   @Prop() heading: string;
@@ -192,7 +192,7 @@ If you have a Stencil component nested within another component, any `part` spec
 @Component({
   tag: 'outer-component',
   styleUrl: 'outer-component.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class OuterComponent {
   render() {
@@ -208,7 +208,7 @@ export class OuterComponent {
 @Component({
   tag: 'inner-component',
   styleUrl: 'inner-component.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class InnerComponent {
   render() {
@@ -371,4 +371,4 @@ The `:host()` function allows you to select the host element of a component when
 The `:host()` selector in global styles will only affect components that use shadow DOM. For scoped components, you should use regular tag selectors in your global styles.
 :::
 
-This behavior can be turned off via the [`extras.addGlobalStyleToComponents`](../config/extras.md#addglobalstyletocomponents) flag. 
+This behavior is controlled by the `inject` property on the `global-style` output target (`'none'`, `'client'`, or `'all'`) rather than a top-level config flag.

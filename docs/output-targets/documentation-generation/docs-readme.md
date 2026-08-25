@@ -93,7 +93,7 @@ In the code block below, `@internal` is added to the JSDoc for `MyComponent`:
  */
 @Component({
   tag: 'my-component',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyComponent { /* omitted */ }
 ```
@@ -115,7 +115,7 @@ For a component with the JSDoc:
  */
 @Component({
   tag: 'my-component',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyComponent { /* omitted */ }
 ```
@@ -145,7 +145,7 @@ A Stencil component that has a JSDoc comment on its class component like so:
  */
 @Component({
   tag: 'my-component',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyComponent { }
 ```
@@ -376,7 +376,7 @@ For the following usages of `@slot()` in a component:
  */
 @Component({
   tag: 'my-component',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyComponent {
   // ...
@@ -438,7 +438,7 @@ For the following usages of `@part()` in a component:
 @Component({
   tag: 'my-component',
   styleUrl: 'my-component.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyComponent {
   // ...
@@ -481,7 +481,7 @@ import { Component, h, AttachInternals } from '@stencil/core';
 @Component({
   tag: 'my-element',
   styleUrl: 'my-element.css',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyElement {
   @AttachInternals({

@@ -56,18 +56,38 @@ Called once just after the component is fully loaded and the first `render()` oc
 
 ## componentShouldUpdate()
 
-This hook is called when a component's [`Prop`](./properties.md) or [`State`](./state.md) property changes and a rerender is about to be requested. This hook receives three arguments: the new value, the old value and the name of the changed state. It should return a boolean to indicate if the component should rerender (`true`) or not (`false`).
+This hook is called when one or more of a component's [`Prop`](./properties.md) or [`State`](./state.md) properties change and a rerender is about to be requested. It receives a single `changes` argument — a map of every prop/state name that changed since the last render to its `{ newVal, oldVal }` — and should return a boolean to indicate if the component should rerender (`true`) or not (`false`).
 
-A couple of things to notice is that this method will not be executed before the initial render, that is, when the component is first attached to the dom, nor when a rerender is already scheduled in the next frame.
-
-Let’s say the following two props of a component change synchronously:
+This method is not executed before the initial render (when the component is first attached to the DOM). It fires once per render cycle, even if multiple props change synchronously:
 
 ```tsx
 component.somePropA = 42;
 component.somePropB = 88;
 ```
 
-The `componentShouldUpdate` will be first called with arguments: `42`, `undefined` and `somePropA`. If it does return `true`, the hook will not be called again since the rerender is already scheduled to happen. Instead, if the first hook returned `false`, then `componentShouldUpdate` will be called again with `88`, `undefined` and `somePropB` as arguments, triggered by the `component.somePropB = 88` mutation.
+Both changes are batched into a single call:
+
+```tsx
+componentShouldUpdate(changes) {
+  if (changes['somePropA'] && changes['somePropA'].newVal === changes['somePropA'].oldVal) {
+    return false;
+  }
+}
+```
+
+For stricter per-prop typing, use the `ComponentShouldUpdateChanges<this>` type:
+
+```tsx
+import { ComponentShouldUpdateChanges } from '@stencil/core';
+
+componentShouldUpdate(changes: ComponentShouldUpdateChanges<this>) {
+  if (changes['somePropA']?.newVal === changes['somePropA']?.oldVal) {
+    return false;
+  }
+}
+```
+
+A compiler warning is raised if `componentShouldUpdate` is declared with more than one parameter — the old `(newVal, oldVal, propName)` per-prop signature is no longer supported.
 
 Since the execution of this hook might be conditioned, it's not good to rely on it to watch for prop changes, instead use the `@Watch` decorator for that.
 

@@ -75,16 +75,20 @@ export interface ChildNode {
 
 ```tsx
 export const AddClass: FunctionalComponent = (_, children, utils) => (
-  utils.map(children, child => ({
-    ...child,
-    vattrs: {
-      ...child.vattrs,
-      class: `${child.vattrs.class} add-class`
+  <>
+    {utils.map(children, child => ({
+      ...child,
+      vattrs: {
+        ...child.vattrs,
+        class: `${child.vattrs.class} add-class`
+      }
     }
-  }
-  ))
+    ))}
+  </>
 );
 ```
+
+`FunctionalComponent` returns a single `VNode` (or `null`), not an array — wrap a `utils.map()` result in a fragment (`<>...</>`) rather than returning it directly.
 
 :::note
 When using a functional component in JSX, its name must start with a capital letter. Therefore it makes sense to export it as such.

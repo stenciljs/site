@@ -135,7 +135,7 @@ import { h, Component, Element, transformTag } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyComponent {
   @Element() host: HTMLElement;
@@ -181,7 +181,7 @@ import { h, Component, Host } from '@stencil/core';
 
 @Component({
   tag: 'my-button',
-  shadow: true,
+  encapsulation: { type: 'shadow' },
 })
 export class MyComponent {
   @Element() host: HTMLElement;

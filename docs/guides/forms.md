@@ -63,7 +63,6 @@ this:
 @Component({
   tag: 'my-name',
   styleUrl: 'my-name.css',
-  formAssociated: true
 })
 export class MyName {
   @State() value: string;
