@@ -19,7 +19,6 @@ The Framework Wrappers are configured like output targets, and emit a native lib
 - [Angular](./angular.md)
 - [React](./react.md)
 - [Vue](./vue.md)
-- [Ember (Community)](./ember.md)
 
 By using Stencil bindings, you can build your components once, and have Stencil emit Angular/React/Vue libraries.
 This way, the consumers of your components can enjoy all the features of their framework of choice.

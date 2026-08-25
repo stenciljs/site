@@ -63,10 +63,10 @@ The generated docs JSON data will in the type of `JsonDocs` which consists of ma
 | `docsTags`    | Annotations (In the way of JSDoc ) written in `.tsx` file will be collected here   |
 | `overview`    | Description written in top of `@Component` e.g. /**  Documentation Example */ |
 | `usage`    | Array of [usage examples](./docs-json.md#usage), written in Markdown files in the `usages/` directory adjacent to the current component. |
-| `props`    | Array of metadata objects for each usage of the [`@Prop` decorator](../components/properties.md#the-prop-decorator-prop) on the current component. |
-| `methods`    | Array of metadata objects for each usage of the [`@Method` decorator](../components/methods.md) on the current component.  | 
-| `events`    | Array of metadata objects for each usage of the [`@Event` decorator](../components/events.md#event-decorator) on the current component. |
-| `listeners`    | Array of metadata objects for each usage of the [`@Listen` decorator](../components/events.md#listen-decorator) on the current component. |
+| `props`    | Array of metadata objects for each usage of the [`@Prop` decorator](../../components/properties.md#the-prop-decorator-prop) on the current component. |
+| `methods`    | Array of metadata objects for each usage of the [`@Method` decorator](../../components/methods.md) on the current component.  | 
+| `events`    | Array of metadata objects for each usage of the [`@Event` decorator](../../components/events.md#event-decorator) on the current component. |
+| `listeners`    | Array of metadata objects for each usage of the [`@Listen` decorator](../../components/events.md#listen-decorator) on the current component. |
 | `styles`    | Array of objects documenting annotated [CSS variables](./docs-json.md#css-variables) used in the current component's CSS. |
 | `slots`    | Array of objects documenting [slots](./docs-json.md#slots-and-css-parts) which are tagged with `@slot` in the current component's JSDoc comment. |
 | `parts`    |  Array of objects documenting [CSS Parts](./docs-json.md#slots-and-css-parts) which are derived from `@part` tags in the current component's JSDoc comment. |

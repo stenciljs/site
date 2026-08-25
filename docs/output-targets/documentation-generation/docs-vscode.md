@@ -10,7 +10,7 @@ slug: /docs-vscode
 One of the core features of web components is the ability to create [custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements),
 which allow developers to reuse custom functionality defined in their components.
 When Stencil compiles a project, it generates a custom element for each component in the project.
-Each of these [custom elements has an associated `tag` name](../components/component.md#component-options) that allows the custom
+Each of these [custom elements has an associated `tag` name](../../components/component.md#component-options) that allows the custom
 element to be used in HTML files. 
 
 By default, integrated development environments (IDEs) like VS Code are not aware of a project's custom elements when

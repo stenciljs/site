@@ -62,8 +62,7 @@ bundles: [
 
 *default: '.stencil'*
 
-The directory where sub-directories will be created for caching when [`enableCache`](#enablecache) is set `true` or if using
-[Stencil's Screenshot Connector](../testing/stencil-testrunner/07-screenshot-connector.md).
+The directory where sub-directories will be created for caching when [`enableCache`](#enablecache) is set `true`.
 
 A Stencil config like the following:
 
@@ -74,9 +73,6 @@ export const config: Config = {
   ...,
   enableCache: true,
   cacheDir: '.cache',
-  testing: {
-    screenshotConnector: 'connector.js'
-  }
 }
 ```
 
@@ -85,9 +81,7 @@ Will result in the following file structure:
 ```tree
 stencil-project-root
 └── .cache
-    ├── .build <-- Where build related file caching is written
-    |
-    └── screenshot-cache.json <-- Where screenshot caching is written
+    └── .build <-- Where build related file caching is written
 ```
 
 ## devServer
@@ -486,10 +480,6 @@ main thread to periodically lock-up, it's always recommended to try
 ```tsx
 taskQueue: 'async'
 ```
-
-## testing
-
-Please see the [testing config docs](../testing/stencil-testrunner/02-config.md).
 
 ## transformAliasedImportPaths
 

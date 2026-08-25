@@ -47,7 +47,7 @@ export default config;
 
 By default, the Stencil Storybook plugin registers the component specified via the `component` property in your story. However, if your component depends on other custom elements from your Stencil library, you'll want to ensure those are available too.
 
-To do this, you can embed the [Stencil Loader](/docs/next/distribution#loader) in the Storybook preview script to **lazily register all components** globally:
+To do this, you can embed the [Stencil Loader](../output-targets/dist.md#loader) in the Storybook preview script to **lazily register all components** globally:
 
 ```ts
 // .storybook/preview.tsx

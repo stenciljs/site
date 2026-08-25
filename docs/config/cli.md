@@ -38,7 +38,7 @@ Builds a Stencil project. The flags below are the available options for the `bui
 ## `stencil docs`
 
 Performs a one-time generation of documentation for your project.
-For more information on documentation generation, please see the [Documentation Generation section](../documentation-generation/01-overview.md).
+For more information on documentation generation, please see the [Documentation Generation section](../output-targets/documentation-generation/01-overview.md).
 
 :::info
 This command runs with dev mode enabled, which does not run a full build. As a result, documentation that needs to be built first, like CSS styles, will not be generated. You will need to run `npx stencil build --docs` to generate documentation that requires building.

@@ -120,7 +120,7 @@ Then you'd get the following in the JSON output:
 ]
 ```
 
-If the style sheet is configured to be used with [a specific mode](../components/styling.md), the mode associated with
+If the style sheet is configured to be used with [a specific mode](../../components/styling.md), the mode associated with
 the CSS property will be provided as well:
 
 ```diff title="Example docs-json Output with Mode"

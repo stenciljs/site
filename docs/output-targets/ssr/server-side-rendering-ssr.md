@@ -15,5 +15,5 @@ Static Site Generation (SSG) does the rendering at build time instead of request
 
 SSG has limits, and pages that require some server-side processing before rendering won't benefit from using it. However, that set of pages that _truly_ need to be rendered at request time on the server is lower than most would think. For example, instead of using SSR, why not prerender and simply make an API request from the Client? Or configure the server to modify headers without having to run a classic expressjs/etc. server?
 
-If a page simply _must_ be Server Side Rendered, then that can be done using Stencil's [hydration functionality](../guides/hydrate-app.md) in any Node.js based server.
+If a page simply _must_ be Server Side Rendered, then that can be done using Stencil's [hydration functionality](../../guides/hydrate-app.md) in any Node.js based server.
 

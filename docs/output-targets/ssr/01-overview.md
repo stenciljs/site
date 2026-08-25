@@ -25,7 +25,7 @@ Stencil makes SSG easy, so read on to see how to incorporate it into your apps.
 
 ## How Static Site Generation and Prerendering Works
 
-**Build Hydrate App**: The first step in prerendering is for the compiler to generate a "hydrate" app, which is a single directory to be used by Node.js. The "hydrate" app is automatically generated when the `--prerender` CLI flag is provided and by default the app is saved to `dist/hydrate`. Prerendering uses the hydrate app internally, however it can be used directly at a lower-level. [Learn more about the Hydrate App](../guides/hydrate-app.md)
+**Build Hydrate App**: The first step in prerendering is for the compiler to generate a "hydrate" app, which is a single directory to be used by Node.js. The "hydrate" app is automatically generated when the `--prerender` CLI flag is provided and by default the app is saved to `dist/hydrate`. Prerendering uses the hydrate app internally, however it can be used directly at a lower-level. [Learn more about the Hydrate App](../../guides/hydrate-app.md)
 
 **Fork Prerender Tasks to Available CPUs**: Stencil can efficiently divide out the prerendering to each of the current machine's CPUs using [Node.js' Child Process API](https://nodejs.org/api/child_process.html). By tasking each CPU on the machine, the compiler can drastically speed up prerendering times.
 

@@ -165,7 +165,7 @@ For Stencil v4 the information included in the output of the `docs-json` output
 target was expanded to include more information about the types of properties
 and methods on Stencil components.
 
-For more context on this change, see the [documentation for the new `supplementalPublicTypes`](../documentation-generation/docs-json.md#supplementalpublictypes)
+For more context on this change, see the [documentation for the new `supplementalPublicTypes`](../output-targets/documentation-generation/docs-json.md#supplementalpublictypes)
 option for the JSON documentation output target.
 
 ### `JsonDocsEvent`

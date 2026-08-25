@@ -104,52 +104,12 @@ To install the Stencil Playwright adapter in an existing Stencil project, follow
 
 ## Migrating to Playwright
 
-If you are working in a Stencil project with an existing end-to-end testing setup via the [Stencil Test Runner](../stencil-testrunner/05-e2e-testing.md),
-you can continue using your existing e2e testing setup while sampling the Playwright adapter or migrating tests over time. To do so, there are two
-options:
-
-- **Option 1:** Update the Playwright config to match a different test file pattern:
-
-  ```ts title="playwright.config.ts"
-  export default createConfig({
-    // Example: match all test files with the 'e2e.playwright.ts' naming convention
-    testMatch: '*.e2e.playwright.ts',
-  });
-  ```
-
-  By default, the Playwright adapter will match all files with the '.e2e.ts' extension, which is the same pattern used by the Stencil test
-  runner for e2e tests. See the [Playwright`testMatch` documentation](https://playwright.dev/docs/api/class-testconfig#test-config-test-match)
-  for more information on acceptable values.
-
-  Changing this value is useful if you are just testing out Playwright, but haven't committed to migrating all test files.
-
-- **Option 2:** Update the Stencil Test Runner to match a different test file pattern:
-
-  ```ts title="stencil.config.ts"
-  export config: Config = {
-     ...,
-     test: {
-        // Stencil Test Runner will no longer execute any 'e2e.ts` files
-        testRegex: '(/__tests__/.*|(\\.|/)(test|spec)|[//](e2e))\\.[jt]sx?$'
-     }
-  }
-  ```
-
-  Changing this value is useful if you intend on using Playwright as your main e2e testing solution and want to keep the 'e2e.ts` extension
-  for test files.
-
-:::tip
-You could also separate tests into specific directories for each test runner and have the test patterns match only their respective directories.
-:::
-
-In addition, Playwright will not execute as a part of the Stencil CLI's `test` command (i.e. `stencil test --e2e`). To have Playwright execute
-alongside the Stencil Test Runner, you'll need to include an explicit call to the Playwright CLI as a part of your project's `package.json` test
-script:
+Coming from Stencil v4's integrated test runner (`stencil test --e2e`, Puppeteer-based)? That runner is removed in v5 — Playwright is now the e2e testing tool. Add a Playwright CLI call to your project's `package.json` test script:
 
 ```json title="package.json"
 {
   "scripts": {
-    "test.e2e": "stencil test --e2e && playwright test"
+    "test.e2e": "playwright test"
   }
 }
 ```

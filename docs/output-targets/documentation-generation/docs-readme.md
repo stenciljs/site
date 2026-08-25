@@ -30,7 +30,7 @@ export const config: Config = {
 
 ### Using the Build Command
 
-If your project has a `docs-readme` output target configured in your Stencil configuration file, the Stencil [build command](../config/cli.md#stencil-build) is all that's needed to generate README docs:
+If your project has a `docs-readme` output target configured in your Stencil configuration file, the Stencil [build command](../../config/cli.md#stencil-build) is all that's needed to generate README docs:
 ```bash
 npx stencil build
 ```
@@ -53,7 +53,7 @@ This will cause the Stencil compiler to perform a one-time build of your entire 
 
 ### Using the Docs Command
 
-As an alternative to the build command, the [docs command](../config/cli.md#stencil-docs) can be used to perform a one time generation of the documentation:
+As an alternative to the build command, the [docs command](../../config/cli.md#stencil-docs) can be used to perform a one time generation of the documentation:
 ```bash
 npx stencil docs
 ```
@@ -214,7 +214,7 @@ If a component's directory does not contain any usage files, this section will b
 
 ### @Prop() Details
 
-Usages of Stencil's [`@Prop()` decorator](../components/properties.md) are described in a table containing the following information for each usage of `@Prop()`:
+Usages of Stencil's [`@Prop()` decorator](../../components/properties.md) are described in a table containing the following information for each usage of `@Prop()`:
 - **Property**: The name of the property on the TypeScript class.
 - **Attribute**: The name of the attribute associated with the property name.
 - **Description**: A description of the property, if one was given in a JSDoc comment for the property.
@@ -255,7 +255,7 @@ If a component does not use the `@Prop()` decorator, this section will be omitte
 
 ### @Event() Details
 
-Usages of Stencil's [`@Event()` decorator](../components/events.md) are described in a table containing the following information for each usage of `@Event()`:
+Usages of Stencil's [`@Event()` decorator](../../components/events.md) are described in a table containing the following information for each usage of `@Event()`:
 - **Event**: The name of the property on the TypeScript class decorated with `@Event()`.
 - **Description**: A description of the property, if one was given in a JSDoc comment for the property.
 - **Type**: The TypeScript type of the property.
@@ -293,7 +293,7 @@ If a component does not use the `@Event()` decorator, this section will be omitt
 
 ### @Method() Details
 
-Components that use Stencil's [`@Method()` decorator](../components/methods.md) will have a section describing each usage `@Method`.
+Components that use Stencil's [`@Method()` decorator](../../components/methods.md) will have a section describing each usage `@Method`.
 
 Each usage of `@Method` will be documented with its own subsection containing the following:
 - The method signature will be used as the heading for each subsection 
@@ -350,7 +350,7 @@ If a component does not use the `@Method()` decorator, this section will be omit
 
 ### @slot Details
 
-A component that uses [slots](../components/templating-and-jsx.md#slots) may describe its slots in the component's JSDoc using the Stencil-specific `@slot` JSDoc tag.
+A component that uses [slots](../../components/templating-and-jsx.md#slots) may describe its slots in the component's JSDoc using the Stencil-specific `@slot` JSDoc tag.
 The `@slot` tag follows the following format:
 ```
 @slot [slot-name] - [description]
@@ -414,7 +414,7 @@ If a component's top-level JSDoc does not use `@slot` tags, this section will be
 
 ### Shadow Parts
 
-A component that uses [CSS shadow parts](../components/styling.md#css-parts) may describe the component's shadow parts in the component's JSDoc using the Stencil-specific `@part` JSDoc tag.
+A component that uses [CSS shadow parts](../../components/styling.md#css-parts) may describe the component's shadow parts in the component's JSDoc using the Stencil-specific `@part` JSDoc tag.
 The `@part` tag follows the following format:
 ```
 @part [part-name] - [description]

@@ -93,7 +93,7 @@ platformBrowserDynamic()
 
 #### WWW
 
-Unfortunately, setting `nonce` attributes gets a bit trickier when it comes to [SSR and SSG](../static-site-generation/01-overview.md). As a `nonce` needs
+Unfortunately, setting `nonce` attributes gets a bit trickier when it comes to [SSR and SSG](../output-targets/ssr/01-overview.md). As a `nonce` needs
 to be unique per page view, it cannot be defined/set at build time. So, this responsibility now falls on the
 [hydrate app](../guides/hydrate-app.md)'s execution of runtime code.
 
@@ -114,6 +114,6 @@ nonce _ahead_ of the script's execution.
 
 **SSG**
 
-Stencil cannot support CSP nonces with SSG. Because all of the code is generated during [pre-rendering](../static-site-generation/01-overview.md#how-static-site-generation-and-prerendering-works), Stencil doesn't generate the `style` or `script` tags at runtime.
+Stencil cannot support CSP nonces with SSG. Because all of the code is generated during [pre-rendering](../output-targets/ssr/01-overview.md#how-static-site-generation-and-prerendering-works), Stencil doesn't generate the `style` or `script` tags at runtime.
 If an application wants to leverage nonces in SSG, they can build a mechanism to scrape the pre-rendered code and apply the attribute server-side before
 it is served to the client.
