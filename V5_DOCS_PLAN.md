@@ -16,6 +16,8 @@ Two audiences, one site:
 
 This is not just "update the docs for renamed APIs." The audit below treats structure, writing quality, and example freshness as equally in scope.
 
+**Added 2026-08-26, from John directly (not surfaced by the audit):** the docs currently undersell `encapsulation: { type: 'none' }` combined with `<slot>` — today's only mention (`styling.md`'s Scoped CSS section) frames non-shadow encapsulation defensively ("does not, however, prevent styles from the light DOM from seeping into your component") rather than as a deliberate, well-supported choice. John considers this combination something many developers wrongly treat as a footgun, and wants it made prominent: on the marketing homepage (confirmed out of this repo — flag to whoever owns it, can't action here) and threaded through the docs themselves, with a real explanation of what to choose and why, style implications, and — notably — that projects targeting only modern browsers can reach for the native CSS `@scope` at-rule instead of Stencil's own `scoped` pseudo-encapsulation when using `encapsulation: { type: 'none' }`. See the new content item in §5.
+
 ---
 
 ## 1. Versioning & branch strategy — DONE
@@ -301,6 +303,12 @@ Consumers import the generated types directly (e.g. `import 'your-component-libr
 ## 5. Net-new content (zero existing docs today)
 
 Ranked roughly by how load-bearing they are for the stated vision:
+
+0. **A real explanation of `encapsulation: { type: 'none' }` + `<slot>`** (added 2026-08-26, John's direct request — bumped to top priority). Not currently planned content anywhere else in this doc; the closest existing thing is `component.md`'s `encapsulation` reference section (rewritten this session, but purely dry option-reference, no guidance on when/why) and `styling.md`'s defensively-worded `Scoped CSS` section. Needs, roughly:
+   - **Where:** primary home is `components/styling.md` — add a real `## No Encapsulation` section (there's currently a `## Shadow DOM` and `## Scoped CSS` top-level section each, but nothing dedicated to `type: 'none'`, even though it's the *default*). Cover: what "no encapsulation" actually means (light DOM markup, global-cascade styles, real native `<slot>` behavior with zero Stencil runtime involvement since there's no polyfill layer to reason about), why it's not a lesser/fallback option, and a real comparison table (shadow vs. scoped vs. none) covering style isolation, slot behavior, DOM inspectability, SSR/SSG cost, and runtime patch overhead (`lightDomPatches`).
+   - **The `@scope` angle specifically:** explain that `encapsulation: { type: 'none' }` combined with the native [`@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/@scope) at-rule gives you real style scoping without Stencil's `scoped` data-attribute mechanism (and its `lightDomPatches` runtime cost) at all — for projects that can commit to modern-browser-only support. Verified 2026-08-26: `@scope` reached Baseline "Newly available" as of Firefox 146 (Dec 2025) — also supported in Chrome 118+, Safari 17.4+, Edge 118+. "Newly available" means real, current support across all four engines, but some users may still be on pre-146 Firefox; be honest about that rather than claiming universal support. This is a genuine, current trade-off worth presenting plainly (native `@scope` + zero encapsulation vs. Stencil's `scoped` for broader compatibility), not hedged.
+   - **Thread through:** a short, decisive pointer (not a repeat of the full explanation) from `components/component.md`'s `encapsulation` section, from `getting-started/` (which encapsulation to reach for and why, right when a reader is picking one for the first time), and from `concepts/` once that category exists (the "why" framing fits there too).
+   - **Explicitly out of this repo:** the marketing homepage. Not part of `stencil-site` — flag to whoever owns it rather than trying to action here.
 
 1. **`getting-started/03-getting-started.md` rebuild** around the `stencil init` wizard (new-project + add-capabilities modes, third-party `stencil.wizard` plugin discovery for `@stencil/vitest`/`@stencil/playwright`/`@stencil/sass`/etc.).
 2. **`upgrading-to-stencil-five.md`** — the biggest single writing task, mirroring the full v5.0.0 `BREAKING_CHANGES.md` section.
