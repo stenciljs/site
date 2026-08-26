@@ -22,7 +22,7 @@ The **asset base path** is the directory that Stencil will use to resolve assets
 When a component uses an asset, the asset's location is resolved relative to the asset base path.
 
 The asset base path is automatically set for the following output targets:
-- [dist](../output-targets/dist.md)
+- [loader-bundle](../output-targets/dist.md)
 - [hydrate](./hydrate-app.md)
 - [www](../output-targets/www.md)
 
@@ -132,7 +132,7 @@ In the example above, the following allows `my-component` to display the provide
 
 ### Manually Moving Assets
 
-For the [dist-custom-elements](../output-targets/custom-elements.md) output target, options like `assetsDirs` do not copy assets to the distribution directory.
+For the [standalone](../output-targets/custom-elements.md) output target, options like `assetsDirs` do not copy assets to the distribution directory.
 
 It's recommended that a bundler (such as rollup) or a Stencil `copy` task is used to ensure the static assets are copied to the distribution directory.
 
@@ -149,11 +149,11 @@ export const config: Config = {
   namespace: 'your-component-library',
   outputTargets: [
     {
-      type: 'dist-custom-elements',
+      type: 'standalone',
       copy: [
         {
           src: '**/*.{jpg,png}',
-          dest: 'dist/components/assets',
+          dest: 'dist/standalone/assets',
           warn: true,
         }
       ]
@@ -162,11 +162,11 @@ export const config: Config = {
   // ...
 };
 ```
-#### Rollup Configuration
+#### Bundler Plugin Configuration
 
-[Rollup Plugins](../config/plugins.md#rollup-plugins)'s can be used to define files and folders to be copied over to the distribution directory.
+A bundler plugin (such as one for [Rolldown](https://rolldown.rs/), which replaced Rollup as Stencil's own bundler in v5) can be used to define files and folders to be copied over to the distribution directory.
 
-The example below shows how a the `rollup-plugin-copy` NPM module can be used to find all '.jpg' and '.png' files under a project's `src` directory and copy them to `dist/components/assets` at build time.
+The example below shows how a Rolldown-compatible `rollup-plugin-copy` NPM module can be used to find all '.jpg' and '.png' files under a project's `src` directory and copy them to `dist/standalone/assets` at build time.
 
 ```javascript
 import { Config } from '@stencil/core';
@@ -176,16 +176,16 @@ export const config: Config = {
     namespace: 'copy',
     outputTargets: [
       {
-        type: 'dist-custom-elements',
+        type: 'standalone',
       },
     ],
-    rollupPlugins: {
+    rolldownPlugins: {
       after: [
         copy({
           targets: [
             {
               src: 'src/**/*.{jpg,png}',
-              dest: 'dist/components/assets',
+              dest: 'dist/standalone/assets',
             },
           ],
         }),

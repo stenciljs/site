@@ -9,11 +9,11 @@ There are numerous strategies to publish and distribute your component library t
 
 ## Use Cases
 
-To use your Stencil components in other projects, there are two different output targets to consider: [`dist`](../output-targets/dist.md) and [`dist-custom-elements`](../output-targets/custom-elements.md). Both export your components for different use cases. Luckily, both can be generated at the same time, using the same source code, and shipped in the same distribution. It would be up to the consumer of your component library to decide which build to use.
+To use your Stencil components in other projects, there are two different output targets to consider: [`loader-bundle`](../output-targets/dist.md) and [`standalone`](../output-targets/custom-elements.md). Both export your components for different use cases. Luckily, both can be generated at the same time, using the same source code, and shipped in the same distribution. It would be up to the consumer of your component library to decide which build to use.
 
 ### Lazy Loading
 
-If you prefer to have your components automatically loaded when used in your application, we recommend enabling the [`dist`](../output-targets/dist.md) output target. The bundle gives you a small entry file that registers all your components and defers loading the full component logic until it is rendered in your application. It doesn't matter if the actual application is written in HTML or created with vanilla JavaScript, jQuery, React, etc.
+If you prefer to have your components automatically loaded when used in your application, we recommend enabling the [`loader-bundle`](../output-targets/dist.md) output target. The bundle gives you a small entry file that registers all your components and defers loading the full component logic until it is rendered in your application. It doesn't matter if the actual application is written in HTML or created with vanilla JavaScript, jQuery, React, etc.
 
 Your users can import your component library, e.g. called `my-design-system`, either via a `script` tag:
 
@@ -31,25 +31,29 @@ To ensure that the right entry file is loaded when importing the project, define
 
 ```json
 {
-  "exports": "./dist/esm/my-design-system.js",
-  "main": "./dist/cjs/my-design-system.js",
-  "unpkg": "dist/my-design-system/my-design-system.esm.js",
+  "exports": "./dist/loader-bundle/my-design-system.js",
+  "main": "./dist/loader-bundle/my-design-system.js",
+  "unpkg": "dist/loader-bundle/my-design-system.js",
 }
 ```
 
-Read more about various options when it comes to configuring your project's components for lazy loading in the [`dist`](../output-targets/dist.md) output target section.
+:::note
+As of Stencil v5, `loader-bundle` only generates ESM by default — add `"main"` pointing at a `.cjs` file only if you've set `cjs: true` on the output target.
+:::
+
+Read more about various options when it comes to configuring your project's components for lazy loading in the [`loader-bundle`](../output-targets/dist.md) output target section.
 
 #### Considerations
 
-To start, Stencil was designed to lazy-load itself only when the component was actually used on a page. There are many benefits to this approach, such as simply adding a script tag to any page and the entire library is available for use, yet only the components actually used are downloaded. For example, [`@ionic/core`](https://www.npmjs.com/package/@ionic/core) comes with over 100 components, but a webpage may only need `ion-toggle`. Instead of requesting the entire component library, or generating a custom bundle for just `ion-toggle`, the `dist` output target is able to generate a tiny entry build ready to load any of its components on-demand.
+To start, Stencil was designed to lazy-load itself only when the component was actually used on a page. There are many benefits to this approach, such as simply adding a script tag to any page and the entire library is available for use, yet only the components actually used are downloaded. For example, [`@ionic/core`](https://www.npmjs.com/package/@ionic/core) comes with over 100 components, but a webpage may only need `ion-toggle`. Instead of requesting the entire component library, or generating a custom bundle for just `ion-toggle`, the `loader-bundle` output target is able to generate a tiny entry build ready to load any of its components on-demand.
 
 However be aware that this approach is not ideal in all cases. It requires your application to ship the bundled components as static assets in order for them to load properly. Furthermore, having many nested component dependencies can have an impact on the performance of your application. For example, given you have a component `CmpA` which uses a Stencil component `CmpB` which itself uses another Stencil component `CmpC`. In order to fully render `CmpA` the browser has to load 3 scripts sequentially which can result in undesired rendering delays.
 
 ### Standalone
 
-The [`dist-custom-elements`](../output-targets/custom-elements.md) output target builds each component as a stand-alone class that extends `HTMLElement`. The output is a standardized custom element with the styles already attached and without any of Stencil's lazy-loading. This may be preferred for projects that are already handling bundling, lazy-loading and defining the custom elements themselves.
+The [`standalone`](../output-targets/custom-elements.md) output target builds each component as a stand-alone class that extends `HTMLElement`. The output is a standardized custom element with the styles already attached and without any of Stencil's lazy-loading. This may be preferred for projects that are already handling bundling, lazy-loading and defining the custom elements themselves.
 
-The generated files will each export a component class and will already have the styles bundled. However, this build does not define the custom elements or apply any polyfills. Static assets referenced within components will need to be set using `setAssetPath` (see [Making Assets Available](../output-targets/custom-elements.md#making-assets-available)).
+The generated files will each export a component class and will already have the styles bundled. However, this build does not define the custom elements. Static assets referenced within components will need to be set using `setAssetPath` (see [Making Assets Available](../output-targets/custom-elements.md#making-assets-available)).
 
 You can use these standalone components by importing them via:
 
@@ -72,15 +76,15 @@ To ensure that the right entry file is loaded when importing the project, define
 {
   "exports": {
     ".": {
-      "import": "./dist/components/index.js",
-      "types": "./dist/components/index.d.ts"
+      "import": "./dist/standalone/index.js",
+      "types": "./dist/types/index.d.ts"
     },
     "./my-component": {
-      "import": "./dist/components/my-component.js",
-      "types": "./dist/components/my-component.d.ts"
+      "import": "./dist/standalone/my-component.js",
+      "types": "./dist/types/my-component.d.ts"
     }
   },
-  "types": "dist/components/index.d.ts",
+  "types": "dist/types/index.d.ts",
 }
 ```
 
@@ -100,15 +104,15 @@ import 'my-design-system/my-component'
 ```
 
 :::note
-If you are distributing both the `dist` and `dist-custom-elements`, then it's best to pick one of them as the main entry depending on which use case is more prominent.
+If you are distributing both `loader-bundle` and `standalone`, then it's best to pick one of them as the main entry depending on which use case is more prominent — `loader-bundle` takes priority by default if both are configured (see [Package.json Validation](../output-targets/01-overview.md#packagejson-validation)).
 :::
 
-Read more about various options when it comes to distributing your components as standalone components in the [`dist-custom-elements`](../output-targets/custom-elements.md) output target section.
+Read more about various options when it comes to distributing your components as standalone components in the [`standalone`](../output-targets/custom-elements.md) output target section.
 
 The output directory will also contain an `index.js` file which exports some helper methods by default. The contents of the file will look something like:
 
 ```js
-export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
+export { setAssetPath, setPlatformOptions } from '@stencil/core/runtime/client';
 ```
 
 :::note
@@ -117,11 +121,11 @@ The contents may look different if [`customElementsExportBehavior`](../output-ta
 
 #### Considerations
 
-The `dist-custom-elements` is a direct build of the custom element that extends `HTMLElement`, without any lazy-loading. This distribution strategy may be preferred for projects that use an external bundler such as [Vite](https://vitejs.dev/), [WebPack](https://webpack.js.org/) or [Rollup](https://rollupjs.org) to compile the application. They ensure that only the components used within your application are bundled into compilation.
+`standalone` is a direct build of the custom element that extends `HTMLElement`, without any lazy-loading. This distribution strategy may be preferred for projects that use an external bundler such as [Vite](https://vitejs.dev/), [WebPack](https://webpack.js.org/) or [Rolldown](https://rolldown.rs/) to compile the application. They ensure that only the components used within your application are bundled into compilation.
 
 #### Usage in TypeScript
 
-If you plan to support consuming your component library in TypeScript you'll need to set `generateTypeDeclarations: true` on the output target in your `stencil.config.ts`, like so:
+Type declarations are always generated as of Stencil v5 — add a first-class `types` output target to your `stencil.config.ts` (there's no `generateTypeDeclarations` flag to set anymore):
 
 ```tsx title="stencil.config.ts"
 import { Config } from '@stencil/core';
@@ -129,8 +133,10 @@ import { Config } from '@stencil/core';
 export const config: Config = {
   outputTargets: [
     {
-      type: 'dist-custom-elements',
-      generateTypeDeclarations: true,
+      type: 'standalone',
+    },
+    {
+      type: 'types',
     },
     // ...
   ],
@@ -142,7 +148,7 @@ Then you can set the `types` property in `package.json` so that consumers of you
 
 ```json title="package.json"
 {
-  "types": "dist/components/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "dependencies": {
     "@stencil/core": "latest"
   },
@@ -151,7 +157,7 @@ Then you can set the `types` property in `package.json` so that consumers of you
 ```
 
 :::note
-If you set the `dir` property on the output target config, replace `dist/components` in the above snippet with the path set in the config.
+If you set the `dir` property on the `types` output target, replace `dist/types` in the above snippet with the path set in the config.
 :::
 
 ## Publishing to NPM

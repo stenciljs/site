@@ -9,7 +9,7 @@ slug: /copy-tasks
 # Copy Tasks for Output Targets
 
 All of Stencil's non-documentation output targets
-([`dist-custom-elements`](./custom-elements.md), [`dist`](./dist.md), and
+([`standalone`](./custom-elements.md), [`loader-bundle`](./dist.md), and
 [`www`](./www.md)) support a `copy` config which allows you to define file copy
 operations which Stencil will automatically perform as part of the build. This
 could be useful if, for instance, you had some static assets like images which
@@ -151,7 +151,7 @@ found, set `warn: true` in the `CopyTask` object, like so:
 ```tsx
   outputTargets: [
     {
-      type: 'dist',
+      type: 'loader-bundle',
       copy: [
         { src: 'fonts', warn: true }
       ]

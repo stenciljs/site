@@ -66,19 +66,19 @@ defineCustomElements();
 
 #### Custom Elements
 
-Consuming a `nonce` in the `dist-custom-elements` output target is easy using the provided `setNonce` helper function. This function is exported
+Consuming a `nonce` in the `standalone` output target is easy using the provided `setNonce` helper function. This function is exported
 from the index file of the output target's designated output directory.
 
 This function simply accepts the `nonce` string value that you want set for every `style` and `script` tag.
 
-This is an example of consuming the `dist-custom-elements` output in an Angular app's entrypoint:
+This is an example of consuming the `standalone` output in an Angular app's entrypoint:
 
 ```ts
 // main.ts
 
-import { defineCustomElements, setNonce } from 'my-lib/dist/components';
+import { defineCustomElements, setNonce } from 'my-lib/dist/standalone';
 // Assume `customElementsExportBehavior: 'auto-define-custom-elements'` is set
-import 'my-lib/dist/components/my-component';
+import 'my-lib/dist/standalone/my-component';
 
 // Will set the `nonce` attribute for all scripts/style tags
 // i.e. will run styleTag.setAttribute('nonce', 'r4nd0m')

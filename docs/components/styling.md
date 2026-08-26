@@ -327,7 +327,7 @@ export const config: Config = {
 };
 ```
 
-The compiler will run the same minification, autoprefixing, and plugins over `global.css` and generate an output file for the [`www`](../output-targets/www.md) and [`dist`](../output-targets/dist.md) output targets. The generated file will always have the `.css` extension and be named as the specified `namespace`.
+The compiler will run the same minification, autoprefixing, and plugins over `global.css` and generate an output file for the [`www`](../output-targets/www.md) and [`loader-bundle`](../output-targets/dist.md) output targets. The generated file will always have the `.css` extension and be named as the specified `namespace`.
 
 In the example above, since the namespace is `app`, the generated global styles file will be located at: `./www/build/app.css`.
 

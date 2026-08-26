@@ -22,17 +22,17 @@ export const config: Config = {
 };
 ```
 
-## Rollup plugins
+## Rolldown plugins
 
-The `rollupPlugins` config can be used to add your own [Rollup](https://rollupjs.org) plugins.
-Under the hood, stencil ships with some built-in plugins including `node-resolve` and `commonjs`, since the execution order of rollup plugins is important, stencil provides an API to inject custom plugin **before node-resolve** and after **commonjs transform**:
+The `rolldownPlugins` config can be used to add your own [Rolldown](https://rolldown.rs/) plugins (renamed from `rollupPlugins` in Stencil v5, which replaced Rollup with Rolldown as its bundler — run `stencil migrate --dry-run` to preview renaming an existing config automatically).
+Under the hood, stencil ships with some built-in plugins including `node-resolve` and `commonjs`, since the execution order of these plugins is important, stencil provides an API to inject custom plugins **before node-resolve** and after **commonjs transform**:
 
 
 ```tsx
 export const config = {
-  rollupPlugins: {
+  rolldownPlugins: {
     before: [
-      // Plugins injected before rollupNodeResolve()
+      // Plugins injected before node-resolve
       resolvePlugin()
     ],
     after: [

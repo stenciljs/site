@@ -72,7 +72,7 @@ For more information on this flag, please see the [configuration documentation](
 
 #### `transformAliasedImportPathsInCollection`
 
-Introduced in [Stencil v2.18.0](https://github.com/ionic-team/stencil/releases/tag/v2.18.0), `transformAliasedImportPathsInCollection` is a configuration flag on the [`dist` output target](../output-targets/dist.md#transformaliasedimportpathsincollection).
+Introduced in [Stencil v2.18.0](https://github.com/ionic-team/stencil/releases/tag/v2.18.0), `transformAliasedImportPathsInCollection` was a configuration flag on the [`dist` output target](../output-targets/dist.md) (as of Stencil v5, this same functionality lives on the `collection` output target's `transformAliasedImportPaths` option, since collection output is now its own first-class output target rather than a sub-output of `dist`).
 `transformAliasedImportPathsInCollection` transforms import paths, similar to [`transformAliasedImportPaths`](#transformaliasedimportpaths).
 This flag however, only enables the functionality of `transformAliasedImportPaths` for collection output targets.
 
@@ -96,7 +96,7 @@ export const config: Config = {
 };
 ```
 
-For more information on this flag, please see the [`dist` output target's documentation](../output-targets/dist.md#transformaliasedimportpathsincollection).
+For more information on this flag as it existed in v4, please see the [`dist` (now `loader-bundle`) output target's documentation](../output-targets/dist.md).
 
 ### In Browser Compilation Support Removed
 

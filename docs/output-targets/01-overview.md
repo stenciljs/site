@@ -7,13 +7,17 @@ slug: /output-targets
 
 # Output Targets
 
-One of the more powerful features of the compiler is its ability to generate various builds depending on _"how"_ the components are going to be used. Stencil is able to take an app's source and compile it to numerous targets, such as a webapp to be deployed on an http server, as a third-party component lazy-loaded library to be distributed on [npm](https://www.npmjs.com/), or a vanilla custom elements bundle. By default, Stencil apps have an output target type of `www`, which is best suited for a webapp.
-
+One of the more powerful features of the compiler is its ability to generate various builds depending on _"how"_ the components are going to be used. Stencil is able to take an app's source and compile it to numerous targets, such as a webapp to be deployed on an http server, as a third-party component lazy-loaded library to be distributed on [npm](https://www.npmjs.com/), or a vanilla custom elements bundle. By default, Stencil apps have an output target type of `loader-bundle`, which is best suited for design systems and component libraries — set `www` explicitly if you're building a full web app rather than a library.
 
 ## Output Target Types:
- - [`dist`: Distribution](./dist.md)
+ - [`loader-bundle`: lazy-loaded bundle for CDN/npm distribution](./dist.md) (formerly `dist`)
+ - [`standalone`: standalone custom element modules](./custom-elements.md) (formerly `dist-custom-elements`)
  - [`www`: Website](./www.md)
- - [`dist-custom-elements`: Custom Elements](./custom-elements.md)
+ - `collection`: transpiled source for downstream re-bundling, auto-generated in production (formerly the `dist-collection` sub-output of `dist`)
+ - `types`: TypeScript type declarations, auto-generated in production (formerly a sub-output of `dist`/`dist-custom-elements`)
+ - `global-style` and `assets`: first-class targets for global stylesheets and component assets
+ - `ssr`: server-side rendering (formerly `dist-hydrate-script`) — see [SSR / SSG](./ssr/01-overview.md)
+ - [Documentation generation targets](./documentation-generation/01-overview.md) (`docs-readme`, `docs-json`, `docs-custom-elements-manifest`, and others)
 
 ## Example:
 
@@ -23,7 +27,7 @@ import { Config } from '@stencil/core';
 export const config: Config = {
   outputTargets: [
     {
-      type: 'dist'
+      type: 'loader-bundle'
     },
     {
       type: 'www'
@@ -32,37 +36,10 @@ export const config: Config = {
 };
 ```
 
-## Primary Package Output Target Validation
+## Package.json Validation
 
-If `validatePrimaryPackageOutputTarget: true` is set in your project's [Stencil config](../config/01-overview.md#validateprimarypackageoutputtarget) Stencil will
-attempt to validate certain fields in your `package.json` that correspond with the generated distribution code. Because Stencil can output many different formats
-from a single project, it can only validate that the `package.json` has field values that align with one of the specified output targets in your project's config.
-So, Stencil allows you to designate which output target should be used for this validation and thus which will be the default distribution when bundling your
-project. 
-
-This behavior only affects a small subset of output targets so a flag exists on the following targets that are eligible for this level of validation: `dist`, `dist-types`,
-`dist-collection`, and `dist-custom-elements`. For any of these output targets, you can configure the target to be validated as follows:
-
-```ts title='stencil.config.ts'
-import { Config } from '@stencil/core';
-
-export const config: Config = {
-  ...,
-  outputTargets: [
-    {
-      type: 'dist',
-      // This flag is what tells Stencil to use this target for validation
-      isPrimaryPackageOutputTarget: true,
-      ...
-    },
-    ...
-  ],
-  // If this is not set, Stencil will not validate any targets
-  validatePrimaryPackageOutputTarget: true,
-};
-```
+Stencil validates that your `package.json` fields (`main`, `module`, `types`, etc.) point at real, configured output. As of Stencil v5, this validation is fully automatic — it runs whenever a distributable output target is configured, based on which outputs you have, with no config flag to enable or disable it and no per-target flag to mark one as "primary." Priority order for the root package export: `loader-bundle` takes priority over `standalone` if both are configured; types always come from the `types` output target.
 
 :::note
-Stencil can only validate one of these output targets for your build. If multiple output targets are marked for validation, Stencil will use
-the first designated target in the array and ignore all others.
+Stencil v4 required setting `validatePrimaryPackageOutputTarget: true` plus an `isPrimaryPackageOutputTarget: true` flag on one output target. Both are removed in v5 — there's no replacement flag, since validation is now fully auto-detected. Run `stencil migrate --dry-run` to preview removing them from an existing config.
 :::

@@ -46,7 +46,7 @@ named
 method on `HTMLElement` to associate your Stencil component with an ancestor
 `<form>` element. During compilation, Stencil will generate code that calls
 this method at an appropriate point in the component lifecycle for both
-[lazy](../output-targets/dist.md) and [custom elements](../output-targets/custom-elements.md) builds.
+[loader-bundle](../output-targets/dist.md) and [standalone](../output-targets/custom-elements.md) builds.
 :::
 
 A Stencil component using this API to implement a custom text input could look

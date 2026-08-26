@@ -165,9 +165,8 @@ export {};
 
 Depending on your Stencil configuration, you may need to adjust how components are loaded:
 
-- **Default (lazy-load)**: Works with the standard dev build
-- **Production build**: Use `--prod` flag to generate production bundles
-- **Custom elements**: If using the `dist-custom-elements` output target, adjust the setup file accordingly. If you wish to test this output in `--watch` mode, set `buildDist: true` in your stencil.config
+- **Default (lazy-load)**: Works with the standard dev build. Production is the default build mode as of Stencil v5 — pass `--dev` to opt into a development build instead.
+- **Custom elements**: If using the `standalone` output target, adjust the setup file accordingly. This output target is skipped in dev builds by default — set `skipInDev: false` on the `standalone` output target if you wish to test it in `--watch` mode.
 
 ## TypeScript Configuration
 

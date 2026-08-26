@@ -1,17 +1,21 @@
 ---
-title: Custom Elements with Stencil
-sidebar_label: dist-custom-elements
+title: Standalone Output Target
+sidebar_label: standalone
 description: Custom Elements with Stencil
 slug: /custom-elements
 ---
 
-# Custom Elements
+# Standalone Output Target
 
-The `dist-custom-elements` output target creates custom elements that directly extend `HTMLElement` and provides simple utility functions for easily defining these elements on the [Custom Element Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). This output target excels in use in frontend frameworks and projects that will handle bundling, lazy-loading, and custom element registration themselves.
+:::note
+Renamed from `dist-custom-elements` in Stencil v4. Run `stencil migrate --dry-run` to preview updating an existing config automatically.
+:::
 
-This target can be used outside of frameworks as well, if lazy-loading functionality is not required or desired. For using lazily loaded Stencil components, please refer to the [dist output target](./dist.md).
+The `standalone` output target creates custom elements that directly extend `HTMLElement` and provides simple utility functions for easily defining these elements on the [Custom Element Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). This output target excels in use in frontend frameworks and projects that will handle bundling, lazy-loading, and custom element registration themselves.
 
-To generate components using the `dist-custom-elements` output target, add it to a project's `stencil.config.ts` file like so:
+This target can be used outside of frameworks as well, if lazy-loading functionality is not required or desired. For using lazily loaded Stencil components, please refer to the [loader-bundle output target](./dist.md).
+
+To generate components using the `standalone` output target, add it to a project's `stencil.config.ts` file like so:
 
 ```tsx title="stencil.config.ts"
 import { Config } from '@stencil/core';
@@ -20,7 +24,7 @@ export const config: Config = {
   // Other top-level config options here
   outputTargets: [
     {
-      type: 'dist-custom-elements',
+      type: 'standalone',
       // Output target config options here
     },
     // Other output targets here
@@ -40,7 +44,7 @@ An array of [copy tasks](./copy-tasks.md) to be executed during the build proces
 
 _default: `'default'`_
 
-By default, the `dist-custom-elements` output target generates a single file per component, and exports each of those files individually.
+By default, the `standalone` output target generates a single file per component, and exports each of those files individually.
 
 In some cases, library authors may want to change this behavior, for instance to automatically define component children, provide a single file containing all component exports, etc.
 
@@ -54,7 +58,7 @@ import { Config } from '@stencil/core';
 export const config: Config = {
   outputTargets: [
     {
-      type: 'dist-custom-elements',
+      type: 'standalone',
       customElementsExportBehavior: 'default' | 'auto-define-custom-elements' | 'bundle' | 'single-export-module',
     },
     // ...
@@ -75,9 +79,29 @@ At this time, components that do not use JSX cannot be automatically
 defined. This is a known limitation of Stencil that users should be aware of.
 :::
 
+### autoLoader
+
+_default: `true`_
+
+Generates an auto-loader script that uses a `MutationObserver` to lazily load and define custom elements as they appear in the DOM — a `loader.js` file that auto-starts on import.
+
+Set to `false` to skip generating it, or pass an object for more control:
+
+```ts
+outputTargets: [
+  {
+    type: 'standalone',
+    autoLoader: {
+      fileName: 'my-loader.js', // default: 'loader.js'
+      autoStart: false,         // default: true — call start() yourself if false
+    },
+  },
+]
+```
+
 ### dir
 
-_default: `'dist/components'`_
+_default: `'dist/standalone'`_
 
 This config option allows you to change the output directory where the compiled output for this output target will be written.
 
@@ -89,26 +113,16 @@ Setting this flag to `true` will remove the contents of the [output directory](#
 
 ### externalRuntime
 
-_default: `true`_
+_default: `false`_
 
 Setting this flag to `true` results in the following behaviors:
 
 1. Minification will follow what is specified in the [Stencil config](../config/01-overview.md#minifyjs).
 2. Filenames will not be hashed.
-3. All imports from packages under `@stencil/core/*` will be marked as external and therefore not included in the generated Rollup bundle.
-
-Ensure that `@stencil/core` is included in your list of dependencies if you set this option to `true`. This is crucial to prevent any runtime errors.
-
-### generateTypeDeclarations
-
-_default: `true`_
-
-By default, Stencil will generate type declaration files (`.d.ts` files) as a part of the `dist-custom-elements` output target through the `generateTypeDeclarations` field on the target options. Type declaration files will be placed in the `dist/types` directory in the root of a Stencil project. At this time, this output destination is not able to be configured.
-
-Setting this flag to `false` will not generate type declaration files for the `dist-custom-elements` output target.
+3. All imports from packages under `@stencil/core/*` will be marked as external and therefore not included in the generated bundle.
 
 :::note
-When set to generate type declarations, Stencil respects the export behavior selected via `customElementsExportBehavior` and generates type declarations specific to the content of the generated [output directory's](#dir) `index.js` file.
+As of Stencil v5, component bundles are self-contained by default (`externalRuntime: false`) — the runtime is included as a local shared chunk. Set this to `true` only if you need multiple Stencil component libraries on the same page to share a single runtime instance, and ensure `@stencil/core` is included in your list of dependencies if you do — this is crucial to prevent any runtime errors.
 :::
 
 ### includeGlobalScripts
@@ -116,13 +130,6 @@ When set to generate type declarations, Stencil respects the export behavior sel
 _default: `false`_
 
 Setting this flag to `true` will include [global scripts](../config/01-overview.md#globalscript) in the bundle and execute them once the bundle entry point in loaded.
-
-### isPrimaryPackageOutputTarget
-
-_default: `false`_
-
-If `true`, this output target will be used to validate `package.json` fields for your project's distribution. See the overview of [primary package output target validation](./01-overview.md#primary-package-output-target-validation)
-for more information.
 
 ### minify
 
@@ -132,14 +139,14 @@ Setting this flag to `true` will cause file minification to follow what is speci
 
 ## Making Assets Available
 
-For performance reasons, the generated bundle does not include [local assets](../guides/assets.md) built within the JavaScript output, 
+For performance reasons, the generated bundle does not include [local assets](../guides/assets.md) built within the JavaScript output,
 but instead it's recommended to keep static assets as external files. By keeping them external this ensures they can be requested on-demand, rather
 than either welding their content into the JS file, or adding many URLs for the bundler to add to the output.
 One method to ensure [assets](../guides/assets.md) are available to external builds and http servers is to set the asset path using `setAssetPath()`.
 
 The `setAssetPath()` function is used to manually set the base path where static assets can be found.
-For the lazy-loaded output target the asset path is automatically set and assets copied to the correct
-build directory. However, for custom elements builds, the `setAssetPath(path)` should be
+For the [`loader-bundle`](./dist.md) output target the asset path is automatically set and assets copied to the correct
+build directory. However, for `standalone` builds, `setAssetPath(path)` should be
 used to customize the asset path depending on where they are found on the http server.
 
 If the component's script is a `type="module"`, it's recommended to use `import.meta.url`, such
@@ -147,7 +154,7 @@ as `setAssetPath(import.meta.url)`. Other options include `setAssetPath(document
 dynamically set the path at build time, such as `setAssetPath(process.env.ASSET_PATH)`.
 
 ```tsx
-import { setAssetPath } from 'my-library/dist/components';
+import { setAssetPath } from 'my-library/dist/standalone';
 
 setAssetPath(document.currentScript.src);
 ```
@@ -158,7 +165,7 @@ The configs below provide examples of how to do this automatically with popular 
 
 ## Example Bundler Configs
 
-Instructions for consuming the custom elements bundle vary depending on the bundler you're using. These examples will help your users consume your components with webpack and Rollup.
+Instructions for consuming the standalone bundle vary depending on the bundler you're using. These examples will help your users consume your components with webpack and Rollup.
 
 The following examples assume your component library is published to NPM as `my-library`. You should change this to the name you actually publish your library with.
 
@@ -194,7 +201,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'node_modules/my-library/dist/my-library/assets'),
+          from: path.resolve(__dirname, 'node_modules/my-library/dist/standalone/assets'),
           to: path.resolve(__dirname, 'dist/assets'),
         },
       ],
@@ -226,7 +233,7 @@ export default {
     copy({
       targets: [
         {
-          src: path.resolve(__dirname, 'node_modules/my-library/dist/my-library/assets'),
+          src: path.resolve(__dirname, 'node_modules/my-library/dist/standalone/assets'),
           dest: path.resolve(__dirname, 'dist'),
         },
       ],

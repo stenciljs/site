@@ -48,12 +48,12 @@ export { setTagTransformer } from '@stencil/core';
 
 2) Application developers can then import and use `setTagTransformer` (*before component definition*)
 
-#### Usage via the `dist` output
+#### Usage via the `loader-bundle` output
 
 ```html
 <!-- Setup a tag transformer -->
 <script type="module">
-  import { setTagTransformer } from 'https://cdn.jsdelivr.net/npm/@component/library/dist/index.esm.js';
+  import { setTagTransformer } from 'https://cdn.jsdelivr.net/npm/@component/library/dist/loader-bundle/index.js';
     
   setTagTransformer((tag) => {
     if (tag.startsWith('my-')) {
@@ -65,7 +65,7 @@ export { setTagTransformer } from '@stencil/core';
 
 <!-- Use the lazy loader as normal -->
  
-<script type="module" src="https://cdn.jsdelivr.net/npm/@component/library/dist/my-app.esm.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@component/library/dist/loader-bundle/my-app.js"></script>
 
 <body>
   <your-button></your-button> 
@@ -73,7 +73,7 @@ export { setTagTransformer } from '@stencil/core';
 </body>
 ```
 
-#### Usage via a the `dist-custom-elements` output
+#### Usage via the `standalone` output
 
 ```js
 import { setTagTransformer } from '@component/library';
@@ -93,7 +93,7 @@ setTagTransformer((tag) => {
 defineCustomElement();
 ```
 
-#### Usage via `dist-hydrate-script` output (on a Node.js server)
+#### Usage via `ssr` output (on a Node.js server)
 
 ```js
 import { renderToString } from '@component/library/v1/hydrate/index.mjs';

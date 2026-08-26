@@ -157,9 +157,9 @@ export class APIComponent {
 
 *default: `false`*
 
-Stencil will generate [export maps](https://nodejs.org/api/packages.html#packages_exports) that correspond with various output target outputs. This includes the root
-entry point based on the [primary output target](../output-targets/01-overview.md#primary-package-output-target-validation) (or first eligible output target if not specified),
-the entry point for the lazy-loader (if using the `dist` output target), and entry points for each component (if using `dist-custom-elements`).
+Stencil will generate [export maps](https://nodejs.org/api/packages.html#packages_exports) that correspond with various output target outputs. The root
+entry point uses smart defaults (see [Package.json Validation](../output-targets/01-overview.md#packagejson-validation)) —
+`loader-bundle` takes priority over `standalone` if both are configured — and entry points are also added for the lazy-loader (if using the `loader-bundle` output target) and for each component (if using `standalone`).
 
 ## globalScript
 
@@ -534,21 +534,16 @@ import { UtilInterface } from '../path/to/utils';
 export declare function util(arg: UtilInterface): void;
 ```
 
-## validatePrimaryPackageOutputTarget
-
-*default: `false`*
-
-When `true`, validation for common `package.json` fields will occur based on setting an output target's `isPrimaryPackageOutputTarget` flag.
-For more information on package validation, please see the [output target docs](../output-targets/01-overview.md#primary-package-output-target-validation).
-
-## rollupConfig
-
-Passes custom configuration down to rollup itself. The following options can be overwritten:
-
-- `inputOptions`: [`context`](https://rollupjs.org/configuration-options/#context), [`external`](https://rollupjs.org/configuration-options/#external), [`moduleContext`](https://rollupjs.org/configuration-options/#modulecontext) [`treeshake`](https://rollupjs.org/configuration-options/#treeshake)
-- `outputOptions`: [`globals`](https://rollupjs.org/configuration-options/#output-globals) 
+## rolldownConfig
 
 *default: `{}`*
+
+Passes custom configuration down to [Rolldown](https://rolldown.rs/) itself, which replaced Rollup as Stencil's bundler in v5 (renamed from `rollupConfig` — run `stencil migrate --dry-run` to preview updating an existing config automatically). The config shape is flatter than the old Rollup-era `rollupConfig` — there's no more `inputOptions`/`outputOptions` nesting:
+
+- `treeshake`: boolean
+- `external`: a string, `RegExp`, array of either, or a function `(source, importer, isResolved) => boolean | null | undefined`
+
+The old `inputOptions.context`, `inputOptions.moduleContext`, and `outputOptions.globals` options have no `rolldownConfig` equivalent.
 
 ## watchIgnoredRegex
 

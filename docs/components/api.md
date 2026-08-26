@@ -66,8 +66,8 @@ el.componentOnReady().then(() => {
 ```
 
 The availability of `componentOnReady()` depends on the component's compiled output type. This method is only available for lazy-loaded
-distribution types ([`dist`](../output-targets/dist.md) and [`www`](../output-targets/www.md)) and, as such, is not available for
-[`dist-custom-elements`](../output-targets/custom-elements.md) output. If you want to simulate the behavior of `componentOnReady()` for non-lazy builds,
+distribution types ([`loader-bundle`](../output-targets/dist.md) and [`www`](../output-targets/www.md)) and, as such, is not available for
+[`standalone`](../output-targets/custom-elements.md) output. If you want to simulate the behavior of `componentOnReady()` for non-lazy builds,
 you can implement a helper method to wrap the functionality similar to what the Ionic Framework does [here](https://github.com/ionic-team/ionic-framework/blob/main/core/src/utils/helpers.ts#L60-L79).
 
 ## The `appload` event
