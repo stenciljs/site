@@ -23,18 +23,18 @@ npm create stencil@5
 ```
 
 :::note
-While v5 is in preview, keep the explicit `@5` (or `@next`/`@alpha`) version — plain `npm create stencil` still resolves to the current stable v4 line until v5 reaches general availability.
+While v5 is in preview, keep the explicit `@5` (or `@next`/`@alpha`) version - plain `npm create stencil` still resolves to the current stable v4 line until v5 reaches general availability.
 :::
 
-`stencil init` is context-aware: run in an empty directory, it scaffolds a new project. Run inside an existing Stencil project, it switches to "add capabilities" mode instead, letting you install and configure integrations (testing, styling, framework output targets) you didn't set up initially — the same thing [`stencil add`](#adding-capabilities-later) does for a single package.
+`stencil init` is context-aware: run in an empty directory, it scaffolds a new project. Run inside an existing Stencil project, it switches to "add capabilities" mode instead, letting you install and configure integrations (testing, styling, framework output targets) you didn't set up initially - the same picker [`stencil add`](#adding-capabilities-later) shows when you run it with no arguments.
 
-The wizard walks you through a handful of questions — project name, which output targets you need, and which integrations (testing, styling, framework wrappers) to install and configure. Answering them installs the packages you chose and generates a project directory matching your project name.
+The wizard walks you through a handful of questions - project name, which output targets you need, and which integrations (testing, styling, framework wrappers) to install and configure. Answering them installs the packages you chose and generates a project directory matching your project name.
 
 Once it finishes, move into the new directory and start the dev server:
 
 ```bash npm2yarn
 cd my-first-stencil-project
-npm start
+npm run dev
 ```
 
 ### Useful Initial Commands
@@ -45,11 +45,11 @@ A scaffolded project's `package.json` comes with a few scripts to get started:
 - `npm run build` (`stencil build`) creates a production build of your components.
 - `npm run generate` (`stencil generate`, or `stencil g`) scaffolds a new component.
 
-Unlike Stencil v4, a new project has no test setup by default — v5 has no integrated test runner. Add one through the wizard (`stencil add`, see below) when you're ready; [`@stencil/vitest`](../testing/vitest/01-overview.md) is the recommended starting point for most projects.
+Unlike Stencil v4, a new project has no test setup by default - v5 has no integrated test runner. Add one through the wizard (`stencil add`, see below) when you're ready; [`@stencil/vitest`](../testing/vitest/01-overview.md) is the recommended starting point for most projects.
 
 ### Source Control
 
-`stencil init` initializes a new git repository for you if git is installed and your project isn't already inside another git work tree (for example, a package inside a monorepo won't get its own nested repo). If you'd rather set up version control yourself:
+`stencil init` doesn't set up version control for you. Initialize a git repository once your project is scaffolded:
 
 ```bash
 $ git init
@@ -63,6 +63,19 @@ Stencil components are created by adding a new file with a `.tsx` extension, suc
 The `.tsx` extension is required since Stencil components are built using [JSX](../components/templating-and-jsx.md) and TypeScript.
 
 The wizard generates a starter component, `my-component.tsx`, in the `src/components/my-component` directory:
+
+<!--
+  TODO(live-demo): replace/supplement this static walkthrough (source, usage snippet, and
+  described output below) with a single live, editable demo - the reader edits `first`/
+  `middle`/`last` (or the component source itself) and sees the real compiled/rendered
+  result update, rather than reading a description of what the browser will display. This
+  is the strongest candidate on the whole site for the "real compiler, not a sandboxed
+  runtime" direction (§6): it's the reader's first-ever contact with Stencil's compile step
+  (decorators, JSX, `styleUrl`), so showing the actual transformation matters most here.
+  See V5_DOCS_PLAN.md §6 - tool not yet decided (playground-elements was proposed and
+  retracted; needs a POC comparing @stencil/unplugin-in-a-real-browser-Node-runtime vs. a
+  custom Sandpack/Nodebox-backed playground before implementing).
+-->
 
 ```tsx title="my-component.tsx"
 import { Component, Prop } from '@stencil/core';
@@ -100,13 +113,11 @@ Once compiled, this component can be used in HTML just like any other tag.
 <my-component first="Stencil" middle="'Don't call me a framework'" last="JS"></my-component>
 ```
 
-When rendered, the browser will display `Hello World! I'm Stencil 'Don't call me a framework' JS`.
+When rendered, the browser will display `Hello, World! I'm Stencil 'Don't call me a framework' JS`.
 
 ### Anatomy of `my-component`
 
 Let's dive in and describe what's happening in `my-component`, line-by-line.
-
-Notice there's no `import { h } from '@stencil/core'`, even though the component returns JSX in `render()`. Stencil's default project template uses TypeScript's automatic JSX runtime (`jsx: "react-jsx"`, `jsxImportSource: "@stencil/core"`), so the compiler injects what it needs — you don't have to import `h` yourself just to have it in scope.
 
 The first piece we see is the [`@Component` decorator](../components/component.md):
 ```tsx
@@ -141,10 +152,10 @@ Each of these class members have the [`@Prop()` decorator](../components/propert
 `@Prop()` tells Stencil that the property is public to the component, and allows Stencil to rerender when any of these public properties change.
 We'll see how this works after discussing the `render()` function.
 
-In order for the component to render something to the screen, we must declare a [`render()` function](../components/templating-and-jsx.md#basics) that returns JSX.
+For the component to render something to the screen, we declare a [`render()` function](../components/templating-and-jsx.md#basics) that returns JSX.
 If you're not sure what JSX is, be sure to reference the [Using JSX](../components/templating-and-jsx.md) docs.
 
-The quick idea is that our render function needs to return a representation of the HTML we want to push to the DOM.
+The render function returns a representation of the HTML we want to push to the DOM.
 
 ```tsx
   private getText(): string {
@@ -174,10 +185,6 @@ stencil add
 
 Run without arguments, `stencil add` prompts you to pick from known integrations (like [`@stencil/vitest`](../testing/vitest/01-overview.md) or [`@stencil/playwright`](../testing/playwright/01-overview.md)) and any already-installed packages that expose their own setup wizard. You can also install a specific package directly: `stencil add @stencil/vitest`.
 
-:::note
-As of this writing, `stencil init` and `stencil add` don't yet support running non-interactively (for example, in a CI pipeline) — both need to prompt you for answers.
-:::
-
 ## Local Development
 
 After creating your Stencil components, you'll likely want to use them in an existing application. There are multiple approaches for local development depending on your project setup.
@@ -190,7 +197,7 @@ If you want to integrate your Stencil components directly into an existing appli
 
 If you're building a standalone component library and want to use it in another project during development, you have two main options:
 
-### Using Script Tags
+#### Using Script Tags
 
 For applications that don't use npm or for simple HTML pages, you can include your components directly with a script tag:
 
@@ -200,14 +207,14 @@ cd my-first-stencil-project
 npm run build
 ```
 
-This creates a `dist/loader-bundle/` directory containing your compiled components. Copy this folder to your application, then add a script tag that points to the bundle:
+This creates a `dist/loader-bundle/` directory containing your compiled components. Copy this folder to your application, then add a script tag that points to the bundle. The file lives in a subdirectory named after your project's namespace, lowercased with no separators - for a project named `my-first-stencil-project`, the namespace is `MyFirstStencilProject` and the file is `myfirststencilproject/myfirststencilproject.js`:
 
 ```html
 <!DOCTYPE html>
 <html>
 <head>
   <!-- Import your Stencil namespace -->
-  <script type="module" src="path/to/dist/loader-bundle/my-first-stencil-project.js"></script>
+  <script type="module" src="path/to/dist/loader-bundle/myfirststencilproject/myfirststencilproject.js"></script>
 </head>
 <body>
   <!-- Now you can use your components -->
@@ -216,19 +223,23 @@ This creates a `dist/loader-bundle/` directory containing your compiled componen
 </html>
 ```
 
-> **Note:** When using script tags, your application must be served from a web server rather than opened as a local file. You can use tools like [http-server](https://www.npmjs.com/package/http-server) or your IDE's built-in server.
+:::note
+When using script tags, your application must be served from a web server rather than opened as a local file. You can use tools like [http-server](https://www.npmjs.com/package/http-server) or your IDE's built-in server.
+:::
 
 When you update your Stencil components, remember to rebuild the project and update the files in your consuming application.
 
-Both approaches allow you to develop and test your components in the context of a real application, making it easier to refine their design and functionality.
+Once you `npm publish` your package, that same file is available straight from a CDN like jsDelivr, without copying anything: `https://cdn.jsdelivr.net/npm/my-first-stencil-project@1.0.0/dist/loader-bundle/myfirststencilproject/myfirststencilproject.js`. See [Publishing to NPM](../guides/publishing.md) for the full picture.
 
-### Using npm link
+#### Using npm link
 
 For npm-based projects, `npm link` creates a symbolic link between your Stencil component library and the consuming application. However, linking to a Stencil component this way can still be a little tricky. [Angular](../framework-integration/angular.md), [React](../framework-integration/react.md), and [Vue](../framework-integration/vue.md) each have their own documentation which includes `npm link` and it's recommended you follow those integration guides.
 
+Both approaches let you develop and test your components inside a real application.
+
 ## Updating Stencil
 
-To get the latest version of @stencil/core you can run:
+To get the latest version of `@stencil/core`, run:
 
 ```bash npm2yarn
 npm install @stencil/core@latest --save-exact
