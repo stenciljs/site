@@ -201,26 +201,13 @@ export default function() {
 
 ## globalStyle
 
-Stencil is traditionally used to compile many components into an app, and each component comes with its own compartmentalized styles. However, it's still common to have styles which should be "global" across all components and the website. A global CSS file is often useful to set [CSS Variables](../components/styling.md).
+*default: `undefined`*
 
-Additionally, the `globalStyle` config can be used to precompile styles with Sass, PostCSS, etc.
-
-Below is an example folder structure containing a webapp's global css file, named `app.css`.
-
-```bash
-src/
-  components/
-  global/
-    app.css
-```
-
-The global style config takes a file path as a string. The output from this build will go to the `buildDir`. In this example it would be saved to `www/build/app.css`. Additionally, these global styles are automatically applied to all components with shadow roots via constructable stylesheets, allowing you to style shadow DOM components directly.
+A top-level path to a global stylesheet, predating the [`global-style` output target](../output-targets/01-overview.md). Setting `globalStyle` auto-generates a `global-style` output target for you, so it still works, but new projects should [configure `global-style` directly](../components/styling.md#global-styles) instead - it supports more than one global stylesheet, a custom output filename, and control over shadow-root injection, none of which `globalStyle` alone gives you.
 
 ```tsx
 globalStyle: 'src/global/app.css'
 ```
-
-Check out the [styling docs](../components/styling.md#global-styles) of how to use global styles in your app.
 
 ## hashedFileNameLength
 

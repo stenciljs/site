@@ -117,7 +117,7 @@ If you need to update the host element in response to prop or state changes, you
 
 ## Styling
 
-See full information about styling on the [Styling page](./styling.md#shadow-dom-in-stencil).
+See full information about styling on the [Styling page](./styling.md#shadow).
 
 CSS can be applied to the `<Host>` element by using its component tag defined in the `@Component` decorator.
 

@@ -7,126 +7,84 @@ slug: /styling
 
 # Styling Components
 
-## Shadow DOM
+## Choosing an Encapsulation Strategy
 
-### What is the Shadow DOM?
+Styling your components depends partly on their [`encapsulation`](./component.md#encapsulation) choice - `shadow`, `scoped`, or `none`.
 
-The [shadow DOM](https://developers.google.com/web/fundamentals/web-components/shadowdom) is an API built into the browser that allows for DOM encapsulation and style encapsulation. It is a core aspect of the Web Component standards. The shadow DOM shields a component's styles, markup, and behavior from its surrounding environment. This means that we do not need to be concerned about scoping our CSS to our component, nor worry about a component's internal DOM being interfered with by anything outside the component.
+<!--
+  TODO(live-demo): replace/supplement this static example with an interactive live demo -
+  three near-identical components, one per encapsulation type, the same CSS selector
+  applied to all three, live side by side, so the isolation difference is something the reader
+  sees rather than reads three descriptions of. See V5_DOCS_PLAN.md §6 - the tool for this is
+  not yet decided (playground-elements was proposed and retracted; needs a POC comparing
+  @stencil/unplugin-in-a-real-browser-Node-runtime vs. a custom Sandpack/Nodebox-backed
+  playground before implementing).
+-->
 
-When talking about the shadow DOM, we use the term "light DOM" to refer to the "regular" DOM. The light DOM encompasses any part of the DOM that does not use the shadow DOM.
-
-### Shadow DOM in Stencil
-
-The shadow DOM hides and separates the DOM of a component in order to prevent clashing styles or unwanted side effects. We can use the shadow DOM in our Stencil components to ensure our components won't be affected by the applications in which they are used.
-
-To use the Shadow DOM in a Stencil component, set `encapsulation` to `{ type: 'shadow' }` in the component decorator.
-
-```tsx
+```tsx title="my-component.tsx"
 @Component({
-  tag: 'shadow-component',
-  styleUrl: 'shadow-component.css',
-  encapsulation: { type: 'shadow' },
+  tag: 'my-component',
+  styleUrl: 'my-component.css',
+  encapsulation: { type: 'shadow' }, // or { type: 'scoped' }, or omit entirely for 'none'
 })
-export class ShadowComponent {}
+export class MyComponent {}
 ```
 
-If you'd like to learn more about enabling and configuring the shadow DOM, see the [`encapsulation` field of the component api](./component.md#encapsulation).
+| | `shadow` | `scoped` | `none` |
+|---|---|---|---|
+| Style isolation | Full - styles can't leak in or out | Stencil-applied - a generated class scopes your CSS, but light-DOM styles can still reach in | None by default - pair with native [`@scope`](#real-scoping-with-scope) for real scoping |
+| DOM location | Shadow root (unreachable from `document.querySelector()` or external CSS) | Light DOM (reachable with `document.querySelector()` and ordinary CSS) | Light DOM |
+| `<slot>` | Native browser slot projection | Stencil-managed light-DOM slotting (see [below](#slotting-without-shadow-dom)) | Same as `scoped` |
+| Styling parts from outside | `::part()`, piercing the shadow boundary | A plain attribute selector (e.g. `[part="heading"]`) - there's no boundary for `::part()` to pierce | Same as `scoped` |
+| Global stylesheets reach in? | Only via `:host()` in a stylesheet registered as a [constructable stylesheet](#constructable-stylesheets) | Yes, like any other element | Yes, like any other element |
 
-By default, components created with the [`stencil generate` command](../config/cli.md#stencil-generate) use the shadow DOM.
+Reach for `shadow` when you want the browser to guarantee isolation for you - publishing a design system used across teams you don't control, or embedding a component into a page whose CSS you don't trust. Reach for `scoped` or `none` when you want your component's DOM to behave like an ordinary part of the page.
 
-### Styling with the Shadow DOM
+### `shadow`
 
-With the shadow DOM enabled, elements within the shadow root are scoped, and styles outside of the component do not apply. As a result, CSS selectors inside the component can be simplified, as they will only apply to elements within the component. We do not have to include any specific selectors to scope styles to the component.
+Full isolation, guaranteed by the browser - not just Stencil. The one shadow-specific addition to your CSS is [`:host`](./host-element.md), which selects the host element itself. Enabled by default for components made with [`stencil generate`](../config/cli.md#stencil-generate).
 
-```css
-:host {
-  color: black;
-}
+### `scoped`
 
-div {
-  background: blue;
-}
-```
+Stencil generates a unique class for your component (e.g. `sc-my-component`), rewrites your stylesheet's selectors to include it, and adds that same class to the component's elements at render time - you write ordinary CSS, Stencil does the scoping. One-directional: page styles can still reach in, even though yours can't leak out.
 
-:::note
-The `:host` pseudo-class selector is used to select the [`Host` element](./host-element.md) of the component
-:::
+### `none`
 
-With the shadow DOM enabled, only these styles will be applied to the component. Even if a style in the light DOM uses a selector that matches an element in the component, those styles will not be applied.
+No scoping at all, and the default. Reach for it when a component should inherit and participate in page styles on purpose (a typography or layout primitive), or when you want to add your own scoping - see [Real Scoping With `@scope`](#real-scoping-with-scope) below.
 
-### Shadow DOM QuerySelector
+## Real Scoping With `@scope`
 
-When using Shadow DOM and you want to query an element inside your web component, you must first use the [`@Element` decorator](./host-element.md#element-decorator) to gain access to the host element, and then you can use the `shadowRoot` property to perform the query. This is because all of your DOM inside your web component is in a shadowRoot that Shadow DOM creates. For example:
-  
-```tsx
-import { Component, Element } from '@stencil/core';
+`type: 'none'` doesn't scope your styles at all, so if you want scoping without `type: 'scoped'`'s generated class, write it yourself with the native [`@scope`](https://developer.mozilla.org/en-US/docs/Web/CSS/@scope) at-rule - no Stencil mechanism involved, just the browser doing what `@scope` was designed for:
 
-@Component({
-  tag: 'shadow-component',
-  styleUrl: 'shadow-component.css',
-  encapsulation: { type: 'shadow' },
-})
-export class ShadowComponent {
-
-  @Element() el: HTMLElement;
-
-  componentDidLoad() {
-    const elementInShadowDom = this.el.shadowRoot.querySelector('.a-class-selector');
-
-    ...
+```css title="plain-component.css"
+@scope (plain-component) {
+  :scope {
+    display: block;
   }
 
+  h1 {
+    color: blue;
+  }
 }
 ```
 
-### Shadow DOM Browser Support
+Everything inside the `@scope` block only matches within a `<plain-component>` element's subtree - `h1` here won't touch any other `h1` on the page. This is the evergreen alternative to `type: 'scoped'`: real scoping, native to the platform, with none of Stencil's own generated-class scoping mechanism involved.
 
-The shadow DOM is currently natively supported in the following browsers:
+:::note
+`@scope` reached Baseline "Newly available" as of Firefox 146 (December 2025) - it's also supported in Chrome 118+, Safari 17.4+, and Edge 118+. Choose `type: 'scoped'` instead if you need to support browsers from before this landed.
+:::
 
-- Chrome
-- Firefox
-- Safari
-- Edge (v79+)
-- Opera
+## Slotting Without Shadow DOM
 
-In browsers which do not support the shadow DOM we fall back to scoped CSS. This gives you the style encapsulation that comes along with the shadow DOM but without loading in a huge shadow DOM polyfill.
+This applies equally to `scoped` and `none` - both keep your component's DOM in the light DOM.
 
-### Scoped CSS
+`<slot>` is normally a shadow DOM feature - outside a shadow root, the browser doesn't know what to do with it. For `scoped` and `none` components, Stencil's own renderer handles this instead: it tracks where each piece of slotted content belongs and places it correctly during render, and polyfills the parts of the `<slot>` API you'd expect (`slotchange` events, `assignedElements()`/`assignedNodes()`, named slots, fallback content). This happens automatically - you write `<slot>` in your `render()` function exactly like you would in a shadow-encapsulated component.
 
-An alternative to using the shadow DOM is using scoped components. You can use scoped components by setting `encapsulation` to `{ type: 'scoped' }` in the component decorator.
-
-```tsx
-@Component({
-  tag: 'scoped-component',
-  styleUrl: 'scoped-component.css',
-  encapsulation: { type: 'scoped' },
-})
-export class ScopedComponent {}
-```
-
-Scoped CSS is a proxy for style encapsulation. It works by appending a data attribute to your styles to make them unique and thereby scope them to your component. It does not, however, prevent styles from the light DOM from seeping into your component.
+Slot placement can still go wrong when something other than Stencil's own renderer moves your component's children around after the fact - a consuming framework's reconciler, or a script calling `appendChild()`/`insertBefore()` directly on your component. Left alone, that content could land in the wrong slot, or outside any slot at all. Stencil patches those DOM-mutation methods on non-shadow components so they keep slot placement correct even when called from outside its own renderer. This is controlled by the [`compat.lightDomPatches`](../config/compat.md#lightdompatches) config option, which is enabled by default.
 
 ## CSS Custom Properties
 
-CSS custom properties, also often referred to as CSS variables, are used to contain values that can then be used in multiple CSS declarations. For example, we can create a custom property called `--color-primary` and assign it a value of `blue`.
-
-```css
-:host {
-  --color-primary: blue;
-}
-```
-
-And then we can use that custom property to style different parts of our component
-
-```css
-h1 {
-  color: var(--color-primary);
-}
-```
-
-### Customizing Components with Custom Properties
-
-CSS custom properties can allow the consumers of a component to customize a component's styles from the light DOM. Consider a `shadow-card` component that uses a custom property for the color of the card heading.
+CSS custom properties (CSS variables) let consumers of a component customize its styles from the light DOM, reaching in even through a shadow boundary. Consider a `shadow-card` component that uses a custom property for the color of its heading:
 
 ```css
 :host {
@@ -139,7 +97,7 @@ CSS custom properties can allow the consumers of a component to customize a comp
 ```
 
 :::note
-CSS custom properties must be declared on the `Host` element (`:host`) in order for them to be exposed to the consuming application.
+Declare the custom property on the `Host` element (`:host`) to expose it to the consuming application - this sets its default value for the component. `var(--heading-color)` works the same way with or without this declaration; declaring it on `:host` is what makes *this* component the one that defines the default, rather than inheriting one from further up the page (or having none at all).
 :::
 
 The `shadow-card` heading will have a default color of `black`, but this can now be changed in the light DOM by selecting the `shadow-card` and changing the value of the `--heading-color` custom property.
@@ -147,6 +105,17 @@ The `shadow-card` heading will have a default color of `black`, but this can now
 ```css
 shadow-card {
   --heading-color: blue;
+}
+```
+
+Document a custom property meant for consumers with a `@prop` JSDoc comment next to where you declare it - Stencil picks these up and generates a table of them for your component's docs (see [Styling Details](../output-targets/documentation-generation/docs-readme.md#styling-details)):
+
+```css
+:host {
+  /**
+   * @prop --heading-color: Color of the card heading
+   */
+  --heading-color: black;
 }
 ```
 
@@ -298,7 +267,9 @@ This approach ensures your components are adaptable and can dynamically switch b
 
 ## Global styles
 
-While most styles are usually scoped to each component, sometimes it's useful to have styles that are available to all the components in your project. To create styles that are globally available, start by creating a global stylesheet. For example, you can create a folder in your `src` directory called `global` and create a file called `global.css` within that. Most commonly, this file is used to declare CSS custom properties on the root element via the `:root` pseudo-class. This is because styles provided via the `:root` pseudo-class can pass through the shadow boundary. For example, you can define a primary color that all your components can use.
+While most styles are scoped to each component, some styles need to be available everywhere: theming, `@font-face`, an app-wide font family, CSS resets. Stencil generates these through a `global-style` output target.
+
+Create `src/global.css` and Stencil picks it up automatically, no config required - it generates a `global-style` output target for you, named after your project's `namespace`. Commonly, this file might declare CSS custom properties on the root element via `:root`, since `:root` styles pass through the shadow boundary and reach every component:
 
 ```css
 :root {
@@ -306,69 +277,84 @@ While most styles are usually scoped to each component, sometimes it's useful to
 }
 ```
 
-In addition to CSS custom properties, other use cases for a global stylesheet include
-
-- Theming: defining CSS variables used across the app
-- Load fonts with `@font-face`
-- App wide font-family
-- CSS resets
-
-To make the global styles available to all the components in your project, the `stencil.config.ts` file comes with an optional [`globalStyle` setting](../config/01-overview.md#globalstyle) that accepts the path to your global stylesheet.
+For anything beyond that default - a stylesheet outside `src/global.{css,...}`, more than one global stylesheet (light / dark themes), a custom output filename, or making the stylesheet's CSS directly available inside shadow roots - configure `global-style` directly:
 
 ```tsx
 export const config: Config = {
-  namespace: 'app',
-  globalStyle: 'src/global/global.css',
-  outputTarget: [
+  outputTargets: [
     {
-      type: 'www',
+      type: 'global-style',
+      input: './src/theme.css',
+      fileName: 'theme.css',
+    },
+    {
+      type: 'global-style',
+      input: './src/print.css',
+      fileName: 'print.css',
     },
   ],
 };
 ```
 
-The compiler will run the same minification, autoprefixing, and plugins over `global.css` and generate an output file for the [`www`](../output-targets/www.md) and [`loader-bundle`](../output-targets/dist.md) output targets. The generated file will always have the `.css` extension and be named as the specified `namespace`.
+For more advanced `global-style` options, refer to the `global-style` output target docs.
 
-In the example above, since the namespace is `app`, the generated global styles file will be located at: `./www/build/app.css`.
-
-This file must be manually imported in the `index.html` of your application.
+The compiler runs minification, autoprefixing, and plugins over global stylesheets and writes the result to `dist/assets/`, alongside component assets - import it in your `index.html`:
 
 ```html
-<link rel="stylesheet" href="/build/app.css" />
+<link rel="stylesheet" href="/assets/theme.css" />
 ```
+
+### Co-locating styles with a component
+
+A project-wide global stylesheet works well for true app-wide concerns, but sometimes a *specific component* needs to contribute document-level styles: a card component that also needs to style its slotted children before Stencil's JS has loaded, or a design token set that only matters when that component is present on the page. Set `globalStyleUrl` (or inline `globalStyle`) on `@Component()` to co-locate that CSS with the component itself, instead of maintaining a separate global stylesheet by hand:
+
+```tsx
+@Component({
+  tag: 'my-card',
+  styleUrl: 'my-card.css',
+  globalStyleUrl: './my-card.global.css',
+})
+export class MyCard {}
+```
+
+`globalStyleUrl` styles aren't scoped to the component the way `styleUrl` styles are - they're collected at build time from every component that declares one, then injected wherever `@import "stencil-globals";` appears in a global stylesheet:
+
+```css title="src/global.css"
+@import "stencil-globals";
+```
+
+This works for every `encapsulation` type. It's also what makes a CSS-only component possible - one with no `render()` method or component logic at all, where the tag exists purely so its co-located styles have something to attach to.
+
+`@import "stencil-globals"` accepts the same modifiers a normal `@import` does, wrapping the injected CSS accordingly: `@import "stencil-globals" layer(components);` wraps it in `@layer components { ... }`.
+
+### Preventing flash of unstyled content with `stencil-hydrate`
+
+Before a component's JavaScript loads and its `render()` runs for the first time, the browser has already parsed its light-DOM markup and any co-located styles - so there's a moment where a component can be visible but not yet interactive or fully styled by its own `render()` output. Left alone, this shows up as a flash of unstyled content (FOUC): the raw, unhydrated markup appears briefly before Stencil's runtime takes over.
+
+By default, Stencil's [loader script](../output-targets/dist.md#loader) - the small entry file that registers and lazy-loads your components - handles this at runtime: it inserts a `<style>` tag that hides components until they're hydrated. But that script still has to load and run before it can insert anything - on a slow connection or a busy main thread, the page can paint before the loader gets a chance to hide the unhydrated content, and FOUC happens anyway. Add `@import "stencil-hydrate";` to a global stylesheet to generate that same hiding CSS at build time instead, so it's already in the page's stylesheet before any JS has to run:
+
+```css title="src/global.css"
+@import "stencil-hydrate";
+```
+
+The compiler replaces the placeholder with the sorted tag list for every component in the build, hiding each one until it's hydrated:
+
+```css
+my-cmp,other-cmp{visibility:hidden}.hydrated{visibility:inherit}
+```
+
+This is also the only option for a [`standalone`](../output-targets/custom-elements.md) build, which has no loader to do the dynamic injection at all - `stencil-hydrate.css` is generated alongside the bundle automatically in that case. Like `stencil-globals`, `stencil-hydrate` accepts the same `layer()`/`supports()`/media modifiers.
 
 ### Constructable Stylesheets
 
-In addition to being available in the light DOM, global styles are automatically registered to every shadow root via [constructable stylesheets](https://web.dev/constructable-stylesheets/). This means that your global styles can target and style shadow DOM components directly.
+<!--
+  TODO(live-demo, speculative - lower priority than the encapsulation demo above): once
+  output-targets/global-style.md exists and a playground direction is chosen (see
+  V5_DOCS_PLAN.md §6), consider a live demo here specifically - a global stylesheet with a
+  :host(my-button) rule, inject: 'client' toggled on vs. off, showing it actually reach a live
+  shadow root only when enabled. Unlike the multi-sheet/co-location story (build-time, not a
+  good live-demo fit), this one piece is genuine runtime behavior. Not scoped or committed to;
+  revisit after the encapsulation POC lands.
+-->
 
-This allows you to apply styles to specific component types using the `:host()` pseudo-class with a tag name selector. For example, you can target all instances of a specific component:
-
-```css
-/* In your global stylesheet */
-:host(my-button) {
-  --button-border-radius: 8px;
-  display: inline-block;
-}
-
-:host(my-card) {
-  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 16px 0;
-}
-
-/* You can also use attribute selectors */
-:host(my-input[type="password"]) {
-  --input-font-family: monospace;
-}
-```
-
-The `:host()` function allows you to select the host element of a component when it matches the given selector. This is particularly useful for:
-
-- Setting default CSS custom properties for specific component types
-- Applying consistent spacing or layout styles across all instances of a component
-- Theming components based on their tag names or attributes
-
-:::note
-The `:host()` selector in global styles will only affect components that use shadow DOM. For scoped components, you should use regular tag selectors in your global styles.
-:::
-
-This behavior is controlled by the `inject` property on the `global-style` output target (`'none'`, `'client'`, or `'all'`) rather than a top-level config flag.
+A global stylesheet isn't registered inside shadow roots by default - it only reaches the light DOM, the same as any page-level stylesheet. Opt in via the `global-style` output target to also register it as a [constructable stylesheet](https://web.dev/constructable-stylesheets/) on every shadow root, letting it target shadow-encapsulated components directly (with `:host()` and a tag name selector, for instance). Refer to the `global-style` output target docs for how to turn this on and what it makes possible.

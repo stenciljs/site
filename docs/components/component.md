@@ -139,8 +139,8 @@ type Encapsulation =
 **Details:**<br/>
 `encapsulation` controls how a component's styles and DOM are isolated from the rest of the page. Stencil supports three encapsulation types:
 
-- `shadow`: uses the browser's native [Shadow DOM](./styling.md#shadow-dom). Styles and internal markup are fully isolated from the rest of the page.
-- `scoped`: uses [scoped CSS](./styling.md#scoped-css). Stencil appends a unique data attribute to your styles so they don't leak out, but the component's DOM stays in the light DOM and light-DOM styles can still leak in.
+- `shadow`: uses the browser's native [Shadow DOM](./styling.md#shadow). Styles and internal markup are fully isolated from the rest of the page.
+- `scoped`: uses [scoped CSS](./styling.md#scoped). Stencil generates a unique class for your styles so they don't leak out, but the component's DOM stays in the light DOM and light-DOM styles can still leak in.
 - `none` (default): no style encapsulation. The component's markup and styles behave like any other element on the page.
 
 **Shadow DOM options** (`type: 'shadow'`):
