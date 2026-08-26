@@ -546,7 +546,7 @@ In addition, all the Web Components will be automatically defined as the generat
 
 ### TypeError: Cannot read properties of undefined (reading 'isProxied')
 
-If you encounter this error when running the Vue application consuming your proxy components, you can set the [`enableImportInjection`](../config/extras.md#enableimportinjection)
+If you encounter this error when running the Vue application consuming your proxy components, you can set the [`enableImportInjection`](../config/compat.md#enableimportinjection)
 flag on the Stencil config's `extras` object. Once set, this will require you to rebuild the Stencil component library and the Vue component library.
 
 ### Vue warns "Failed to resolve component: my-component"

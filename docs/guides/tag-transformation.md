@@ -32,7 +32,7 @@ Until scoped custom element registries are more widely supported, Stencil provid
 As of Stencil v4.39, Stencil makes available two utilities to help manage dynamic tag names:
 
 1) `setTagTransformer` allows application developers (your component library consumers) to assign a tag transformer function.
-2) `transformTag` is mainly used *within* your component libraries - transforming any static string tag names using the tag transformer function assigned via `setTagTransformer` (Alternatively, you can auto apply `transformTag` to all tag names via the [`extras.additionalTagTransformers` config option](#extrasadditionaltagtransformers).)
+2) `transformTag` is mainly used *within* your component libraries - transforming any static string tag names using the tag transformer function assigned via `setTagTransformer` (Alternatively, you can auto apply `transformTag` to all tag names via the [`compat.additionalTagTransformers` config option](#compatadditionaltagtransformers).)
 
 
 ### Using `setTagTransformer`
@@ -159,7 +159,7 @@ export class MyComponent {
 
 #### Notes on CSS
 
-Unless using `extras.additionalTagTransformers`, 
+Unless using `compat.additionalTagTransformers`, 
 you need to be thoughtful when writing CSS selectors within a component library that exposes `setTagTransformer`. 
 
 For example, if `my-button` is transformed to `your-button` this won't work:
@@ -204,9 +204,9 @@ export class MyComponent {
 }
 ```
 
-## `extras.additionalTagTransformers`
+## `compat.additionalTagTransformers`
 
-Setting the experimental `extras.additionalTagTransformers` configuration option to `true` (or `prod` to only apply to production builds) 
+Setting the experimental `compat.additionalTagTransformers` configuration option to `true` (or `prod` to only apply to production builds) 
 will auto-wrap `transformTag(...)` to most static tag names within your component library (including CSS selectors!).
 
 Examples of auto-transformations include:

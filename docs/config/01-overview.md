@@ -116,9 +116,9 @@ Supports glob patterns for matching multiple components:
 
 Components matching these patterns will be completely excluded from all output targets when *not* using the `--dev` flag.
 
-## extras
+## compat
 
-Please see the [Extras docs](./extras.md).
+Please see the [Compat docs](./compat.md).
 
 ## env
 
