@@ -33,7 +33,13 @@ The developer experience is also tuned, and comes with live reload and a small d
 
 ### Design Systems & Component Libraries
 
-Stencil's primary objective is providing amazing tools for design systems and component libraries. Components as a concept provide similar language for engineers and designers to have productive conversations about design implementation. [Visit the Stencil for Design Systems page to learn more.](../guides/design-systems.md)
+Stencil is built for design systems and component libraries first, apps second. That shows up throughout the toolchain:
+
+- Style components however you like: shadow DOM for full isolation, or [light DOM](../components/styling.md) when you want your styles to participate in the page around them.
+- Global stylesheets are developed side by side with component styles, not as a separate concern.
+- The [dev server](../config/dev-server.md) previews one component at a time by default, no app shell required - though it still serves a full app once you have one.
+- Documentation from day one: [Custom Elements Manifests, readmes, and IDE autocomplete data](../output-targets/documentation-generation/01-overview.md) are generated from your component source, along with an Agent Skill that lets AI coding agents consume your library directly.
+- Framework wrappers give consumers of your library [first-class components](../framework-integration/01-overview.md) for their framework of choice, not just raw custom elements.
 
 ## The History of Stencil
 

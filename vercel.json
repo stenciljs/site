@@ -103,12 +103,12 @@
     },
     {
       "source": "/:version(next|(?:v[\\d]+(?:\\.[\\dx]+)?))?/what-is-design-system",
-      "destination": "/docs/:version/design-systems",
+      "destination": "/docs/:version/introduction",
       "statusCode": 301
     },
     {
       "source": "/:version(next|(?:v[\\d]+(?:\\.[\\dx]+)?))?/stencil-for-design-systems",
-      "destination": "/docs/:version/design-systems",
+      "destination": "/docs/:version/introduction",
       "statusCode": 301
     },
     {
