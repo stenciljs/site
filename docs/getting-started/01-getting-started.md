@@ -185,57 +185,11 @@ stencil add
 
 Run without arguments, `stencil add` prompts you to pick from known integrations (like [`@stencil/vitest`](../testing/vitest/01-overview.md) or [`@stencil/playwright`](../testing/playwright/01-overview.md)) and any already-installed packages that expose their own setup wizard. You can also install a specific package directly: `stencil add @stencil/vitest`.
 
-## Local Development
+## Next Steps
 
-After creating your Stencil components, you'll likely want to use them in an existing application. There are multiple approaches for local development depending on your project setup.
+You've built and rendered your first component. Getting it into another project means publishing it - see [Publishing to NPM](../guides/publishing.md) for packaging, publishing, and how consumers pull your components into their own projects.
 
-### Framework Integration
-
-If you want to integrate your Stencil components directly into an existing application built with frameworks like React, Angular, or Vue, refer to the [Framework Integrations](../framework-integration/01-overview.md) guide for specific integration instructions.
-
-### Using Component Library in Another Project
-
-If you're building a standalone component library and want to use it in another project during development, you have two main options:
-
-#### Using Script Tags
-
-For applications that don't use npm or for simple HTML pages, you can include your components directly with a script tag:
-
-```bash
-# First, build your Stencil project
-cd my-first-stencil-project
-npm run build
-```
-
-This creates a `dist/loader-bundle/` directory containing your compiled components. Copy this folder to your application, then add a script tag that points to the bundle. The file lives in a subdirectory named after your project's namespace, lowercased with no separators - for a project named `my-first-stencil-project`, the namespace is `MyFirstStencilProject` and the file is `myfirststencilproject/myfirststencilproject.js`:
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <!-- Import your Stencil namespace -->
-  <script type="module" src="path/to/dist/loader-bundle/myfirststencilproject/myfirststencilproject.js"></script>
-</head>
-<body>
-  <!-- Now you can use your components -->
-  <my-component first="Stencil" middle="'Don't call me a framework'" last="JS"></my-component>
-</body>
-</html>
-```
-
-:::note
-When using script tags, your application must be served from a web server rather than opened as a local file. You can use tools like [http-server](https://www.npmjs.com/package/http-server) or your IDE's built-in server.
-:::
-
-When you update your Stencil components, remember to rebuild the project and update the files in your consuming application.
-
-Once you `npm publish` your package, that same file is available straight from a CDN like jsDelivr, without copying anything: `https://cdn.jsdelivr.net/npm/my-first-stencil-project@1.0.0/dist/loader-bundle/myfirststencilproject/myfirststencilproject.js`. See [Publishing to NPM](../guides/publishing.md) for the full picture.
-
-#### Using npm link
-
-For npm-based projects, `npm link` creates a symbolic link between your Stencil component library and the consuming application. However, linking to a Stencil component this way can still be a little tricky. [Angular](../framework-integration/angular.md), [React](../framework-integration/react.md), and [Vue](../framework-integration/vue.md) each have their own documentation which includes `npm link` and it's recommended you follow those integration guides.
-
-Both approaches let you develop and test your components inside a real application.
+If you also want consumers to get idiomatic React, Angular, or Vue components instead of raw custom elements, see [Framework Integration](../framework-integration/01-overview.md) for generating those wrapper packages on top of your published library.
 
 ## Updating Stencil
 

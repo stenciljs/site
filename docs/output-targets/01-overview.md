@@ -19,6 +19,24 @@ One of the more powerful features of the compiler is its ability to generate var
  - `ssr`: server-side rendering (formerly `dist-hydrate-script`) — see [SSR / SSG](./ssr/01-overview.md)
  - [Documentation generation targets](./documentation-generation/01-overview.md) (`docs-readme`, `docs-json`, `docs-custom-elements-manifest`, and others)
 
+## Choosing Between `loader-bundle` and `standalone`
+
+Both targets export your components for consumption elsewhere, but they suit different situations.
+
+`loader-bundle` lazy-loads each component's full logic only once it's actually used on the page. Drop in a single script tag and the whole library is available, but the browser only downloads the components that actually render - useful when component usage can't be known ahead of time, like a CMS where content authors freely combine components per page. The trade-off is sequential loading through nested dependencies: if `CmpA` renders `CmpB`, which renders `CmpC`, the browser loads three scripts one after another before `CmpA` finishes rendering, which can show up as a rendering delay. It also requires your application to ship all your bundled components as static assets.
+
+:::note
+Stencil does some optimization to reduce the number of sequential loads (e.g. via statically analyzing component dependencies), but it can't eliminate them entirely.
+:::
+
+`standalone` builds each component as a direct class extending `HTMLElement` for you to import and register explicitly - on its own it doesn't bundle by default. It mainly suits projects that already use a bundler like [Vite](https://vitejs.dev/), [Webpack](https://webpack.js.org/), or [Rolldown](https://rolldown.rs/), where usage is static and known at build time.
+
+:::note
+The standalone output does ship an [auto-loader](../guides/publishing.md#auto-loader) for DOM-driven loading without a bundler however it is less performant than the dedicated `loader-bundle`.
+:::
+
+Both can be generated from the same source at the same time; it's up to the consumer which one they use. See [Publishing a Component Library](../guides/publishing.md) for how to wire each one up for consumers.
+
 ## Example:
 
 ```tsx
