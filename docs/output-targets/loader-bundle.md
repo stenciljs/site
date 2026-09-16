@@ -11,7 +11,9 @@ slug: /loader-bundle
 Renamed from `dist` in Stencil v4. Run `stencil migrate --dry-run` to preview updating an existing config automatically.
 :::
 
-The `loader-bundle` type generates the component(s) as a reusable, lazy-loading library, such as [Ionic](https://www.npmjs.com/package/@ionic/core). When creating this output, the project's `package.json` will also have to be updated. The generated bundle is tree-shakable, ensuring that only imported components will end up in the build.
+The `loader-bundle` type generates the component(s) as a reusable, lazy-loading library, such as [Ionic](https://www.npmjs.com/package/@ionic/core). Every component compiles to its own chunk, and the loader only fetches a given chunk once that component actually appears in the DOM - the browser downloads just the components a page uses, not the whole library up front.
+
+Publishing this output requires the right `package.json` fields pointing at it - see [Lazy Loading](../guides/publishing.md#lazy-loading) in the publishing guide for the exact `exports` map.
 
 ```tsx
 outputTargets: [
@@ -39,7 +41,13 @@ Where the lazy-loaded chunks themselves are written, relative to `dir`. Set this
 
 *default: `false`*
 
-Whether to also generate CommonJS bundles, written to a `cjs/` subdirectory. As of Stencil v5, `loader-bundle` only generates ESM output by default — set this to `true` to restore CommonJS output.
+Whether to also generate CommonJS bundles, written to a `cjs/` subdirectory. As of Stencil v5, `loader-bundle` only generates ESM output by default - set this to `true` to restore CommonJS output.
+
+### copy
+
+*default: `undefined`*
+
+An array of [copy tasks](./copy-tasks.md) to be executed during the build process.
 
 ### empty
 
@@ -51,10 +59,10 @@ By default, before each build the `dir` directory will be emptied of all files. 
 
 *default: `loader` (relative to `dir`)*
 
-Provide a custom path for the loader directory, containing files you can import in an initiation script within your application to register all your components for lazy loading. Read more about the loader directory in the [section below](#loader).
+Provide a custom path for the loader directory, containing files you can import in an initiation script within your application to register all your components for lazy loading. Read more about the loader directory [below](#importing-with-a-bundler).
 
 :::note
-Renamed from `esmLoaderPath` in Stencil v4 — and its path is now resolved relative to `dist/loader-bundle` instead of `dist`. Pass `loaderPath: '../'` to reproduce the old resolved path.
+Renamed from `esmLoaderPath` in Stencil v4 - and its path is now resolved relative to `dist/loader-bundle` instead of `dist`. Pass `loaderPath: '../'` to reproduce the old resolved path.
 :::
 
 If you don't use a custom [exports](https://nodejs.org/api/packages.html#exports) map, users would have to import the loader script via:
@@ -85,55 +93,38 @@ Number of characters to use for the content hash in filenames, when [`hashFileNa
 
 *default: `false`*
 
-When `true`, marks `@stencil/core` as an external dependency in the ESM/CJS distribution output rather than bundling it as a local shared chunk — consumers must provide `@stencil/core` themselves. Has no effect on the browser/CDN build, which always includes the runtime. Useful when multiple Stencil component libraries on the same page need to share a single runtime instance (for example, so `setNonce`/`setTagTransformer` propagate across libraries).
+When `true`, marks `@stencil/core` as an external dependency in the ESM/CJS distribution output rather than bundling it as a local shared chunk - consumers must provide `@stencil/core` themselves (has no effect on the browser/CDN build, which always includes the runtime). This is useful when multiple Stencil component libraries are loaded on the same page; they will share a single stencil runtime.
 
 :::note
 Ensure `@stencil/core` is listed in your project's `dependencies` if you enable this option, to prevent runtime errors for your consumers.
 :::
 
-## Publishing
+### skipInDev
 
-Next you can publish your library to [Node Package Manager (NPM)](https://www.npmjs.com/). For more information about setting up the `package.json` file, and publishing, see: [Publishing A Component Library](../guides/publishing.md).
+*default: `true`*
 
-## Loader
+Skips the publish-ready distribution artifacts (the `esm`/`cjs`/`index` files under [`dir`](#dir), with types) during development builds, to improve build times. The browser/CDN-facing lazy bundle is always built regardless, in dev or production, so components still work while you develop against them - only the npm-publishable output is deferred. Set this to `false` to build the distribution artifacts in dev too.
 
-The `loader-bundle` output target generates a loader directory that exports `setNonce` and `defineCustomElements` helper functions when imported within an ESM context. This allows you to register all components of your library to be used in your project in an application setup script, e.g.:
+## Consumption
+
+### Script Tag
+
+Load your components straight from a CDN with a single script tag - no bundler, no framework, no import. The file lives at `dist/loader-bundle/<namespace>/<namespace>.js`, where `<namespace>` is your Stencil `namespace` config value, lowercased. By default file entries are hashed for cache-busting.
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/my-design-system@1.0.0/dist/loader-bundle/my-design-system/my-design-system.js"></script>
+```
+
+The script itself is tiny - just a registry. Only the components actually used on the page get requested and lazy-loaded.
+
+### Importing With a Bundler
+
+After installing your library via npm, import the loader and call `defineCustomElements()`
 
 ```ts
-import { defineCustomElements, setNonce } from 'stencil-library/loader';
-
-// Will set the `nonce` attribute for all scripts/style tags
-// i.e. will run styleTag.setAttribute('nonce', 'r4nd0m')
-// Obviously, you should use the nonce generated by your server
-setNonce('r4nd0m');
+import { defineCustomElements } from 'my-design-system/loader';
 
 defineCustomElements();
 ```
 
-This is an alternative approach to e.g. loading the components directly through a script tag as mentioned below. Read more about `setNonce` and when to set it in our guide on [Content Security Policy Nonces](../guides/csp-nonce.md).
-
-## Distribution Options
-
-Each output target's form of bundling and distribution has its own pros and cons. Luckily you can just worry about writing good source code for your component. Stencil will handle generating the various bundles and consumers of your library can decide how to apply your components to their external projects. Below are a few of the options.
-
-### Script tag
-
-- Use a script tag linked to a CDN copy of your published NPM module, for example: `<script type="module" src='https://cdn.jsdelivr.net/npm/my-name@0.0.1/dist/loader-bundle/myname.js'></script>`.
-- The initial script itself is extremely tiny and does not represent the entire library. It's only a small registry.
-- You can use any or all components within your library anywhere within that webpage.
-- It doesn't matter if the actual component was written within the HTML or created with vanilla JavaScript, jQuery, React, etc.
-- Only the components used on that page will be requested and lazy-loaded.
-
-### Importing the `loader-bundle` library using a bundler
-
-- Run `npm install my-name --save`
-- Add an `import` within the root component: `import my-component`;
-- Stencil will automatically setup the lazy-loading capabilities for the Stencil library.
-- Then you can use the element anywhere in your template, JSX, HTML etc.
-
-### Importing the `loader-bundle` library into another Stencil app
-
-- Run `npm install my-name --save`
-- Add an `import` within the root component: `import my-component`;
-- Stencil will automatically setup the lazy-loading capabilities for the Stencil library.
-- Then you can use the element anywhere in your template, JSX, HTML etc.
+This works the same in any npm-based project, regardless of framework.

@@ -15,7 +15,7 @@ One of the more powerful features of the compiler is its ability to generate var
  - [`www`: Website](./www.md)
  - `collection`: transpiled source for downstream re-bundling, auto-generated in production (formerly the `dist-collection` sub-output of `dist`)
  - `types`: TypeScript type declarations, auto-generated in production (formerly a sub-output of `dist`/`dist-custom-elements`)
- - `global-style` and `assets`: first-class targets for global stylesheets and component assets
+ - `global-style` and [`assets`](./assets.md): first-class targets for global stylesheets and component assets
  - `ssr`: server-side rendering (formerly `dist-hydrate-script`) — see [SSR / SSG](./ssr/01-overview.md)
  - [Documentation generation targets](./documentation-generation/01-overview.md) (`docs-readme`, `docs-json`, `docs-custom-elements-manifest`, and others)
 

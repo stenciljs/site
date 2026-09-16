@@ -1,204 +1,160 @@
 ---
 title: Assets
 sidebar_label: Assets
-description: Learn how to reference assets in your components
+description: Bundle and resolve static assets for your components
 slug: /assets
 ---
 
 # Assets
 
-Stencil components may need one or more static files as a part of their design.
-These types of files are referred to as 'assets', and include images, fonts, etc.
+Assets are static files a component needs - images, fonts etc. (CSS is handled differently; see [Styling](../components/styling.md).)
 
-In this guide, we describe different strategies for resolving assets on the filesystem.
+Getting an asset from your source code onto a page a consumer actually loads takes up to four steps:
 
-:::note
-CSS files are handled differently than assets; for more on using CSS, please see the [styling documentation](../components/styling.md).
-:::
+1. [Reference assets in your components](#1-reference-assets-in-your-components)
+2. [Bundle assets with your library](#2-bundle-assets-with-your-library)
+3. [Make assets available in consuming applications](#3-make-assets-available-in-consuming-applications)
+4. [Point your components at the new location](#4-point-your-components-at-the-new-location)
 
-## Asset Base Path
+If you're building an app rather than a library for others to install (a `www` project), or only making your components available via cdn `<script>` - steps 1 and 2 are all you need. Steps 3 and 4 only come up once someone else `npm install`s your published library into their own app.
 
-The **asset base path** is the directory that Stencil will use to resolve assets.
-When a component uses an asset, the asset's location is resolved relative to the asset base path.
+## 1. Reference assets in your components
 
-The asset base path is automatically set for the following output targets:
-- [loader-bundle](../output-targets/loader-bundle.md)
-- [hydrate](./hydrate-app.md)
-- [www](../output-targets/www.md)
-
-For all other output targets, assets must be [moved](#manually-moving-assets) and the asset base path must be [manually set](#setassetpath).
-
-For each instance of the Stencil runtime that is loaded, there is a single asset base path.
-Oftentimes, this means there is only one asset base path per application using Stencil.
-
-## Resolution Overview
-
-The process of resolving an asset involves asking Stencil to build a path to the asset on the filesystem. 
-
-When an asset's path is built, the resolution is always done in a project's compiled output, not the directory containing the original source code.
-
-The example below uses the output of the [`www` output target](../output-targets/www.md) to demonstrate how assets are resolved.
-Although the example uses the output of `www` builds, the general principle of how an asset is found holds for all output targets.
-
-When using the `www` output target, a `build/` directory is automatically created and set as the asset base path.
-An example `build/` directory and the assets it contains can be found below.
-
-```
-www/
-├── build/
-│   ├── assets/
-│   │   ├── logo.png
-│   │   └── scenery/
-│   │       ├── beach.png
-│   │       └── sunset.png
-│   └── other-assets/
-│       └── font.tiff
-└── ...
-```
-
-To resolve the path to an asset, Stencil's [`getAssetPath()` API](#getassetpath) may be used.
-When using `getAssetPath`, the assets in the directory structure above are resolved relative to `build/`.
-
-The code sample below demonstrates the return value of `getAssetPath` for different `path` arguments.
-The return value is a path that Stencil has built to retrieve the asset on the filesystem.
-```ts
-import { getAssetPath } from '@stencil/core';
-
-// with an asset base path of "/build/":
-
-// '/build/assets/logo.png'
-getAssetPath('assets/logo.png');
-// '/build/assets/scenery/beach.png'
-getAssetPath('assets/scenery/beach.png');
-// '/build/other-assets/font.tiff'
-getAssetPath('other-assets/font.tiff'); 
-```
-
-## Making Assets Available
-
-In order to be able to find assets at runtime, they need to be found on the filesystem from the output of a Stencil build.
-In other words, we need to ensure they exist in the distribution directory.
-This section describes how to make assets available under the asset base path.
-
-### assetsDirs
-
-The `@Component` decorator can be [configured with the `assetsDirs` option](../components/component.md#component-options). 
-`assetsDirs` takes an array of strings, where each entry is a relative path from the component to a directory containing the assets the component requires.
-
-When using the `dist` or `www` output targets, setting `assetsDirs` instructs Stencil to copy that folder into the distribution folder.
-When using other output targets, Stencil will not copy assets into the distribution folder.
-
-Below is an example project's directory structure containing an example component and an assets directory.
+List the component's asset directory with [`assetsDirs`](../components/component.md#component-options), then build the URL to a specific file with `getAssetPath()`:
 
 ```
 src/
 └── components/
-    ├── assets/
-    │   ├── beach.jpg
-    │   └── sunset.jpg
-    └── my-component.tsx
+    └── my-component/
+        ├── assets/
+        │   ├── beach.jpg
+        │   └── sunset.jpg
+        └── my-component.tsx
 ```
-
-Below, the `my-component` component will correctly load the assets based on it's `image` prop.
 
 ```tsx
 // file: my-component.tsx
-// 1. getAssetPath is imported from '@stencil/core'
 import { Component, Prop, getAssetPath, h } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
-  // 2. assetsDirs lists the 'assets' directory as a relative
-  //    (sibling) directory
-  assetsDirs: ['assets']
+  assetsDirs: ['assets'], // 1. declares the sibling `assets` directory
 })
 export class MyComponent {
-
-  @Prop() image = "sunset.jpg";
+  @Prop() image = 'sunset.jpg';
 
   render() {
-    // 3. the asset path is retrieved relative to the asset 
-    //    base path to use in the <img> tag
+    // 2. builds the URL to the actual file at build time
     const imageSrc = getAssetPath(`./assets/${this.image}`);
-    return <img src={imageSrc} />
+    return <img src={imageSrc} />;
   }
 }
 ```
 
-In the example above, the following allows `my-component` to display the provided asset:
-1. [`getAssetPath()`](#getassetpath) is imported from `@stencil/core`
-2. The `my-component`'s component decorator has the `assetsDirs` property, and lists the sibling directory, `assets`. This will copy `assets` over to the distribution directory.
-3. `getAssetPath` is used to retrieve the path to the image to be used in the `<img>` tag
+`assetsDirs` alone doesn't make the asset resolvable - it's what step 2 copies. `getAssetPath()` alone doesn't copy anything either - it just builds the URL, assuming the file ends up where step 2 puts it. You need both.
 
-### Manually Moving Assets
+:::note
+Files not tied to a specific component - or that need a destination other than the unified `assets` output from step 2 - use a [Stencil `copy` task](../output-targets/copy-tasks.md) instead, available on `loader-bundle`, `standalone`, and `www`.
+:::
 
-For the [standalone](../output-targets/standalone.md) output target, options like `assetsDirs` do not copy assets to the distribution directory.
+## 2. Bundle assets with your library
 
-It's recommended that a bundler (such as rollup) or a Stencil `copy` task is used to ensure the static assets are copied to the distribution directory.
+Every component's `assetsDirs` are copied automatically to one unified `dist/assets/` directory, regardless of which output targets you configure - see the [`assets` output target](../output-targets/assets.md) for where that directory lives and how to change it. There's nothing to configure for the common case; this step is already done for you.
 
-#### Stencil Copy Task
+## 3. Make assets available in consuming applications
 
-[Stencil `copy` task](../output-targets/copy-tasks.md)s can be used to define files and folders to be copied over to the distribution directory.
+The URL `getAssetPath()` builds is only useful if the file it points to is actually reachable at runtime. Once a consumer runs `npm install my-library`, your assets sit in `node_modules/my-library/dist/assets/` - and most dev servers and production builds don't serve `node_modules` publicly.
 
-The example below shows how a copy task can be used to find all '.jpg' and '.png' files under a project's `src` directory and copy them to `dist/components/assets` at build time.
+This applies to [`loader-bundle`](../output-targets/loader-bundle.md) and [`standalone`](../output-targets/standalone.md) alike, whenever a consumer's own bundler resolves your package from `node_modules` rather than loading it wholesale from a CDN (a CDN or `www`-style deploy ships the whole tree together, so this isn't a problem there).
 
-```ts
-import { Config } from '@stencil/core';
+Copy or symlink the assets into a servable location as part of the consumer's own build. A webpack config might look like this:
 
-export const config: Config = {
-  namespace: 'your-component-library',
-  outputTargets: [
-    {
-      type: 'standalone',
-      copy: [
+```js
+const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
         {
-          src: '**/*.{jpg,png}',
-          dest: 'dist/standalone/assets',
-          warn: true,
-        }
-      ]
-    },
-  ], 
-  // ...
+          from: path.resolve(__dirname, 'node_modules/my-library/dist/assets'),
+          to: path.resolve(__dirname, 'dist/assets'),
+        },
+      ],
+    }),
+  ],
 };
 ```
-#### Bundler Plugin Configuration
 
-A bundler plugin (such as one for [Rolldown](https://rolldown.rs/), which replaced Rollup as Stencil's own bundler in v5) can be used to define files and folders to be copied over to the distribution directory.
+Or with Rollup:
 
-The example below shows how a Rolldown-compatible `rollup-plugin-copy` NPM module can be used to find all '.jpg' and '.png' files under a project's `src` directory and copy them to `dist/standalone/assets` at build time.
-
-```javascript
-import { Config } from '@stencil/core';
+```js
+import path from 'path';
 import copy from 'rollup-plugin-copy';
 
-export const config: Config = {
-    namespace: 'copy',
-    outputTargets: [
-      {
-        type: 'standalone',
-      },
-    ],
-    rolldownPlugins: {
-      after: [
-        copy({
-          targets: [
-            {
-              src: 'src/**/*.{jpg,png}',
-              dest: 'dist/standalone/assets',
-            },
-          ],
-        }),
-      ]
-    }
+export default {
+  input: 'src/index.js',
+  output: [{ dir: path.resolve('dist/'), format: 'es' }],
+  plugins: [
+    copy({
+      targets: [
+        {
+          src: path.resolve(__dirname, 'node_modules/my-library/dist/assets'),
+          dest: path.resolve(__dirname, 'dist'),
+        },
+      ],
+    }),
+  ],
 };
 ```
+
+For a simpler static-hosting setup with no bundler step, a symlink works just as well:
+
+```bash
+ln -s node_modules/my-library/dist/assets public/assets
+```
+
+## 4. Point your components at the new location
+
+The path Stencil computed in step 1 assumed your component's file would stay at the same relative distance from its assets that it had in your build. A bundler relocating that file (the common case) breaks that assumption, even after step 3 makes the files themselves reachable. Call [`setAssetPath()`](#setassetpath) to repoint it at wherever you actually put them.
+
+For `standalone`, it's re-exported both from each per-component subpath and from the package root, regardless of which one you're already importing the component from:
+
+```ts
+import { setAssetPath, defineCustomElement } from 'my-library/my-component';
+// or, from the root:
+// import { setAssetPath, defineCustomElements } from 'my-library';
+
+setAssetPath('/assets/');
+defineCustomElement();
+```
+
+For `loader-bundle`, it's re-exported from the `/loader` entry point instead, alongside `defineCustomElements`:
+
+```ts
+import { setAssetPath, defineCustomElements } from 'my-library/loader';
+
+setAssetPath('/assets/');
+defineCustomElements();
+```
+
+Either way, this needs no separate import beyond what you're already using to load your components. It sets the base path for every component sharing that Stencil runtime instance, so call it once, outside any component - not from within one.
+
+:::note
+Server-side rendering uses a separate mechanism: `getAssetPath()` on the server can't fall back to a browser URL, so it needs `resourcesUrl` passed explicitly to `ssrDocument()`. See [SSR / SSG](../output-targets/ssr/01-overview.md).
+:::
 
 ## API Reference
 
 ### getAssetPath
 
-`getAssetPath()` is an API provided by Stencil to build the path to an asset, relative to the asset base path. 
+`getAssetPath()` is an API provided by Stencil to build the path to an asset, relative to the asset base path.
 
 ```ts
 /** 
@@ -210,18 +166,18 @@ export const config: Config = {
 declare function getAssetPath(path: string): string;
 ```
 
-The code sample below demonstrates the return value of `getAssetPath` for different `path` arguments, when an asset base path of `/build/` has been set.
+The code sample below demonstrates the return value of `getAssetPath` for different `path` arguments, when an asset base path of `/static/` has been set.
 ```ts
 import { getAssetPath } from '@stencil/core';
 
-// with an asset base path of "/build/":
-// "/build/"
+// with an asset base path of "/static/":
+// "/static/"
 getAssetPath('');
-// "/build/my-image.png"
+// "/static/my-image.png"
 getAssetPath('my-image.png');
-// "/build/assets/my-image.png"
+// "/static/assets/my-image.png"
 getAssetPath('assets/my-image.png');
-// "/build/assets/my-image.png"
+// "/static/assets/my-image.png"
 getAssetPath('./assets/my-image.png');
 // "/assets/my-image.png"
 getAssetPath('../assets/my-image.png');
@@ -231,7 +187,7 @@ getAssetPath('/assets/my-image.png');
 
 ### setAssetPath
 
-`setAssetPath` is an API provided by Stencil's runtime to manually set the asset base path where assets can be found. If you are using `getAssetPath` to compose the path for your component assets, `setAssetPath` allows you or the consumer of the component to change that path.
+`setAssetPath` is an API provided by Stencil's runtime to manually set the asset base path where assets can be found.
 
 ```ts
 /**
@@ -242,43 +198,6 @@ getAssetPath('/assets/my-image.png');
 export declare function setAssetPath(path: string): string;
 ```
 
-Calling this API will set the asset base path for all Stencil components attached to a Stencil runtime. As a result, calling `setAssetPath` should not be done from within a component in order to prevent unwanted side effects when using a component.
+Calling this API sets the asset base path for every Stencil component attached to that Stencil runtime instance - as a result, don't call it from within a component, to avoid unwanted side effects for other components sharing the same page.
 
-Make sure as component author to export this function as part of your module in order to also make it accessible to the consumer of your component, e.g. in your package entry file export the function via:
-
-```ts title="/src/index.ts"
-export { setAssetPath } from '@stencil/core';
-```
-
-Now your users can import it directly from your component library, e.g.:
-
-```ts
-import { setAssetPath } from 'my-component-library';
-setAssetPath(`${window.location.protocol}//assets.${window.location.host}/`);
-```
-
-Alternatively, one may use [`document.currentScript.src`](https://developer.mozilla.org/en-US/docs/Web/API/Document/currentScript) when working in the browser and not using modules or environment variables (e.g. `document.env.ASSET_PATH`) to set the
-asset base path. This configuration depends on how your script is bundled, (or lack of bundling), and where your assets can be loaded from.
-
-:::note
-
-If your component library exports components compiled with the [`standalone`](../output-targets/standalone.md) output target and `externalRuntime` set to `true`, then `setAssetPath` has to be imported from `@stencil/core` directly.
-
-:::
-
-In case you import a component directly via script tag, this would look like:
-
-```html
-<html>
-  <head>
-    <script src="https://cdn.jsdelivr.net/npm/my-component-library/dist/my-component-library.js"></script>
-    <script type="module">
-      import { setAssetPath } from 'https://cdn.jsdelivr.net/npm/my-component-library/dist/my-component-library.js';
-      setAssetPath(`${window.location.origin}/`);
-    </script>
-  </head>
-  <body>
-    <ion-toggle></ion-toggle>
-  </body>
-</html>
-```
+Besides a fixed string, [`document.currentScript.src`](https://developer.mozilla.org/en-US/docs/Web/API/Document/currentScript) or a bundler-injected environment variable both work as the argument, if the right value isn't known until runtime or build time respectively. See [Publishing & Consuming a Component Library](./publishing.md) for how consumers load your components in the first place, script tag included.

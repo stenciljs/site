@@ -11,9 +11,11 @@ slug: /standalone
 Renamed from `dist-custom-elements` in Stencil v4. Run `stencil migrate --dry-run` to preview updating an existing config automatically.
 :::
 
-The `standalone` output target creates custom elements that directly extend `HTMLElement` and provides simple utility functions for easily defining these elements on the [Custom Element Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). This output target excels in use in frontend frameworks and projects that will handle bundling, lazy-loading, and custom element registration themselves.
+The `standalone` output target creates custom elements that directly extend `HTMLElement` and provides simple utility functions for easily defining these elements on the [Custom Element Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). Each component compiles to its own file with determinative filenames; a consuming project's own bundler only includes the ones it actually imports making it better suited to frameworks and any project that already takes care of bundling and lazy-loading itself.
 
-This target can be used outside of frameworks as well, if lazy-loading functionality is not required or desired. For using lazily loaded Stencil components, please refer to the [loader-bundle output target](./loader-bundle.md).
+Standalone components can be cherry-picked and defined individually, bundled and defined all at once, or defined automatically via the auto-loader as they appear in the DOM - see [Consumption](#consumption) below. See [Choosing Between `loader-bundle` and `standalone`](./01-overview.md#choosing-between-loader-bundle-and-standalone) for when each output target is the better fit.
+
+Publishing this output requires the right `package.json` fields pointing at it - see [Standalone](../guides/publishing.md#standalone) in the publishing guide for the exact `exports` map.
 
 To generate components using the `standalone` output target, add it to a project's `stencil.config.ts` file like so:
 
@@ -83,7 +85,7 @@ defined. This is a known limitation of Stencil that users should be aware of.
 
 _default: `true`_
 
-Generates an auto-loader script that uses a `MutationObserver` to lazily load and define custom elements as they appear in the DOM — a `loader.js` file that auto-starts on import.
+Generates an auto-loader script that uses a `MutationObserver` to lazily load and define custom elements as they appear in the DOM - a `loader.js` file that auto-starts on import.
 
 Set to `false` to skip generating it, or pass an object for more control:
 
@@ -93,7 +95,7 @@ outputTargets: [
     type: 'standalone',
     autoLoader: {
       fileName: 'my-loader.js', // default: 'loader.js'
-      autoStart: false,         // default: true — call start() yourself if false
+      autoStart: false,         // default: true - call start() yourself if false
     },
   },
 ]
@@ -115,14 +117,10 @@ Setting this flag to `true` will remove the contents of the [output directory](#
 
 _default: `false`_
 
-Setting this flag to `true` results in the following behaviors:
-
-1. Minification will follow what is specified in the [Stencil config](../config/01-overview.md#minifyjs).
-2. Filenames will not be hashed.
-3. All imports from packages under `@stencil/core/*` will be marked as external and therefore not included in the generated bundle.
+Setting this flag to `true` marks all imports from `@stencil/core/*` as external, so they're not included in the generated bundle - consumers must provide `@stencil/core` themselves. It has no effect on minification or file naming; `standalone` output is never filename-hashed, regardless of this setting.
 
 :::note
-As of Stencil v5, component bundles are self-contained by default (`externalRuntime: false`) — the runtime is included as a local shared chunk. Set this to `true` only if you need multiple Stencil component libraries on the same page to share a single runtime instance, and ensure `@stencil/core` is included in your list of dependencies if you do — this is crucial to prevent any runtime errors.
+As of Stencil v5, component bundles are self-contained by default (`externalRuntime: false`) - the runtime is included as a local shared chunk. Set this to `true` only if you need multiple Stencil component libraries on the same page to share a single runtime instance, and ensure `@stencil/core` is included in your list of dependencies if you do - this is crucial to prevent any runtime errors.
 :::
 
 ### includeGlobalScripts
@@ -133,103 +131,58 @@ Setting this flag to `true` will include [global scripts](../config/01-overview.
 
 ### minify
 
-_default: `false`_
+_default: follows the Stencil config's [`minifyJs`](../config/01-overview.md#minifyjs) option - minified in a production build, unminified in dev_
 
-Setting this flag to `true` will cause file minification to follow what is specified in the [Stencil config](../config/01-overview.md#minifyjs). _However_, if [`externalRuntime`](#externalruntime) is enabled, it will override this option and always result in minification being disabled.
+Set this explicitly to `true` or `false` to override that default for this output target specifically.
 
-## Making Assets Available
+### skipInDev
 
-For performance reasons, the generated bundle does not include [local assets](../guides/assets.md) built within the JavaScript output,
-but instead it's recommended to keep static assets as external files. By keeping them external this ensures they can be requested on-demand, rather
-than either welding their content into the JS file, or adding many URLs for the bundler to add to the output.
+_default: `true` if [`loader-bundle`](./loader-bundle.md) is also configured, else `false`_
 
-Each component's asset path is set automatically, the same as [`loader-bundle`](./loader-bundle.md): every per-component chunk calls `setAssetPath()` itself, relative to its own `import.meta.url`. You don't need to call it yourself unless your bundler relocates the file relative to that URL - inlining it into a larger chunk, for example - in which case the auto-computed path no longer points at your assets directory. Override it by importing `setAssetPath` from the same subpath you already import the component from:
+Skips this output target during development builds (`--dev`) to improve build times. If `loader-bundle` is configured too, `standalone` is treated as the secondary output and skipped in dev by default; with no `loader-bundle`, `standalone` is the primary output and builds in dev as well. Set this explicitly to override either default.
 
-```tsx
-import { setAssetPath, MyComponent } from 'my-library/my-component';
+## Consumption
 
-setAssetPath(document.currentScript.src);
+Your users can either install your library via npm and import the components they need, or load them directly from a CDN within a `<script type="module">` tag.
+
+### Cherry-Picking Components
+
+Import and define only the components consumers use - each compiles to its own file, so a bundler only includes what's imported:
+
+```ts
+import { MyComponent, defineCustomElement } from 'my-library/my-component';
+
+defineCustomElement();
+// or define it yourself:
+customElements.define('my-component', MyComponent);
 ```
 
-Make sure to copy the assets over to a public directory in your app. This configuration depends on how your script is bundled, or lack of
-bundling, and where your assets can be loaded from. How the files are copied to the production build directory depends on the bundler or tooling.
-The configs below provide examples of how to do this automatically with popular bundlers.
+:::note
+A component's `defineCustomElement()` also defines any child components it depends on, so you rarely need to import and define those separately. If defining the class yourself with `customElements.define()` you must also make sure to define any child components too.
+:::
 
-## Example Bundler Configs
+### Bundling All Components
 
-Instructions for consuming the standalone bundle vary depending on the bundler you're using. These examples will help your users consume your components with webpack and Rollup.
+Set [`customElementsExportBehavior: 'bundle'`](#customelementsexportbehavior) to register every component from a single call instead of one `defineCustomElement()` each:
 
-The following examples assume your component library is published to NPM as `my-library`. You should change this to the name you actually publish your library with.
+```ts
+import { defineCustomElements } from 'my-library';
 
-Users will need to install your library before importing them.
-
-```bash npm2yarn
-npm install my-library
+defineCustomElements();
 ```
 
-### webpack.config.js
+This defines every component immediately. `loader-bundle` exports a same-named `defineCustomElements()`, but that one lazy-loads each component's logic on first use - the two aren't interchangeable across output targets.
 
-A webpack config will look something like the one below. Note how assets are copied from the library's `node_module` folder to `dist/assets` via the `CopyPlugin` utility. This is important if your library includes [local assets](../guides/assets.md).
+### Auto-Loading Components
 
-```js
-const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
+With [`autoLoader`](#autoloader), components register themselves as they appear in the DOM - no import or `defineCustomElement` call needed:
 
-module.exports = {
-  entry: './src/index.js',
-  output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, 'dist'),
-  },
-  module: {
-    rules: [
-      {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
-      },
-    ],
-  },
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: path.resolve(__dirname, 'node_modules/my-library/dist/standalone/assets'),
-          to: path.resolve(__dirname, 'dist/assets'),
-        },
-      ],
-    }),
-  ],
-};
+```ts
+import 'my-library/dist/standalone/loader.js';
 ```
 
-### rollup.config.js
+A `MutationObserver` watches the page and defines each custom element the first time it appears, at the cost of being less performant than `loader-bundle`'s per-component lazy loading, which can statically analyze which components a page needs ahead of time.
 
-A Rollup config will look something like the one below. Note how assets are copied from the library's `node_module` folder to `dist/assets` via the `rollup-copy-plugin` utility. This is important if your library includes [local assets](../guides/assets.md).
+## Assets
 
-```js
-import path from 'path';
-import commonjs from '@rollup/plugin-commonjs';
-import copy from 'rollup-plugin-copy';
-import postcss from 'rollup-plugin-postcss';
-import resolve from '@rollup/plugin-node-resolve';
-
-export default {
-  input: 'src/index.js',
-  output: [{ dir: path.resolve('dist/'), format: 'es' }],
-  plugins: [
-    resolve(),
-    commonjs(),
-    postcss({
-      extensions: ['.css'],
-    }),
-    copy({
-      targets: [
-        {
-          src: path.resolve(__dirname, 'node_modules/my-library/dist/standalone/assets'),
-          dest: path.resolve(__dirname, 'dist'),
-        },
-      ],
-    }),
-  ],
-};
-```
+Component asset resolution works the same as every other output target - see the [Assets guide](../guides/assets.md) for `assetsDirs`, `getAssetPath()`, `setAssetPath()`, and [making the asset files themselves servable to a consumer using a bundler](../guides/assets.md#3-make-assets-available-in-consuming-applications).
