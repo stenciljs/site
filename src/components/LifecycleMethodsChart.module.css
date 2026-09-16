@@ -1,5 +1,6 @@
 .lifecycleChart {
   display: block;
+  margin: 2rem 0;
 
   --opacity: 1;
 }
