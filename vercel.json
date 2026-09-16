@@ -155,6 +155,21 @@
       "source": "/:version(next|(?:v[\\d]+(?:\\.[\\dx]+)?))?/static-site-generation-debugging",
       "destination": "/docs/:version/vs-code-debugging",
       "statusCode": 301
+    },
+    {
+      "source": "/v5/extends",
+      "destination": "/docs/v5/mixins-and-controllers",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/distribution",
+      "destination": "/docs/v5/loader-bundle",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/custom-elements",
+      "destination": "/docs/v5/standalone",
+      "statusCode": 301
     }
   ],
   "rewrites": [

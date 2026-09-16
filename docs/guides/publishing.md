@@ -17,7 +17,7 @@ This covers the npm registry specifically; the same package works the same way o
 
 ## Consuming Your Library
 
-To use your Stencil components in other projects, there are two different output targets to consider: [`loader-bundle`](../output-targets/dist.md) and [`standalone`](../output-targets/custom-elements.md). Both can be generated at the same time, using the same source code, and shipped in the same distribution - it's up to the consumer of your component library to decide which build to use. See [Choosing Between `loader-bundle` and `standalone`](../output-targets/01-overview.md#choosing-between-loader-bundle-and-standalone) for the tradeoffs. If your components reference static assets, see [Making Assets Available](../output-targets/custom-elements.md#making-assets-available) for how the asset path is resolved for either output target.
+To use your Stencil components in other projects, there are two different output targets to consider: [`loader-bundle`](../output-targets/loader-bundle.md) and [`standalone`](../output-targets/standalone.md). Both can be generated at the same time, using the same source code, and shipped in the same distribution - it's up to the consumer of your component library to decide which build to use. See [Choosing Between `loader-bundle` and `standalone`](../output-targets/01-overview.md#choosing-between-loader-bundle-and-standalone) for the tradeoffs. If your components reference static assets, see [Making Assets Available](../output-targets/standalone.md#making-assets-available) for how the asset path is resolved for either output target.
 
 :::note
 If you distribute both, pick one of them as the `main` package.json entry depending on which use case is more prominent - `loader-bundle` takes priority by default if both are configured (see [Package.json Validation](../output-targets/01-overview.md#packagejson-validation)).
@@ -25,7 +25,7 @@ If you distribute both, pick one of them as the `main` package.json entry depend
 
 ### Lazy Loading
 
-If you prefer to have your components automatically loaded when used in your application, we recommend enabling the [`loader-bundle`](../output-targets/dist.md) output target. The bundle gives you a small entry file that registers all your components and defers loading the full component logic until it is rendered in your application. This works the same regardless of framework, or with no framework at all.
+If you prefer to have your components automatically loaded when used in your application, we recommend enabling the [`loader-bundle`](../output-targets/loader-bundle.md) output target. The bundle gives you a small entry file that registers all your components and defers loading the full component logic until it is rendered in your application. This works the same regardless of framework, or with no framework at all.
 
 Once published, a `script` tag can load your components straight from a CDN. The self-registering file lives at `dist/loader-bundle/<namespace>/<namespace>.js`, where `<namespace>` is your Stencil `namespace` config value, lowercased - it defaults to your `package.json` name if you don't set one explicitly. Check your own `dist/loader-bundle/` output to confirm the exact folder name for your project:
 
@@ -58,11 +58,11 @@ Make sure your `package.json` has an `exports` or `module` entry pointing at the
 }
 ```
 
-Read more about various options when it comes to configuring your project's components for lazy loading in the [`loader-bundle`](../output-targets/dist.md) output target section.
+Read more about various options when it comes to configuring your project's components for lazy loading in the [`loader-bundle`](../output-targets/loader-bundle.md) output target section.
 
 ### Standalone
 
-The [`standalone`](../output-targets/custom-elements.md) output target builds each component as a stand-alone class that extends `HTMLElement`. The output is a standardized custom element with the styles already attached and without any of Stencil's lazy-loading. This may be preferred for projects that are already handling bundling and / or lazy-loading.
+The [`standalone`](../output-targets/standalone.md) output target builds each component as a stand-alone class that extends `HTMLElement`. The output is a standardized custom element with the styles already attached and without any of Stencil's lazy-loading. This may be preferred for projects that are already handling bundling and / or lazy-loading.
 
 Each generated file exports a component class and a `defineCustomElement` function - registering the custom element is up to you; it doesn't happen automatically on import.
 
@@ -82,7 +82,7 @@ customElements.define('my-custom-component', MyCustomComponent);
 ```
 
 :::note
-[`customElementsExportBehavior`](../output-targets/custom-elements.md#customelementsexportbehavior) controls this: `single-export-module` re-exports every component from the root instead of its own subpath, and `auto-define-custom-elements` skips the explicit `defineCustomElement()` call by registering components automatically on import.
+[`customElementsExportBehavior`](../output-targets/standalone.md#customelementsexportbehavior) controls this: `single-export-module` re-exports every component from the root instead of its own subpath, and `auto-define-custom-elements` skips the explicit `defineCustomElement()` call by registering components automatically on import.
 :::
 
 To ensure that the right entry file is loaded when importing the project, define [exports fields](https://nodejs.org/api/packages.html#exports) in your `package.json`:
@@ -127,7 +127,7 @@ import 'my-design-system/loader';
 It starts watching as soon as it's imported; `start()`/`stop()` are also exported for manual control.
 
 :::note
-If making extensive use of the auto-loader, consider [`loader-bundle`](../output-targets/dist.md) instead - it's purpose-built for loading components on demand and does so more efficiently.
+If making extensive use of the auto-loader, consider [`loader-bundle`](../output-targets/loader-bundle.md) instead - it's purpose-built for loading components on demand and does so more efficiently.
 :::
 
-Read more about various options when it comes to distributing your components as standalone components in the [`standalone`](../output-targets/custom-elements.md) output target section.
+Read more about various options when it comes to distributing your components as standalone components in the [`standalone`](../output-targets/standalone.md) output target section.

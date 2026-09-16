@@ -2,7 +2,7 @@
 title: Loader Bundle Output Target
 sidebar_label: loader-bundle
 description: Distributing Web Components Built with Stencil
-slug: /distribution
+slug: /loader-bundle
 ---
 
 # Loader Bundle Output Target

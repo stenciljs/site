@@ -2,7 +2,7 @@
 title: Standalone Output Target
 sidebar_label: standalone
 description: Custom Elements with Stencil
-slug: /custom-elements
+slug: /standalone
 ---
 
 # Standalone Output Target
@@ -13,7 +13,7 @@ Renamed from `dist-custom-elements` in Stencil v4. Run `stencil migrate --dry-ru
 
 The `standalone` output target creates custom elements that directly extend `HTMLElement` and provides simple utility functions for easily defining these elements on the [Custom Element Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). This output target excels in use in frontend frameworks and projects that will handle bundling, lazy-loading, and custom element registration themselves.
 
-This target can be used outside of frameworks as well, if lazy-loading functionality is not required or desired. For using lazily loaded Stencil components, please refer to the [loader-bundle output target](./dist.md).
+This target can be used outside of frameworks as well, if lazy-loading functionality is not required or desired. For using lazily loaded Stencil components, please refer to the [loader-bundle output target](./loader-bundle.md).
 
 To generate components using the `standalone` output target, add it to a project's `stencil.config.ts` file like so:
 
@@ -142,19 +142,11 @@ Setting this flag to `true` will cause file minification to follow what is speci
 For performance reasons, the generated bundle does not include [local assets](../guides/assets.md) built within the JavaScript output,
 but instead it's recommended to keep static assets as external files. By keeping them external this ensures they can be requested on-demand, rather
 than either welding their content into the JS file, or adding many URLs for the bundler to add to the output.
-One method to ensure [assets](../guides/assets.md) are available to external builds and http servers is to set the asset path using `setAssetPath()`.
 
-The `setAssetPath()` function is used to manually set the base path where static assets can be found.
-For the [`loader-bundle`](./dist.md) output target the asset path is automatically set and assets copied to the correct
-build directory. However, for `standalone` builds, `setAssetPath(path)` should be
-used to customize the asset path depending on where they are found on the http server.
-
-If the component's script is a `type="module"`, it's recommended to use `import.meta.url`, such
-as `setAssetPath(import.meta.url)`. Other options include `setAssetPath(document.currentScript.src)`, or using a bundler's replace plugin to
-dynamically set the path at build time, such as `setAssetPath(process.env.ASSET_PATH)`.
+Each component's asset path is set automatically, the same as [`loader-bundle`](./loader-bundle.md): every per-component chunk calls `setAssetPath()` itself, relative to its own `import.meta.url`. You don't need to call it yourself unless your bundler relocates the file relative to that URL - inlining it into a larger chunk, for example - in which case the auto-computed path no longer points at your assets directory. Override it by importing `setAssetPath` from the same subpath you already import the component from:
 
 ```tsx
-import { setAssetPath } from 'my-library/dist/standalone';
+import { setAssetPath, MyComponent } from 'my-library/my-component';
 
 setAssetPath(document.currentScript.src);
 ```

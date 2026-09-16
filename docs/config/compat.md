@@ -17,14 +17,14 @@ Migrating from Stencil v4? Run `stencil migrate --dry-run` to preview renaming `
 
 **Default: `true`**
 
-Projects that use a Stencil library built using the [`loader-bundle` output target](../output-targets/dist.md) may have trouble lazily
+Projects that use a Stencil library built using the [`loader-bundle` output target](../output-targets/loader-bundle.md) may have trouble lazily
 loading components when using a bundler such as Vite or Parcel. This flag changes how Stencil
 lazily loads components in a way that works with additional bundlers, at the cost of a larger compiled output.
 
 In order for this flag to have an effect:
 
 1. The Stencil library must expose lazy loadable components, such as those created with the
-   [`loader-bundle` output target](../output-targets/dist.md)
+   [`loader-bundle` output target](../output-targets/loader-bundle.md)
 2. The Stencil library must be compiled with `compat.enableImportInjection` set (or left at its default)
 
 Set this to `false` to opt out.

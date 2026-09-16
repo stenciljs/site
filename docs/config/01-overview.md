@@ -231,7 +231,7 @@ hashFileNames: true
 
 ## hydratedFlag
 
-When using the [lazy build](https://stenciljs.com/docs/distribution) Stencil
+When using the [`loader-bundle`](../output-targets/loader-bundle.md) output target, Stencil
 has support for automatically applying a class or attribute to a component and
 all of its child components when they have finished hydrating. This can be used
 to prevent a [flash of unstyled content

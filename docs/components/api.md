@@ -66,8 +66,8 @@ el.componentOnReady().then(() => {
 ```
 
 The availability of `componentOnReady()` depends on the component's compiled output type. This method is only available for lazy-loaded
-distribution types ([`loader-bundle`](../output-targets/dist.md) and [`www`](../output-targets/www.md)) and, as such, is not available for
-[`standalone`](../output-targets/custom-elements.md) output. If you want to simulate the behavior of `componentOnReady()` for non-lazy builds,
+distribution types ([`loader-bundle`](../output-targets/loader-bundle.md) and [`www`](../output-targets/www.md)) and, as such, is not available for
+[`standalone`](../output-targets/standalone.md) output. If you want to simulate the behavior of `componentOnReady()` for non-lazy builds,
 you can implement a helper method to wrap the functionality similar to what the Ionic Framework does [here](https://github.com/ionic-team/ionic-framework/blob/main/core/src/utils/helpers.ts#L60-L79).
 
 ## The `appload` event
@@ -305,7 +305,7 @@ If your Stencil component library uses `Mixin()` (or `extends`) and *might* be u
 The static-analysis that Stencil uses to find mixed-in classes does not work within 3rd party (node_module) barrel files.
 :::
 
-For detailed guidance on using `Mixin()` and `extends` for component architecture, including when to use inheritance vs composition patterns, see the [Extends & Mixins](../guides/extends.md) guide.
+For detailed guidance on using `Mixin()` to compose behavior into a component, including when to write your own mixin factories versus reactive controllers, see the [Mixins & Reactive Controllers](../guides/mixins-and-controllers.md) guide.
 
 ### [**setTagTransformer()** and **transformTag()**](../guides/tag-transformation.md): 
 

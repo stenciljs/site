@@ -237,7 +237,7 @@ import { defineCustomElements } from 'stencil-library/loader';
 export class ComponentLibraryModule {}
 ```
 
-See the [documentation](../output-targets/dist.md) for more information on defining custom elements using the
+See the [documentation](../output-targets/loader-bundle.md) for more information on defining custom elements using the
 `dist` output target, or [update the Angular output target](#do-i-have-to-use-the-dist-output-target) to use `dist-custom-elements`.
 
 ### Link Your Packages (Optional)
@@ -634,8 +634,8 @@ Specifies the type of output to be generated. It can take one of the following v
 Both `scam` and `standalone` options are compatible with the `dist-custom-elements` output.
 
 :::note
-The configuration for the [Custom Elements](../output-targets/custom-elements.md) output target must set the
-[export behavior](../output-targets/custom-elements.md#customelementsexportbehavior) to `single-export-module` for the wrappers to generate correctly
+The configuration for the [Custom Elements](../output-targets/standalone.md) output target must set the
+[export behavior](../output-targets/standalone.md#customelementsexportbehavior) to `single-export-module` for the wrappers to generate correctly
 if using the `scam` or `standalone` output type.
 :::
 

@@ -22,7 +22,7 @@ The **asset base path** is the directory that Stencil will use to resolve assets
 When a component uses an asset, the asset's location is resolved relative to the asset base path.
 
 The asset base path is automatically set for the following output targets:
-- [loader-bundle](../output-targets/dist.md)
+- [loader-bundle](../output-targets/loader-bundle.md)
 - [hydrate](./hydrate-app.md)
 - [www](../output-targets/www.md)
 
@@ -132,7 +132,7 @@ In the example above, the following allows `my-component` to display the provide
 
 ### Manually Moving Assets
 
-For the [standalone](../output-targets/custom-elements.md) output target, options like `assetsDirs` do not copy assets to the distribution directory.
+For the [standalone](../output-targets/standalone.md) output target, options like `assetsDirs` do not copy assets to the distribution directory.
 
 It's recommended that a bundler (such as rollup) or a Stencil `copy` task is used to ensure the static assets are copied to the distribution directory.
 
@@ -262,7 +262,7 @@ asset base path. This configuration depends on how your script is bundled, (or l
 
 :::note
 
-If your component library exports components compiled with [`dist-output-target`](/output-targets/custom-elements.md) and `externalRuntime` set to `true`, then `setAssetPath` has to be imported from `@stencil/core` directly.
+If your component library exports components compiled with the [`standalone`](../output-targets/standalone.md) output target and `externalRuntime` set to `true`, then `setAssetPath` has to be imported from `@stencil/core` directly.
 
 :::
 

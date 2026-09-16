@@ -331,7 +331,7 @@ This works for every `encapsulation` type. It's also what makes a CSS-only compo
 
 Before a component's JavaScript loads and its `render()` runs for the first time, the browser has already parsed its light-DOM markup and any co-located styles - so there's a moment where a component can be visible but not yet interactive or fully styled by its own `render()` output. Left alone, this shows up as a flash of unstyled content (FOUC): the raw, unhydrated markup appears briefly before Stencil's runtime takes over.
 
-By default, Stencil's [loader script](../output-targets/dist.md#loader) - the small entry file that registers and lazy-loads your components - handles this at runtime: it inserts a `<style>` tag that hides components until they're hydrated. But that script still has to load and run before it can insert anything - on a slow connection or a busy main thread, the page can paint before the loader gets a chance to hide the unhydrated content, and FOUC happens anyway. Add `@import "stencil-hydrate";` to a global stylesheet to generate that same hiding CSS at build time instead, so it's already in the page's stylesheet before any JS has to run:
+By default, Stencil's [loader script](../output-targets/loader-bundle.md#loader) - the small entry file that registers and lazy-loads your components - handles this at runtime: it inserts a `<style>` tag that hides components until they're hydrated. But that script still has to load and run before it can insert anything - on a slow connection or a busy main thread, the page can paint before the loader gets a chance to hide the unhydrated content, and FOUC happens anyway. Add `@import "stencil-hydrate";` to a global stylesheet to generate that same hiding CSS at build time instead, so it's already in the page's stylesheet before any JS has to run:
 
 ```css title="src/global.css"
 @import "stencil-hydrate";
@@ -343,7 +343,7 @@ The compiler replaces the placeholder with the sorted tag list for every compone
 my-cmp,other-cmp{visibility:hidden}.hydrated{visibility:inherit}
 ```
 
-This is also the only option for a [`standalone`](../output-targets/custom-elements.md) build, which has no loader to do the dynamic injection at all - `stencil-hydrate.css` is generated alongside the bundle automatically in that case. Like `stencil-globals`, `stencil-hydrate` accepts the same `layer()`/`supports()`/media modifiers.
+This is also the only option for a [`standalone`](../output-targets/standalone.md) build, which has no loader to do the dynamic injection at all - `stencil-hydrate.css` is generated alongside the bundle automatically in that case. Like `stencil-globals`, `stencil-hydrate` accepts the same `layer()`/`supports()`/media modifiers.
 
 ### Constructable Stylesheets
 
