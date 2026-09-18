@@ -139,7 +139,7 @@ CSS custom properties can allow the consumers of a component to customize a comp
 ```
 
 :::note
-CSS custom properties must be declared on the `Host` element (`:host`) in order for them to be exposed to the consuming application.
+Declaring a CSS custom property on `:host` provides a default value for the component. A consuming application can set the CSS custom property on the host element whether or not the component declares it on `:host`.
 :::
 
 The `shadow-card` heading will have a default color of `black`, but this can now be changed in the light DOM by selecting the `shadow-card` and changing the value of the `--heading-color` custom property.
