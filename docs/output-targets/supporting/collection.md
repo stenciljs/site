@@ -1,4 +1,5 @@
 ---
+sidebar_position: 2
 title: Collection Output Target
 sidebar_label: collection
 description: Transpiled source for downstream Stencil projects to re-compile
@@ -7,7 +8,7 @@ slug: /collection
 
 # Collection Output Target
 
-The `collection` output target contains your components' transpiled source, metadata, and build flags - not a bundle. It exists so a downstream Stencil project can re-compile and re-bundle your components with its own compiler, instead of treating your library as an opaque pre-built dependency the way [`loader-bundle`](./loader-bundle.md)/[`standalone`](./standalone.md) are consumed.
+The `collection` output target contains your components' transpiled source, metadata, and build flags - not a bundle. It exists so a downstream Stencil project can re-compile and re-bundle your components with its own compiler, instead of treating your library as an opaque pre-built dependency the way [`loader-bundle`](../main/loader-bundle.md)/[`standalone`](../main/standalone.md) are consumed.
 
 It's always generated in production builds unless you configure one explicitly - there's nothing to add to `outputTargets` for the common case.
 
@@ -77,7 +78,7 @@ A downstream Stencil project discovers your collection through your package's `c
 
 `component-starter`-scaffolded projects set this by default, so most libraries don't need to add it by hand.
 
-The consuming project then opts in, either by listing your package in its [`collections`](../config/01-overview.md#collections) config, or with a side-effect import anywhere in its source:
+The consuming project then opts in, either by listing your package in its [`collections`](../../config/01-overview.md#collections) config, or with a side-effect import anywhere in its source:
 
 ```ts
 import 'my-library';

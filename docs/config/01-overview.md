@@ -63,7 +63,7 @@ stencil-project-root
 
 *default: `[]`*
 
-npm packages whose [`collection`](../output-targets/collection.md) output this project should compile in alongside its own components.
+npm packages whose [`collection`](../output-targets/supporting/collection.md) output this project should compile in alongside its own components.
 
 ```ts title='stencil.config.ts'
 export const config: Config = {
@@ -192,7 +192,7 @@ export default function() {
 
 *default: `undefined`*
 
-A top-level path to a global stylesheet, predating the [`global-style` output target](../output-targets/global-style.md). Setting `globalStyle` auto-generates a `global-style` output target for you, so it still works, but new projects should [configure `global-style` directly](../components/styling.md#global-styles) instead - it supports more than one global stylesheet, a custom output filename, and control over shadow-root injection, none of which `globalStyle` alone gives you.
+A top-level path to a global stylesheet, predating the [`global-style` output target](../output-targets/asset-outputs/global-style.md). Setting `globalStyle` auto-generates a `global-style` output target for you, so it still works, but new projects should [configure `global-style` directly](../components/styling.md#global-styles) instead - it supports more than one global stylesheet, a custom output filename, and control over shadow-root injection, none of which `globalStyle` alone gives you.
 
 ```tsx
 globalStyle: 'src/global/app.css'
@@ -200,7 +200,7 @@ globalStyle: 'src/global/app.css'
 
 ## hydratedFlag
 
-When using the [`loader-bundle`](../output-targets/loader-bundle.md) output target, Stencil
+When using the [`loader-bundle`](../output-targets/main/loader-bundle.md) output target, Stencil
 has support for automatically applying a class or attribute to a component and
 all of its child components when they have finished hydrating. This can be used
 to prevent a [flash of unstyled content

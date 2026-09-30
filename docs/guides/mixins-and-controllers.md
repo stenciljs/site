@@ -131,7 +131,7 @@ export class MouseController implements ReactiveController {
 }
 ```
 
-If using the [`loader-bundle`](../output-targets/loader-bundle.md) output target, a controller that also needs the real host element (e.g. `@lit/context`'s `ContextProvider` which dispatches DOM events), cannot use a field initializer (like the `MouseController` above), but must instead use `connectedCallback()`.
+If using the [`loader-bundle`](../output-targets/main/loader-bundle.md) output target, a controller that also needs the real host element (e.g. `@lit/context`'s `ContextProvider` which dispatches DOM events), cannot use a field initializer (like the `MouseController` above), but must instead use `connectedCallback()`.
 In the loader-bundle, `this` and the host element are different objects until `connectedCallback` runs: `this` has `addController` / `requestUpdate` / `updateComplete`, the element does not yet. 
 
 ```typescript

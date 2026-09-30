@@ -78,7 +78,7 @@ Any other `@tagname` in the block is preserved as-is alongside the component's o
 
 ## Getting the styles onto the page
 
-With zero or one [`global-style`](../output-targets/global-style.md) output target, this is automatic - Stencil collects every discovered CSS-only component's CSS and places it for you, either prepended to your one global stylesheet or written to its own generated file if you don't have one at all. Nothing to write.
+With zero or one [`global-style`](../output-targets/asset-outputs/global-style.md) output target, this is automatic - Stencil collects every discovered CSS-only component's CSS and places it for you, either prepended to your one global stylesheet or written to its own generated file if you don't have one at all. Nothing to write.
 
 Write `@import "stencil-css-components";` yourself only to control exactly where in the cascade it lands, or if your project configures more than one `global-style` output - the compiler can't guess which one should hold it, and errors naming the import that needs placing:
 

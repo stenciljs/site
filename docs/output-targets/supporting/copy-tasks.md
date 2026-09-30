@@ -1,4 +1,5 @@
 ---
+sidebar_position: 3
 title: Stencil Copy Tasks
 sidebar_label: Copy Tasks
 description: Stencil Copy Tasks
@@ -9,8 +10,8 @@ slug: /copy-tasks
 # Copy Tasks for Output Targets
 
 All of Stencil's non-documentation output targets
-([`standalone`](./standalone.md), [`loader-bundle`](./loader-bundle.md), and
-[`www`](./www.md)) support a `copy` config which allows you to define file copy
+([`standalone`](../main/standalone.md), [`loader-bundle`](../main/loader-bundle.md), and
+[`www`](../main/www.md)) support a `copy` config which allows you to define file copy
 operations which Stencil will automatically perform as part of the build. This
 could be useful if, for instance, you had some static assets like images which
 should be distributed alongside your components.
@@ -88,7 +89,7 @@ If a `dest` path is supplied then `keepDirStructure` will default to `false`, so
 
 ### Images in the `www` Output Target
 
-The `copy` config within the following [`www` output target](./www.md) config
+The `copy` config within the following [`www` output target](../main/www.md) config
 will cause Stencil to copy the entire directory from `src/images` to
 `www/images`:
 

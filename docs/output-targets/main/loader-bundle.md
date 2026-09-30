@@ -1,4 +1,5 @@
 ---
+sidebar_position: 1
 title: Loader Bundle Output Target
 sidebar_label: loader-bundle
 description: Distributing Web Components Built with Stencil
@@ -13,7 +14,7 @@ Renamed from `dist` in Stencil v4. Run `stencil migrate --dry-run` to preview up
 
 The `loader-bundle` type generates the component(s) as a reusable, lazy-loading library, such as [Ionic](https://www.npmjs.com/package/@ionic/core). Every component compiles to its own chunk, and the loader only fetches a given chunk once that component actually appears in the DOM - the browser downloads just the components a page uses, not the whole library up front.
 
-Publishing this output requires the right `package.json` fields pointing at it - see [Lazy Loading](../guides/publishing.md#lazy-loading) in the publishing guide for the exact `exports` map.
+Publishing this output requires the right `package.json` fields pointing at it - see [Lazy Loading](../../guides/publishing.md#lazy-loading) in the publishing guide for the exact `exports` map.
 
 ```tsx
 outputTargets: [
@@ -47,7 +48,7 @@ Whether to also generate CommonJS bundles, written to a `cjs/` subdirectory. As 
 
 *default: `undefined`*
 
-An array of [copy tasks](./copy-tasks.md) to be executed during the build process.
+An array of [copy tasks](../supporting/copy-tasks.md) to be executed during the build process.
 
 ### empty
 
@@ -130,5 +131,5 @@ defineCustomElements();
 This works the same in any npm-based project, regardless of framework.
 
 :::note
-For a downstream Stencil project specifically, [`collection`](./collection.md) is usually the better fit - it hands over transpiled source for the consumer's own compiler to re-process, rather than a pre-built dependency.
+For a downstream Stencil project specifically, [`collection`](../supporting/collection.md) is usually the better fit - it hands over transpiled source for the consumer's own compiler to re-process, rather than a pre-built dependency.
 :::

@@ -132,7 +132,7 @@ Information, such as the custom element name (`tag`) to use, can be set here.
 This decorator tells Stencil to:
 - Set the [element's name](../components/component.md#tag) to 'my-component'
 - [Apply the stylesheet](../components/component.md#styleurl) 'my-component.css' to the component
-- Use [native Shadow DOM encapsulation](../components/component.md#encapsulation) for this component
+- Use [native Shadow DOM encapsulation](../components/component.md#encapsulation) for this component - one of [several options](../concepts/component-archetypes.md)
 
 Below the `@Component()` decorator, we have a standard JavaScript class declaration:
 

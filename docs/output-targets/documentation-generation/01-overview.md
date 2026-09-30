@@ -12,7 +12,10 @@ slug: /doc-generation
 - [`docs-custom-elements-manifest`: Custom Elements Manifest (CEM) format](./docs-custom-elements-manifest.md)
 - [`docs-custom`: Custom documentation generation](./docs-custom.md)
 - [`docs-vscode`: Documentation generation for VS Code](./docs-vscode.md)
+- [`docs-agent-skill`: An Agent Skill for AI coding agents](./docs-agent-skill.md)
 - [`stats`: Stats about the compiled files](./docs-stats.md)
+
+Each is generated only when added to `outputTargets` in your `stencil.config.ts`.
 
 ## Docs Auto-Generation
 

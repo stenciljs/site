@@ -143,6 +143,8 @@ type Encapsulation =
 - `scoped`: uses [scoped CSS](./styling.md#scoped). Stencil generates a unique class for your styles so they don't leak out, but the component's DOM stays in the light DOM and light-DOM styles can still leak in.
 - `none` (default): no style encapsulation. The component's markup and styles behave like any other element on the page.
 
+See [Component Archetypes](../concepts/component-archetypes.md) for when to use each.
+
 **Shadow DOM options** (`type: 'shadow'`):
 
 - `mode`: `'open'` (default) or `'closed'`. A closed shadow root can't be reached from `element.shadowRoot` outside the component.

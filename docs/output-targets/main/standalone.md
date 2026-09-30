@@ -1,4 +1,5 @@
 ---
+sidebar_position: 2
 title: Standalone Output Target
 sidebar_label: standalone
 description: Custom Elements with Stencil
@@ -13,9 +14,9 @@ Renamed from `dist-custom-elements` in Stencil v4. Run `stencil migrate --dry-ru
 
 The `standalone` output target creates custom elements that directly extend `HTMLElement` and provides simple utility functions for easily defining these elements on the [Custom Element Registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry). Each component compiles to its own file with determinative filenames; a consuming project's own bundler only includes the ones it actually imports making it better suited to frameworks and any project that already takes care of bundling and lazy-loading itself.
 
-Standalone components can be cherry-picked and defined individually, bundled and defined all at once, or defined automatically via the auto-loader as they appear in the DOM - see [Consumption](#consumption) below. See [Choosing Between `loader-bundle` and `standalone`](./01-overview.md#choosing-between-loader-bundle-and-standalone) for when each output target is the better fit.
+Standalone components can be cherry-picked and defined individually, bundled and defined all at once, or defined automatically via the auto-loader as they appear in the DOM - see [Consumption](#consumption) below. See [Choosing Between `loader-bundle` and `standalone`](../01-overview.md#choosing-between-loader-bundle-and-standalone) for when each output target is the better fit.
 
-Publishing this output requires the right `package.json` fields pointing at it - see [Standalone](../guides/publishing.md#standalone) in the publishing guide for the exact `exports` map.
+Publishing this output requires the right `package.json` fields pointing at it - see [Standalone](../../guides/publishing.md#standalone) in the publishing guide for the exact `exports` map.
 
 To generate components using the `standalone` output target, add it to a project's `stencil.config.ts` file like so:
 
@@ -40,7 +41,7 @@ export const config: Config = {
 
 _default: `undefined`_
 
-An array of [copy tasks](./copy-tasks.md) to be executed during the build process.
+An array of [copy tasks](../supporting/copy-tasks.md) to be executed during the build process.
 
 ### customElementsExportBehavior
 
@@ -127,11 +128,11 @@ As of Stencil v5, component bundles are self-contained by default (`externalRunt
 
 _default: `false`_
 
-Setting this flag to `true` will include [global scripts](../config/01-overview.md#globalscript) in the bundle and execute them once the bundle entry point in loaded.
+Setting this flag to `true` will include [global scripts](../../config/01-overview.md#globalscript) in the bundle and execute them once the bundle entry point in loaded.
 
 ### minify
 
-_default: follows the Stencil config's [`minifyJs`](../config/01-overview.md#minifyjs) option - minified in a production build, unminified in dev_
+_default: follows the Stencil config's [`minifyJs`](../../config/01-overview.md#minifyjs) option - minified in a production build, unminified in dev_
 
 Set this explicitly to `true` or `false` to override that default for this output target specifically.
 
@@ -185,4 +186,4 @@ A `MutationObserver` watches the page and defines each custom element the first 
 
 ## Assets
 
-Component asset resolution works the same as every other output target - see the [Assets guide](../guides/assets.md) for `assetsDirs`, `getAssetPath()`, `setAssetPath()`, and [making the asset files themselves servable to a consumer using a bundler](../guides/assets.md#3-make-assets-available-in-consuming-applications).
+Component asset resolution works the same as every other output target - see the [Assets guide](../../guides/assets.md) for `assetsDirs`, `getAssetPath()`, `setAssetPath()`, and [making the asset files themselves servable to a consumer using a bundler](../../guides/assets.md#3-make-assets-available-in-consuming-applications).

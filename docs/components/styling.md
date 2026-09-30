@@ -296,7 +296,7 @@ export const config: Config = {
 };
 ```
 
-See the [`global-style` output target](../output-targets/global-style.md) for every option.
+See the [`global-style` output target](../output-targets/asset-outputs/global-style.md) for every option.
 
 The compiler runs minification, autoprefixing, and plugins over global stylesheets and writes the result to `dist/assets/`, alongside component assets - import it in your `index.html`:
 
@@ -319,7 +319,7 @@ export class MyCard {}
 
 `globalStyleUrl` styles aren't scoped to the component the way `styleUrl` styles are - they're collected at build time from every component that declares one. This works for every `encapsulation` type.
 
-With zero or one [`global-style`](../output-targets/global-style.md) output target, getting them onto the page is automatic - Stencil places the collected CSS for you, either prepended to your one global stylesheet or written to its own generated file if you don't have one at all. Write `@import "stencil-component-globals";` yourself only to control exactly where in the cascade it lands, or if your project configures more than one `global-style` output - the compiler can't guess which one should hold it, and errors naming the import that needs placing:
+With zero or one [`global-style`](../output-targets/asset-outputs/global-style.md) output target, getting them onto the page is automatic - Stencil places the collected CSS for you, either prepended to your one global stylesheet or written to its own generated file if you don't have one at all. Write `@import "stencil-component-globals";` yourself only to control exactly where in the cascade it lands, or if your project configures more than one `global-style` output - the compiler can't guess which one should hold it, and errors naming the import that needs placing:
 
 ```css title="src/global.css"
 @import "stencil-component-globals";
@@ -335,7 +335,7 @@ With zero or one [`global-style`](../output-targets/global-style.md) output targ
 
 Before a component's JavaScript loads and its `render()` runs for the first time, the browser has already parsed its light-DOM markup and any co-located styles - so there's a moment where a component can be visible but not yet interactive or fully styled by its own `render()` output. Left alone, this shows up as a flash of unstyled content (FOUC): the raw, unhydrated markup appears briefly before Stencil's runtime takes over.
 
-By default, Stencil's [loader script](../output-targets/loader-bundle.md#importing-with-a-bundler) - the small entry file that registers and lazy-loads your components - handles this at runtime: it inserts a `<style>` tag that hides components until they're hydrated. But that script still has to load and run before it can insert anything - on a slow connection or a busy main thread, the page can paint before the loader gets a chance to hide the unhydrated content, and FOUC happens anyway. Add `@import "stencil-hydrate";` to a global stylesheet to generate that same hiding CSS at build time instead, so it's already in the page's stylesheet before any JS has to run:
+By default, Stencil's [loader script](../output-targets/main/loader-bundle.md#importing-with-a-bundler) - the small entry file that registers and lazy-loads your components - handles this at runtime: it inserts a `<style>` tag that hides components until they're hydrated. But that script still has to load and run before it can insert anything - on a slow connection or a busy main thread, the page can paint before the loader gets a chance to hide the unhydrated content, and FOUC happens anyway. Add `@import "stencil-hydrate";` to a global stylesheet to generate that same hiding CSS at build time instead, so it's already in the page's stylesheet before any JS has to run:
 
 ```css title="src/global.css"
 @import "stencil-hydrate";
@@ -347,7 +347,7 @@ The compiler replaces the placeholder with the sorted tag list for every compone
 my-cmp,other-cmp{visibility:hidden}.hydrated{visibility:inherit}
 ```
 
-This is also the only option for a [`standalone`](../output-targets/standalone.md) build, which has no loader to do the dynamic injection at all - `stencil-hydrate.css` is generated alongside the bundle automatically in that case. Like `stencil-component-globals`, `stencil-hydrate` accepts the same `layer()`/`supports()`/media modifiers.
+This is also the only option for a [`standalone`](../output-targets/main/standalone.md) build, which has no loader to do the dynamic injection at all - `stencil-hydrate.css` is generated alongside the bundle automatically in that case. Like `stencil-component-globals`, `stencil-hydrate` accepts the same `layer()`/`supports()`/media modifiers.
 
 ### Constructable Stylesheets
 
@@ -361,4 +361,4 @@ This is also the only option for a [`standalone`](../output-targets/standalone.m
   revisit after the encapsulation POC lands.
 -->
 
-The zero-config `src/global.css` stylesheet is also registered on every shadow root as a [constructable stylesheet](https://web.dev/constructable-stylesheets/), so it can style shadow DOM components directly - for example with `:host(my-button)`. A `global-style` target with an explicit `input` isn't, unless you set its [`inject`](../output-targets/global-style.md#inject) option. See [Styling Shadow DOM Components From a Global Stylesheet](../output-targets/global-style.md#styling-shadow-dom-components-from-a-global-stylesheet) for examples.
+The zero-config `src/global.css` stylesheet is also registered on every shadow root as a [constructable stylesheet](https://web.dev/constructable-stylesheets/), so it can style shadow DOM components directly - for example with `:host(my-button)`. A `global-style` target with an explicit `input` isn't, unless you set its [`inject`](../output-targets/asset-outputs/global-style.md#inject) option. See [Styling Shadow DOM Components From a Global Stylesheet](../output-targets/asset-outputs/global-style.md#styling-shadow-dom-components-from-a-global-stylesheet) for examples.

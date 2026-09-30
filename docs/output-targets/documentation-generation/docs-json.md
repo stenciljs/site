@@ -287,9 +287,11 @@ You'd get the following in the JSON output under the `"usage"` key:
 
 ```json
 "usage": {
-  "a-usage-example": "# How to use `my-button`\n\nA button is often a great help in adding interactivity to an app!\n\nYou could use it like this:\n\n```html\n<my-button>My Button!</my-button>\n```\n"
+  "my-button-usage": "# How to use `my-button`\n\nA button is often a great help in adding interactivity to an app!\n\nYou could use it like this:\n\n```html\n<my-button>My Button!</my-button>\n```\n"
 }
 ```
+
+Markdown files in `src/usage/` work the same way for the project as a whole, and are added to a top-level `usage` property alongside `components`.
 
 
 ## Custom JSDocs Tags

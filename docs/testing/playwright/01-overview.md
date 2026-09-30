@@ -70,7 +70,7 @@ To install the Stencil Playwright adapter in an existing Stencil project, follow
    to start due to the build error.
    :::
 
-1. Ensure the Stencil project has a [`www` output target](../../output-targets/www.md). Playwright relies on pre-compiled output running in a dev server
+1. Ensure the Stencil project has a [`www` output target](../../output-targets/main/www.md). Playwright relies on pre-compiled output running in a dev server
    to run tests against. When using the `createConfig()` helper, a configuration for the dev server will be automatically created based on
    the Stencil project's `www` output target config and [dev server config](../../config/dev-server.md). If no `www` output target is specified,
    tests will not be able to run.

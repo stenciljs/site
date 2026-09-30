@@ -17,14 +17,14 @@ Migrating from Stencil v4? Run `stencil migrate --dry-run` to preview renaming `
 
 **Default: `true`**
 
-Projects that use a Stencil library built using the [`loader-bundle` output target](../output-targets/loader-bundle.md) may have trouble lazily
+Projects that use a Stencil library built using the [`loader-bundle` output target](../output-targets/main/loader-bundle.md) may have trouble lazily
 loading components when using a bundler such as Vite or Parcel. This flag changes how Stencil
 lazily loads components in a way that works with additional bundlers, at the cost of a larger compiled output.
 
 In order for this flag to have an effect:
 
 1. The Stencil library must expose lazy loadable components, such as those created with the
-   [`loader-bundle` output target](../output-targets/loader-bundle.md)
+   [`loader-bundle` output target](../output-targets/main/loader-bundle.md)
 2. The Stencil library must be compiled with `compat.enableImportInjection` set (or left at its default)
 
 Set this to `false` to opt out.
@@ -97,4 +97,4 @@ A few `extras` options from Stencil v4 have no `compat` equivalent — they were
 - **`experimentalImportInjection`** — use [`enableImportInjection`](#enableimportinjection), which now defaults to `true`.
 - **`experimentalScopedSlotChanges`**, **`experimentalSlotFixes`**, **`slotChildNodesFix`**, **`scopedSlotTextContentFix`**, **`appendChildSlotFix`**, **`cloneNodeFix`** — consolidated into [`lightDomPatches`](#lightdompatches) above.
 - **`scriptDataOpts`** — removed with no replacement, along with the legacy `<script data-opts="...">` bootstrap path it read from.
-- **`addGlobalStyleToComponents`** — replaced by the `inject` property (`'none'`, `'client'`, or `'all'`) on the new first-class [`global-style`](../output-targets/global-style.md#inject) output target.
+- **`addGlobalStyleToComponents`** — replaced by the `inject` property (`'none'`, `'client'`, or `'all'`) on the new first-class [`global-style`](../output-targets/asset-outputs/global-style.md#inject) output target.

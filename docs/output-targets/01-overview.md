@@ -10,13 +10,13 @@ slug: /output-targets
 One of the more powerful features of the compiler is its ability to generate various builds depending on _"how"_ the components are going to be used. Stencil is able to take an app's source and compile it to numerous targets, such as a webapp to be deployed on an http server, as a third-party component lazy-loaded library to be distributed on [npm](https://www.npmjs.com/), or a vanilla custom elements bundle. By default, Stencil apps have an output target type of `loader-bundle`, which is best suited for design systems and component libraries — set `www` explicitly if you're building a full web app rather than a library.
 
 ## Output Target Types:
- - [`loader-bundle`: lazy-loaded bundle for CDN/npm distribution](./loader-bundle.md) (formerly `dist`)
- - [`standalone`: standalone custom element modules](./standalone.md) (formerly `dist-custom-elements`)
- - [`www`: Website](./www.md)
- - [`collection`: transpiled source for downstream re-bundling](./collection.md), auto-generated in production (formerly the `dist-collection` sub-output of `dist`)
- - [`types`: TypeScript type declarations](./types.md), auto-generated in production (formerly a sub-output of `dist`/`dist-custom-elements`)
- - [`global-style`](./global-style.md) and [`assets`](./assets.md): first-class targets for global stylesheets and component assets
- - `ssr`: server-side rendering (formerly `dist-hydrate-script`) — see [SSR / SSG](./ssr/01-overview.md)
+ - [`loader-bundle`: lazy-loaded bundle for CDN/npm distribution](./main/loader-bundle.md) (formerly `dist`)
+ - [`standalone`: standalone custom element modules](./main/standalone.md) (formerly `dist-custom-elements`)
+ - [`www`: Website](./main/www.md)
+ - [`collection`: transpiled source for downstream re-bundling](./supporting/collection.md), auto-generated in production (formerly the `dist-collection` sub-output of `dist`)
+ - [`types`: TypeScript type declarations](./supporting/types.md), auto-generated in production (formerly a sub-output of `dist`/`dist-custom-elements`)
+ - [`global-style`](./asset-outputs/global-style.md) and [`assets`](./asset-outputs/assets.md): first-class targets for global stylesheets and component assets
+ - `ssr`: server-side rendering (formerly `dist-hydrate-script`) — see [SSR / SSG](./main/ssr/01-overview.md)
  - [Documentation generation targets](./documentation-generation/01-overview.md) (`docs-readme`, `docs-json`, `docs-custom-elements-manifest`, and others)
 
 ## Choosing Between `loader-bundle` and `standalone`

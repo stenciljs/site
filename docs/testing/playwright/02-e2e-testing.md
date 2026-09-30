@@ -73,7 +73,7 @@ export const config: Config = {
 ```
 
 In the above snippet, where it says "replace with the path to your entrypoint", the `src` attributes for the `script` tags should be the _relative_ path from the `www` output
-target's [output directory (`dir` option)](../../output-targets/www.md#config) to the namespaced entry file. The entry file will have the name
+target's [output directory (`dir` option)](../../output-targets/main/www.md#config) to the namespaced entry file. The entry file will have the name
 `<namespace>.esm.js` for ESM output and `<namespace>.js` for CJS output. The "namespace" value is the kebab-case value of the `namespace` from your
 [Stencil config](../../config/01-overview.md#namespace).
 
