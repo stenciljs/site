@@ -35,7 +35,7 @@ The developer experience is also tuned, and comes with live reload and a small d
 
 Stencil is built for design systems and component libraries first, apps second. That shows up throughout the toolchain:
 
-- Style components however you like: shadow DOM for full isolation, or [light DOM](../components/styling.md) when you want your styles to participate in the page around them.
+- Style components however you like: shadow DOM for full isolation, or [light DOM](../components/styling.md) when you want your styles to participate in the page around them - all the way down to a tag with [no JS class at all](../components/css-only.md). See [Component Archetypes](./component-archetypes.md) for the full spectrum.
 - Global stylesheets are developed side by side with component styles, not as a separate concern.
 - The [dev server](../config/dev-server.md) previews one component at a time by default, no app shell required - though it still serves a full app once you have one.
 - Documentation from day one: [Custom Elements Manifests, readmes, and IDE autocomplete data](../output-targets/documentation-generation/01-overview.md) are generated from your component source, along with an Agent Skill that lets AI coding agents consume your library directly.

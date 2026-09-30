@@ -13,9 +13,9 @@ One of the more powerful features of the compiler is its ability to generate var
  - [`loader-bundle`: lazy-loaded bundle for CDN/npm distribution](./loader-bundle.md) (formerly `dist`)
  - [`standalone`: standalone custom element modules](./standalone.md) (formerly `dist-custom-elements`)
  - [`www`: Website](./www.md)
- - `collection`: transpiled source for downstream re-bundling, auto-generated in production (formerly the `dist-collection` sub-output of `dist`)
- - `types`: TypeScript type declarations, auto-generated in production (formerly a sub-output of `dist`/`dist-custom-elements`)
- - `global-style` and [`assets`](./assets.md): first-class targets for global stylesheets and component assets
+ - [`collection`: transpiled source for downstream re-bundling](./collection.md), auto-generated in production (formerly the `dist-collection` sub-output of `dist`)
+ - [`types`: TypeScript type declarations](./types.md), auto-generated in production (formerly a sub-output of `dist`/`dist-custom-elements`)
+ - [`global-style`](./global-style.md) and [`assets`](./assets.md): first-class targets for global stylesheets and component assets
  - `ssr`: server-side rendering (formerly `dist-hydrate-script`) — see [SSR / SSG](./ssr/01-overview.md)
  - [Documentation generation targets](./documentation-generation/01-overview.md) (`docs-readme`, `docs-json`, `docs-custom-elements-manifest`, and others)
 

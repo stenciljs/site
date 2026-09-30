@@ -97,4 +97,4 @@ A few `extras` options from Stencil v4 have no `compat` equivalent — they were
 - **`experimentalImportInjection`** — use [`enableImportInjection`](#enableimportinjection), which now defaults to `true`.
 - **`experimentalScopedSlotChanges`**, **`experimentalSlotFixes`**, **`slotChildNodesFix`**, **`scopedSlotTextContentFix`**, **`appendChildSlotFix`**, **`cloneNodeFix`** — consolidated into [`lightDomPatches`](#lightdompatches) above.
 - **`scriptDataOpts`** — removed with no replacement, along with the legacy `<script data-opts="...">` bootstrap path it read from.
-- **`addGlobalStyleToComponents`** — replaced by the `inject` property (`'none'`, `'client'`, or `'all'`) on the new first-class `global-style` output target.
+- **`addGlobalStyleToComponents`** — replaced by the `inject` property (`'none'`, `'client'`, or `'all'`) on the new first-class [`global-style`](../output-targets/global-style.md#inject) output target.

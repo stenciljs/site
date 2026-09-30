@@ -277,7 +277,7 @@ Create `src/global.css` and Stencil picks it up automatically, no config require
 }
 ```
 
-For anything beyond that default - a stylesheet outside `src/global.{css,...}`, more than one global stylesheet (light / dark themes), a custom output filename, or making the stylesheet's CSS directly available inside shadow roots - configure `global-style` directly:
+For anything beyond that default - a stylesheet outside `src/global.{css,...}`, more than one global stylesheet (light / dark themes), or a custom output filename - configure `global-style` directly:
 
 ```tsx
 export const config: Config = {
@@ -296,7 +296,7 @@ export const config: Config = {
 };
 ```
 
-For more advanced `global-style` options, refer to the `global-style` output target docs.
+See the [`global-style` output target](../output-targets/global-style.md) for every option.
 
 The compiler runs minification, autoprefixing, and plugins over global stylesheets and writes the result to `dist/assets/`, alongside component assets - import it in your `index.html`:
 
@@ -317,15 +317,19 @@ A project-wide global stylesheet works well for true app-wide concerns, but some
 export class MyCard {}
 ```
 
-`globalStyleUrl` styles aren't scoped to the component the way `styleUrl` styles are - they're collected at build time from every component that declares one, then injected wherever `@import "stencil-globals";` appears in a global stylesheet:
+`globalStyleUrl` styles aren't scoped to the component the way `styleUrl` styles are - they're collected at build time from every component that declares one. This works for every `encapsulation` type.
+
+With zero or one [`global-style`](../output-targets/global-style.md) output target, getting them onto the page is automatic - Stencil places the collected CSS for you, either prepended to your one global stylesheet or written to its own generated file if you don't have one at all. Write `@import "stencil-component-globals";` yourself only to control exactly where in the cascade it lands, or if your project configures more than one `global-style` output - the compiler can't guess which one should hold it, and errors naming the import that needs placing:
 
 ```css title="src/global.css"
-@import "stencil-globals";
+@import "stencil-component-globals";
 ```
 
-This works for every `encapsulation` type. It's also what makes a CSS-only component possible - one with no `render()` method or component logic at all, where the tag exists purely so its co-located styles have something to attach to.
+`@import "stencil-component-globals"` accepts the same modifiers a normal `@import` does, wrapping the injected CSS accordingly: `@import "stencil-component-globals" layer(components);` wraps it in `@layer components { ... }`.
 
-`@import "stencil-globals"` accepts the same modifiers a normal `@import` does, wrapping the injected CSS accordingly: `@import "stencil-globals" layer(components);` wraps it in `@layer components { ... }`.
+:::note
+[CSS-only components](./css-only.md) - a tag with no backing JS class at all - use a separate placeholder, `@import "stencil-css-components";`, in the same global stylesheet.
+:::
 
 ### Preventing flash of unstyled content with `stencil-hydrate`
 
@@ -343,13 +347,13 @@ The compiler replaces the placeholder with the sorted tag list for every compone
 my-cmp,other-cmp{visibility:hidden}.hydrated{visibility:inherit}
 ```
 
-This is also the only option for a [`standalone`](../output-targets/standalone.md) build, which has no loader to do the dynamic injection at all - `stencil-hydrate.css` is generated alongside the bundle automatically in that case. Like `stencil-globals`, `stencil-hydrate` accepts the same `layer()`/`supports()`/media modifiers.
+This is also the only option for a [`standalone`](../output-targets/standalone.md) build, which has no loader to do the dynamic injection at all - `stencil-hydrate.css` is generated alongside the bundle automatically in that case. Like `stencil-component-globals`, `stencil-hydrate` accepts the same `layer()`/`supports()`/media modifiers.
 
 ### Constructable Stylesheets
 
 <!--
   TODO(live-demo, speculative - lower priority than the encapsulation demo above): once
-  output-targets/global-style.md exists and a playground direction is chosen (see
+  a playground direction is chosen (see
   V5_DOCS_PLAN.md §6), consider a live demo here specifically - a global stylesheet with a
   :host(my-button) rule, inject: 'client' toggled on vs. off, showing it actually reach a live
   shadow root only when enabled. Unlike the multi-sheet/co-location story (build-time, not a
@@ -357,4 +361,4 @@ This is also the only option for a [`standalone`](../output-targets/standalone.m
   revisit after the encapsulation POC lands.
 -->
 
-A global stylesheet isn't registered inside shadow roots by default - it only reaches the light DOM, the same as any page-level stylesheet. Opt in via the `global-style` output target to also register it as a [constructable stylesheet](https://web.dev/constructable-stylesheets/) on every shadow root, letting it target shadow-encapsulated components directly (with `:host()` and a tag name selector, for instance). Refer to the `global-style` output target docs for how to turn this on and what it makes possible.
+The zero-config `src/global.css` stylesheet is also registered on every shadow root as a [constructable stylesheet](https://web.dev/constructable-stylesheets/), so it can style shadow DOM components directly - for example with `:host(my-button)`. A `global-style` target with an explicit `input` isn't, unless you set its [`inject`](../output-targets/global-style.md#inject) option. See [Styling Shadow DOM Components From a Global Stylesheet](../output-targets/global-style.md#styling-shadow-dom-components-from-a-global-stylesheet) for examples.

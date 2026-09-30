@@ -128,3 +128,7 @@ defineCustomElements();
 ```
 
 This works the same in any npm-based project, regardless of framework.
+
+:::note
+For a downstream Stencil project specifically, [`collection`](./collection.md) is usually the better fit - it hands over transpiled source for the consumer's own compiler to re-process, rather than a pre-built dependency.
+:::
