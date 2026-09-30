@@ -20,31 +20,6 @@ export const config: Config = {
 };
 ```
 
-## buildDist
-
-*default: true (prod), false (dev)*
-
-Sets whether or not Stencil will execute output targets and write output to
-`dist/` when `stencil build` is called. Defaults to `false` when building for
-development and `true` when building for production. If set to `true` then
-Stencil will always build all output targets, regardless of whether the build
-is in dev or prod mode or using watch mode.
-
-```tsx
-buildDist: true
-```
-
-## buildEs5
-
-Sets if the ES5 build should be generated or not.
-It defaults to `false`.
-Setting `buildEs5` to `true` will also create ES5 builds for both dev and prod modes.
-Setting `buildEs5` to `prod` will only build ES5 in prod mode.
-
-```tsx
-buildEs5: boolean | 'prod'
-```
-
 ## bundles
 
 By default, Stencil will statically analyze the application and generate a component graph of how all the components are interconnected. From the component graph it is able to best decide how components should be grouped depending on their usage with one another within the app. By doing so it's able to bundle components together in order to reduce network requests. However, bundles can be manually generated using the `bundles` config.
@@ -221,26 +196,6 @@ A top-level path to a global stylesheet, predating the [`global-style` output ta
 
 ```tsx
 globalStyle: 'src/global/app.css'
-```
-
-## hashedFileNameLength
-
-*default: `8`*
-
-When the `hashFileNames` config is set to `true`, and it is a production build, the `hashedFileNameLength` config is used to determine how many characters the file name's hash should be.
-
-```tsx
-hashedFileNameLength: 8
-```
-
-## hashFileNames
-
-*default: `true`*
-
-During production builds, the content of each generated file is hashed to represent the content, and the hashed value is used as the filename. If the content isn't updated between builds, then it receives the same filename. When the content is updated, then the filename is different. By doing this, deployed apps can "forever-cache" the build directory and take full advantage of content delivery networks (CDNs) and heavily caching files for faster apps.
-
-```tsx
-hashFileNames: true
 ```
 
 ## hydratedFlag

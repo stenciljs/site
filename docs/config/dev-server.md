@@ -102,9 +102,9 @@ Every request to the server will be logged within the terminal.
 
 **Type: `boolean`**
 
-**Default: `true`**
+**Default: `false`**
 
-By default, when dev server is started the local dev URL is opened in your default browser. However, to prevent this URL to be opened change this value to `false`.
+Set to `true` to open the local dev URL in your default browser when the dev server starts.
 
 ### `pingRoute`
 
