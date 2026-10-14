@@ -7,7 +7,7 @@ slug: /assets
 
 # Assets
 
-Assets are static files a component needs - images, fonts etc. (CSS is handled differently; see [Styling](../components/styling.md).)
+Assets are static files a component needs - images, fonts etc. (CSS is handled differently; see [Styling](../../components/styling.md).)
 
 Getting an asset from your source code onto a page a consumer actually loads takes up to four steps:
 
@@ -20,7 +20,7 @@ If you're building an app rather than a library for others to install (a `www` p
 
 ## 1. Reference assets in your components
 
-List the component's asset directory with [`assetsDirs`](../components/component.md#component-options), then build the URL to a specific file with `getAssetPath()`:
+List the component's asset directory with [`assetsDirs`](../../components/component.md#component-options), then build the URL to a specific file with `getAssetPath()`:
 
 ```
 src/
@@ -54,18 +54,18 @@ export class MyComponent {
 `assetsDirs` alone doesn't make the asset resolvable - it's what step 2 copies. `getAssetPath()` alone doesn't copy anything either - it just builds the URL, assuming the file ends up where step 2 puts it. You need both.
 
 :::note
-Files not tied to a specific component - or that need a destination other than the unified `assets` output from step 2 - use a [Stencil `copy` task](../output-targets/supporting/copy-tasks.md) instead, available on `loader-bundle`, `standalone`, and `www`.
+Files not tied to a specific component - or that need a destination other than the unified `assets` output from step 2 - use a [Stencil `copy` task](../../output-targets/supporting/copy-tasks.md) instead, available on `loader-bundle`, `standalone`, and `www`.
 :::
 
 ## 2. Bundle assets with your library
 
-Every component's `assetsDirs` are copied automatically to one unified `dist/assets/` directory, regardless of which output targets you configure - see the [`assets` output target](../output-targets/asset-outputs/assets.md) for where that directory lives and how to change it. There's nothing to configure for the common case; this step is already done for you.
+Every component's `assetsDirs` are copied automatically to one unified `dist/assets/` directory, regardless of which output targets you configure - see the [`assets` output target](../../output-targets/asset-outputs/assets.md) for where that directory lives and how to change it. There's nothing to configure for the common case; this step is already done for you.
 
 ## 3. Make assets available in consuming applications
 
 The URL `getAssetPath()` builds is only useful if the file it points to is actually reachable at runtime. Once a consumer runs `npm install my-library`, your assets sit in `node_modules/my-library/dist/assets/` - and most dev servers and production builds don't serve `node_modules` publicly.
 
-This applies to [`loader-bundle`](../output-targets/main/loader-bundle.md) and [`standalone`](../output-targets/main/standalone.md) alike, whenever a consumer's own bundler resolves your package from `node_modules` rather than loading it wholesale from a CDN (a CDN or `www`-style deploy ships the whole tree together, so this isn't a problem there).
+This applies to [`loader-bundle`](../../output-targets/main/loader-bundle.md) and [`standalone`](../../output-targets/main/standalone.md) alike, whenever a consumer's own bundler resolves your package from `node_modules` rather than loading it wholesale from a CDN (a CDN or `www`-style deploy ships the whole tree together, so this isn't a problem there).
 
 Copy or symlink the assets into a servable location as part of the consumer's own build. A webpack config might look like this:
 
@@ -147,7 +147,7 @@ defineCustomElements();
 Either way, this needs no separate import beyond what you're already using to load your components. It sets the base path for every component sharing that Stencil runtime instance, so call it once, outside any component - not from within one.
 
 :::note
-Server-side rendering uses a separate mechanism: `getAssetPath()` on the server can't fall back to a browser URL, so it needs `resourcesUrl` passed explicitly to `ssrDocument()`. See [SSR / SSG](../output-targets/main/ssr/01-overview.md).
+Server-side rendering uses a separate mechanism: `getAssetPath()` on the server can't fall back to a browser URL, so it needs `resourcesUrl` passed explicitly to `ssrDocument()`. See [SSR / SSG](../applications/prerendering/01-overview.md).
 :::
 
 ## API Reference

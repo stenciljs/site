@@ -25,23 +25,21 @@ export const config: Config = {
 ## Rolldown plugins
 
 The `rolldownPlugins` config can be used to add your own [Rolldown](https://rolldown.rs/) plugins (renamed from `rollupPlugins` in Stencil v5, which replaced Rollup with Rolldown as its bundler — run `stencil migrate --dry-run` to preview renaming an existing config automatically).
-Under the hood, stencil ships with some built-in plugins including `node-resolve` and `commonjs`, since the execution order of these plugins is important, stencil provides an API to inject custom plugins **before node-resolve** and after **commonjs transform**:
-
+They run after Stencil's own plugins, the `before` list first and then the `after` list:
 
 ```tsx
+import nodePolyfills from '@rolldown/plugin-node-polyfills';
+
 export const config = {
   rolldownPlugins: {
-    before: [
-      // Plugins injected before node-resolve
-      resolvePlugin()
-    ],
     after: [
-      // Plugins injected after commonjs()
       nodePolyfills()
     ]
   }
 }
 ```
+
+Rolldown resolves modules and bundles CommonJS itself, so don't add `@rollup/plugin-node-resolve` or `@rollup/plugin-commonjs`. See [Module Bundling](../guides/distribution/module-bundling.md#custom-rolldown-plugins) for more.
 
 ### Related Plugins
 
@@ -52,4 +50,4 @@ export const config = {
 
 
 ## Node Polyfills
-See the [Node Polyfills in Module bundling](../guides/module-bundling.md#node-polyfills) for other examples.
+See the [Node Polyfills in Module bundling](../guides/distribution/module-bundling.md#node-polyfills) for other examples.

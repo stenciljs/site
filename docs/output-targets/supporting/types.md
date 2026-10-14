@@ -32,7 +32,7 @@ Formerly a sub-output of `dist` and `dist-custom-elements` in Stencil v4, now a 
 | `loader.d.ts` | The [`loader-bundle`](../main/loader-bundle.md) entry point (`defineCustomElements()`, `setNonce()`, and so on), if that target is configured |
 | `standalone.d.ts` | The [`standalone`](../main/standalone.md) runtime helpers, if that target is configured |
 
-Point your `package.json` `types` field at the entry file that matches your package's main entry point. If it's missing, the build warns with the recommended path. See [Publishing](../../guides/publishing.md) for full `package.json` examples.
+Point your `package.json` `types` field at the entry file that matches your package's main entry point. If it's missing, the build warns with the recommended path. See [Publishing](../../guides/distribution/publishing.md) for full `package.json` examples.
 
 ## Config
 

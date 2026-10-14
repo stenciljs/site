@@ -1,55 +1,17 @@
 ---
-title: Stencil Core Compiler API
+title: Stencil Compiler API
 sidebar_label: Compiler API
-description:  Stencil Core Compiler API
+description: The JavaScript API of the Stencil compiler
 slug: /compiler-api
 ---
 
-# Stencil Core Compiler API
+# Stencil Compiler API
 
-The compiler API can be found at `@stencil/core/compiler/stencil.js`. This module can 
-work in a NodeJS environment.
+The compiler API is the `@stencil/core/compiler` module. It runs in Node.js, and is an ES module, so load it with `import`:
 
-
-```tsx
-// NodeJS (commonjs)
-const stencil = require('@stencil/core/compiler');
+```ts
+import { createCompiler, loadConfig } from '@stencil/core/compiler';
 ```
-
-## transpile()
-
-```tsx
-transpile(code: string, opts?: TranspileOptions): Promise<TranspileResults>
-```
-
-The `transpile()` function inputs source code as a string, with various options
-within the second argument. The function is stateless and returns a `Promise` of the
-results, including diagnostics and the transpiled code. The `transpile()` function
-does not handle any bundling, minifying, or precompiling any CSS preprocessing like
-Sass or Less. 
-
-The `transpileSync()` equivalent is available so the same function
-it can be called synchronously. However, TypeScript must be already loaded within
-the global for it to work, where as the async `transpile()` function will load
-TypeScript automatically.
-
-Since TypeScript is used, the source code will transpile from TypeScript to JavaScript,
-and does not require Babel presets. Additionally, the results includes an `imports`
-array of all the import paths found in the source file. The transpile options can be
-used to set the `module` format, such as `cjs`, and JavaScript `target` version, such
-as `es2017`.
-
-
-## transpileSync()
-
-```tsx
-transpileSync(code: string, opts?: TranspileOptions): TranspileResults
-```
-
-Synchronous equivalent of the `transpile()` function. When used in a browser
-environment, TypeScript must already be available globally, where as the async
-`transpile()` function will load TypeScript automatically.
-
 
 ## createCompiler()
 
@@ -57,22 +19,26 @@ environment, TypeScript must already be available globally, where as the async
 createCompiler(config: Config): Promise<Compiler>
 ```
 
-The compiler is the utility that brings together many tools to build optimized components, such as a
-transpiler, bundler and minifier. When using the CLI, the `stencil build` command uses the compiler for
-the various builds, such as a production build, or watch mode during development. If only one file should
-be transpiled (converting source code from TypeScript to JavaScript) then the `transpile()` function should be used instead.
+Creates a compiler for a project. The compiler brings together the transpiler, bundler, and minifier, and is what `stencil build` runs. Create `config` with [`loadConfig()`](#loadconfig).
 
-Given a Stencil config, this method asynchronously returns a `Compiler` instance. The config provided
-should already be created using the `loadConfig({...})` method.
+A `Compiler` has these methods:
 
-Below is an example of a NodeJS environment running a full build.
+| Method | Description |
+| --- | --- |
+| `build()` | Runs one build, and returns its results, including `hasError` and `diagnostics` |
+| `createWatcher()` | Returns a `CompilerWatcher`, which rebuilds when source files change |
+| `destroy()` | Releases the compiler's resources |
 
-```tsx
-import { createNodeLogger, createNodeSys } from '@stencil/core/sys/node';
+To compile one file without a project, use [`transpile()`](#transpile).
+
+This example runs a full build:
+
+```ts
 import { createCompiler, loadConfig } from '@stencil/core/compiler';
+import { createNodeLogger, createNodeSys } from '@stencil/core/sys/node';
 
-const logger = createNodeLogger(process);
-const sys = createNodeSys(process);
+const logger = createNodeLogger();
+const sys = createNodeSys({ process, logger });
 const validated = await loadConfig({
   logger,
   sys,
@@ -84,28 +50,13 @@ const compiler = await createCompiler(validated.config);
 const results = await compiler.build();
 ```
 
-
 ## createSystem()
 
 ```tsx
-createSystem(): CompilerSystem
+createSystem(c?: { logger?: Logger }): CompilerSystem
 ```
 
-The compiler uses a `CompilerSystem` instance to access any file system reads and writes. When used
-from the CLI, the CLI will provide its own system based on NodeJS. This method provide a compiler
-system is in-memory only and independent of any platform.
-
-
-## dependencies
-
-```tsx
-dependencies: CompilerDependency[]
-```
-
-The `dependencies` array is only informational and provided to state which versions of dependencies
-the compiler was built and works with. For example, the version of TypeScript, Rollup and Terser used
-for this version of Stencil are listed here.
-
+The compiler reads and writes files through a `CompilerSystem`. This function creates one that works in memory only, independent of any platform. For a system that uses the real file system, use [`createNodeSys()`](#createnodesys).
 
 ## loadConfig()
 
@@ -113,39 +64,47 @@ for this version of Stencil are listed here.
 loadConfig(init?: LoadConfigInit): Promise<LoadConfigResults>
 ```
 
-The `loadConfig(init)` method is used to take raw config information and transform it into a
-usable config object for the compiler and dev-server. The `init` argument should be given
-an already created system and logger which can also be used by the compiler.
+Turns raw config into the validated config that the compiler and the dev server need. `init` takes a `logger`, a `sys`, and either a `config` object or a `configPath` to a config file.
 
+The result has the validated `config`, any `diagnostics`, and the project's resolved `tsconfig`.
+
+## transpile()
+
+```tsx
+transpile(code: string, opts?: TranspileOptions): Promise<TranspileResults>
+```
+
+Compiles one source file, given as a string, from TypeScript to JavaScript. The function is stateless. It doesn't bundle or minify, and it doesn't run CSS preprocessors such as Sass.
+
+The result has the output `code`, a source `map`, the `imports` found in the file, and any `diagnostics`.
+
+```ts
+const results = await transpile(source, { file: 'my-component.tsx' });
+```
+
+## transpileSync()
+
+```tsx
+transpileSync(code: string, opts?: TranspileOptions): TranspileResults
+```
+
+The synchronous equivalent of `transpile()`. In a browser, TypeScript must already be available globally.
 
 ## optimizeCss()
 
 ```tsx
-optimizeCss(cssInput?: OptimizeCssInput): Promise<OptimizeCssOutput>
+optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>
 ```
 
-Utility function used by the compiler to optimize CSS.
-
+Optimizes CSS as the compiler does. The result has the `output` string and any `diagnostics`.
 
 ## optimizeJs()
 
-```jsx
-optimizeJs(jsInput?: OptimizeJsInput): Promise<OptimizeJsOutput>
-```
-
-Utility function used by the compiler to optimize JavaScript. Knowing the JavaScript target
-will further apply minification optimizations beyond usual minification.
-
-
-## path
-
 ```tsx
-path: PlatformPath
+optimizeJs(inputOpts: OptimizeJsInput): Promise<OptimizeJsOutput>
 ```
 
-Utility of the `path` API provided by NodeJS, but capable of running in any environment.
-This `path` API is only the POSIX version: https://nodejs.org/api/path.html
-
+Optimizes JavaScript as the compiler does. The result has the `output` string and any `diagnostics`.
 
 ## version
 
@@ -153,4 +112,32 @@ This `path` API is only the POSIX version: https://nodejs.org/api/path.html
 version: string
 ```
 
-Current version of `@stencil/core`.
+The version of `@stencil/core`.
+
+## versions
+
+```tsx
+versions: { stencil: string; typescript: string; rolldown: string; terser: string }
+```
+
+The installed versions of Stencil and of the tools the compiler uses.
+
+## @stencil/core/sys/node
+
+The `@stencil/core/sys/node` module creates the Node.js logger and system that the functions above take.
+
+### createNodeLogger()
+
+```tsx
+createNodeLogger(): Logger
+```
+
+Creates a logger that writes to the terminal.
+
+### createNodeSys()
+
+```tsx
+createNodeSys(c?: { process?: any; logger?: Logger }): CompilerSystem
+```
+
+Creates the system that the compiler uses for everything Node.js-specific, such as reading and writing files and hashing content.

@@ -12,7 +12,7 @@ This can help you to maintain consistently formatted documentation for your comp
 
 ## Setup
 
-To generate markdown files, it is recommended to add the `docs-readme` output target to your Stencil configuration file:
+To generate markdown files, add the `docs-readme` output target to your Stencil configuration file:
 
 ```tsx title="stencil.config.ts"
 import { Config } from '@stencil/core';
@@ -36,7 +36,7 @@ npx stencil build
 ```
 If you're running the build command with the `--watch` flag, your project's README files will automatically update without requiring multiple explicit build commands:
 ```bash
-npm stencil build --watch
+npx stencil build --watch
 ```
 
 :::info
@@ -44,24 +44,26 @@ When running the build command with the `--dev` flag, README files will not be g
 This is to prevent unnecessary I/O operations during the development cycle.
 :::
 
-If you choose not to include a `docs-readme` output target in your Stencil configuration file, use the `--docs` CLI flag as a part of the build command:
-```bash
-npx stencil build --docs
+To generate README files in a `--dev` build as well, set `skipInDev: false` on the output target:
+```tsx title="stencil.config.ts"
+{
+  type: 'docs-readme',
+  skipInDev: false
+}
 ```
-
-This will cause the Stencil compiler to perform a one-time build of your entire project, including README files.
 
 ### Using the Docs Command
 
-As an alternative to the build command, the [docs command](../../config/cli.md#stencil-docs) can be used to perform a one time generation of the documentation:
+As an alternative to the build command, the [docs command](../../config/cli.md#stencil-docs) can be used to generate the documentation without building anything else:
 ```bash
 npx stencil docs
 ```
 Running `stencil docs` will generate documentation for [all documentation output targets](./01-overview.md), not just `docs-readme`.
 
-:::info
-The `npx stencil docs` command runs with dev mode enabled, which does not run a full build. As a result, documentation that needs to be built first, like CSS styles, will not be generated. You will need to run `npx stencil build --docs` to generate documentation that requires building.
-:::
+To keep the documentation up to date while you work, add the `--watch` flag:
+```bash
+npx stencil docs --watch
+```
 
 ## README Sections
 
@@ -500,8 +502,8 @@ The following table will be generated:
 
 | State              | Initial Value | Description                                                |
 | ------------------ | ------------- | ---------------------------------------------------------- |
-| `:state(new)`      | `true`        |                                                            |
 | `:state(archived)` | `false`       | If this item is older than 6 months old                    |
+| `:state(new)`      | `true`        |                                                            |
 ```
 
 ### Styling Details
@@ -557,7 +559,7 @@ export const config: Config = {
 };
 ```
 
-The following footer will be placed at the bottom of your component's README file:
+The following footer will replace the default one at the bottom of your component's README file:
 ```
 *Built with love!*
 ```
@@ -567,8 +569,9 @@ The following footer will be placed at the bottom of your component's README fil
 
 By default, a README file will be generated in the same directory as the
 component it corresponds to. This behavior can be changed by setting the `dir`
-property on the output target configuration. Specifying a directory will create
-the structure `{dir}/{component}/readme.md`.
+property on the output target configuration. Each README is then written under
+that directory, at the same path its component has under `src`, such as
+`output/components/my-component/readme.md`.
 
 ```tsx title="stencil.config.ts"
 import { Config } from '@stencil/core';

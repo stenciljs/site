@@ -7,7 +7,7 @@ slug: /stats
 
 # Stats
 
-Often it's very helpful to understand the state of your libraries generated files in the form of json data. To build the docs as json, use the `--stats` flag, followed by a path on where to write the json file.
+Often it's very helpful to understand the state of your libraries generated files in the form of json data. To write this data, use the `--stats` flag, optionally followed by the path to write the JSON file to.
 
 ```tsx
   scripts: {
@@ -33,154 +33,115 @@ export const config: Config = {
 
 If you don't pass a file name to the `--stats` flag or the output target's `file` key, the file will be output to the root directory of your project as `stencil-stats.json`
 
-Check out the typescript declarations for the JSON output: https://github.com/ionic-team/stencil/blob/main/src/declarations/stencil-public-docs.ts
-
-
 ## Data Model
 
-The file that's generated will produce data similar to this:
+The generated file looks like this, shortened here to one component:
 
 ```json
 {
-  "timestamp": "2021-09-22T17:31:14",
+  "timestamp": "2026-10-10T00:02:11",
   "compiler": {
     "name": "node",
-    "version": "16.9.1"
+    "version": "24.16.0"
   },
   "app": {
-    "namespace": "ExampleStencilLibrary",
-    "fsNamespace": "example-stencil-library",
+    "namespace": "AcmeUi",
+    "fsNamespace": "acmeui",
     "components": 1,
     "entries": 1,
-    "bundles": 30,
+    "bundles": 25,
     "outputs": [
       {
-        "name": "dist-collection",
-        "files": 3,
-        "generatedFiles": [
-          "./dist/collection/components/my-component/my-component.js",
-           // etc...
-        ]
-      },
-      {
-        "name": "dist-lazy",
-        "files": 26,
-        "generatedFiles": [
-          "./dist/cjs/example-stencil-library.cjs.js",
-           // etc...
-        ]
-      },
-      {
-        "name": "dist-types",
+        "name": "assets",
         "files": 1,
-        "generatedFiles": [
-          "./dist/types/stencil-public-runtime.d.ts"
-        ]
-      }
+        "generatedFiles": ["./dist/assets/acmeui.css"]
+      },
+      {
+        "name": "collection",
+        "files": 2,
+        "generatedFiles": ["./dist/collection/components/my-button/my-button.js", "..."]
+      },
+      { "name": "dist-lazy", "...": "..." },
+      { "name": "standalone", "...": "..." },
+      { "name": "types", "...": "..." }
     ]
   },
   "options": {
     "minifyJs": true,
-    "minifyCss": true,
-    "hashFileNames": true,
-    "hashedFileNameLength": 8,
-    "buildEs5": true
+    "minifyCss": true
   },
   "formats": {
     "esmBrowser": [
       {
-        "key": "my-component.entry",
-        "components": [
-          "my-component"
-        ],
-        "bundleId": "p-12cc1edd",
-        "fileName": "p-12cc1edd.entry.js",
-        "imports": [
-          "p-24af5948.js"
-        ],
-        "originalByteSize": 562
+        "key": "my-button.entry",
+        "components": ["my-button"],
+        "bundleId": "p-9dbe23eb",
+        "fileName": "p-9dbe23eb.entry.js",
+        "imports": ["p-Yb2ubLNr.js"],
+        "originalByteSize": 537
       }
     ],
     "esm": [
-      // exact same model as the esmBrowser, but for esm files
+      {
+        "key": "my-button.entry",
+        "components": ["my-button"],
+        "bundleId": "my-button",
+        "fileName": "my-button.entry.js",
+        "imports": ["runtime-Yb2ubLNr.js"],
+        "originalByteSize": 543
+      }
     ],
-    "es5": [
-      // exact same model as the esmBrowser, but for es5 files
-    ],
-    "system": [
-      // exact same model as the esmBrowser, but for system files
-    ],
-    "commonjs": [
-      // exact same model as the esmBrowser, but for cjs files
-    ]
+    "commonjs": []
   },
   "components": [
     {
-      "tag": "my-component",
-      "path": "./src/components/my-component/my-component.js",
-      "source": "./src/components/my-component/my-component.tsx",
-      "elementRef": null,
-      "componentClassName": "MyComponent",
-      "assetsDirs": [],
-      "dependencies": [],
-      "dependents": [],
-      "directDependencies": [],
-      "directDependents": [],
+      "tag": "my-button",
+      "path": "./src/components/my-button/my-button.js",
+      "source": "./src/components/my-button/my-button.tsx",
+      "componentClassName": "MyButton",
+      "encapsulation": "shadow",
       "docs": {
         "tags": [],
-        "text": ""
+        "text": "A clickable button."
       },
-      "encapsulation": "shadow",
-      "excludeFromCollection": false,
+      "dependencies": [],
+      "dependents": [],
       "events": [],
-      "internal": false,
-      "legacyConnect": [],
-      "legacyContext": [],
       "listeners": [],
       "methods": [],
-      "potentialCmpRefs": [],
       "properties": [
         {
-          "name": "first",
+          "name": "variant",
           "type": "string",
-          "attribute": "first",
+          "attribute": "variant",
           "reflect": false,
           "mutable": false,
           "required": false,
           "optional": false,
+          "defaultValue": "'primary'",
           "complexType": {
-            "original": "string",
-            "resolved": "string",
+            "original": "'primary' | 'secondary'",
+            "resolved": "\"primary\" | \"secondary\"",
             "references": {}
-          },
-          "docs": {
-            "tags": [],
-            "text": "The first name"
-          },
-          "internal": false
-        },
+          }
+        }
       ],
-    },
+      "states": []
+    }
   ],
   "entries": [
     {
-      "cmps": [
-       // Expanded component details are produced here
-      ],
-      "entryKey": "my-component.entry"
+      "cmps": [{ "tagName": "my-button", "...": "..." }]
     }
   ],
   "componentGraph": {
-    "sc-my-component": [
-      "p-24af5948.js"
-    ]
+    "sc-my-button": ["p-Yb2ubLNr.js"]
   },
   "sourceGraph": {
-    "./src/components/my-component/my-component.tsx": [
-      "./src/utils/utils"
-    ],
-    "./src/index.ts": [],
-    "./src/utils/utils.ts": []
+    "./src/components/my-button/my-button.tsx": []
+  },
+  "rolldownResults": {
+    "modules": []
   },
   "collections": []
 }

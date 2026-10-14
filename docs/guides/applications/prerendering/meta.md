@@ -15,16 +15,16 @@ Similarly, meta tags can be set using standard DOM APIs as found in the browser,
 For this reason, your component's runtime can take care of much of this custom work during prerendering.
 
 That said, the Prerender Config also includes options that allow individual pages to be modified arbitrarily during prerendering.
-For example, the `afterHydrate(document, url)` hook can be used to update the parsed `document` before it is serialized into an HTML string.
+For example, the `afterSsr(document, url)` hook can be used to update the parsed `document` before it is serialized into an HTML string.
 The `document` argument is a [standard `Document`](https://developer.mozilla.org/en-US/docs/Web/API/Document), while the `url` argument is a [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/URL) for the location of the page being rendered.
 
-In the example below, the `afterHydrate(document, url)` hook is setting the document title from url's pathname.
+In the example below, the `afterSsr(document, url)` hook is setting the document title from url's pathname.
 
 ```tsx
 import { PrerenderConfig } from '@stencil/core';
 
 export const config: PrerenderConfig = {
-  afterHydrate(document, url) {
+  afterSsr(document, url) {
     document.title = url.pathname;
   }
 };
@@ -34,4 +34,4 @@ export const config: PrerenderConfig = {
 
 The `@stencil/helmet` package was a library for managing meta tags dynamically.
 It has since been deprecated.
-For additional information regarding this package, please see its [GitHub page](https://github.com/ionic-team/stencil-helmet) 
+For additional information regarding this package, please see its [GitHub page](https://github.com/stencil-community/stencil-helmet) 

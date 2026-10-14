@@ -160,3 +160,13 @@ To have the page do a full refresh use `pageReload`. To disable any reloading, u
 **Default: `www` output directory if exists, project root otherwise**
 
 The directory to serve files from.
+
+### `ssr`
+
+**Optional**
+
+**Type: `boolean`**
+
+**Default: `false`**
+
+Server-renders each page the dev server serves, so you can check how your components [render on a server](../output-targets/main/ssr/01-overview.md). The `--ssr` CLI flag sets it for one run. It's for development only.

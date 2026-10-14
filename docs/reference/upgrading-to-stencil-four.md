@@ -120,7 +120,7 @@ To migrate away from usages of `connect`, please see [the original deprecation a
 ### Legacy Browser Support Removed
 
 In Stencil v3.0.0, we announced [the deprecation of IE 11, pre-Chromium Edge, and Safari 10 support](https://github.com/ionic-team/stencil/blob/1a8ff39073a88d1372beaa98434dbe2247f68a85/BREAKING_CHANGES.md?plain=1#L78).
-In Stencil v4.0.0, support for these browsers has been dropped (for a full list of supported browsers, please see our [Browser Support policy](../reference/support-policy.md#browser-support)).
+In Stencil v4.0.0, support for these browsers has been dropped (for a full list of supported browsers, please see our [Browser Support policy](./support-policy.md#browser-support)).
 
 By dropping these browsers, a few configuration options are no longer valid in a Stencil configuration file:
 
@@ -157,7 +157,7 @@ flag has been removed from Stencil's API and should be removed from a project's 
 
 Stencil no longer supports Node 14.
 Please upgrade local development machines, continuous integration pipelines, etc. to use Node v16 or higher.
-For the full list of supported runtimes, please see [our Support Policy](../reference/support-policy.md#javascript-runtime).
+For the full list of supported runtimes, please see [our Support Policy](./support-policy.md#javascript-runtime).
 
 ## Information Included in `docs-json` Expanded
 
@@ -246,7 +246,7 @@ To ensure the proper functioning of other `@stencil/` packages, it is advisable 
 |----------------------------------|--------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|-------------------------------------------------------------|
 | `@stencil/angular-output-target` | [0.7.1](https://github.com/ionic-team/stencil-ds-output-targets/releases/tag/%40stencil%2Fangular-output-target%400.7.1) | [GitHub](https://github.com/ionic-team/stencil-ds-output-targets) | [Stencil Doc Site](../framework-integration/angular.md)     |
 | `@stencil/sass`                  | [3.0.4](https://github.com/ionic-team/stencil-sass/releases/tag/v3.0.4)                                                  | [GitHub](https://github.com/ionic-team/stencil-sass)              | [GitHub README](https://github.com/ionic-team/stencil-sass) |
-| `@stencil/store`                 | [2.0.8](https://github.com/ionic-team/stencil-store/releases/tag/v2.0.8)                                                 | [GitHub](https://github.com/ionic-team/stencil-store)             | [Stencil Doc Site](../guides/store.md)                      |
+| `@stencil/store`                 | [2.0.8](https://github.com/ionic-team/stencil-store/releases/tag/v2.0.8)                                                 | [GitHub](https://github.com/ionic-team/stencil-store)             | [Stencil Doc Site](../guides/patterns/store.md)                      |
 | `@stencil/react-output-target`   | [0.5.1](https://github.com/ionic-team/stencil-ds-output-targets/releases/tag/%40stencil%2Freact-output-target%400.5.1)   | [GitHub](https://github.com/ionic-team/stencil-ds-output-targets) | [Stencil Doc Site](../framework-integration/react.md)       |
 | `@stencil/vue-output-target`     | [0.8.6](https://github.com/ionic-team/stencil-ds-output-targets/releases/tag/%40stencil%2Fvue-output-target%400.8.6)     | [GitHub](https://github.com/ionic-team/stencil-ds-output-targets) | [Stencil Doc Site](../framework-integration/vue.md)         |
 

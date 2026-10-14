@@ -7,76 +7,23 @@ slug: /testing-vitest-configuration
 
 # Configuration
 
-`@stencil/vitest` uses Vitest's configuration system with additional Stencil-specific options. Refer to [Vitest's documentation](https://vitest.dev/config/) for all available configuration options.
+`@stencil/vitest` is configured through Vitest's own config file, `vitest.config.ts`. The [`stencil add @stencil/vitest` wizard](./01-overview.md#quick-start) writes one for you, from the options on this page. Refer to [Vitest's documentation](https://vitest.dev/config/) for every available option.
 
-## Basic Configuration
+In each setup on this page, the `stencilVite()` plugin from `@stencil/unplugin` compiles your components as tests import them, so tests always run against your current source and no Stencil build is needed first.
 
-Create a `vitest.config.ts` file in your project root:
+## Browser Tests
+
+Vitest's [browser mode](https://vitest.dev/guide/browser/) runs your tests in a real browser. Components get real layout, CSS, and events, which makes this the best choice for most component tests:
 
 ```typescript title="vitest.config.ts"
-import { defineVitestConfig } from '@stencil/vitest/config';
+import { stencilVite } from '@stencil/unplugin';
 import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
 
-export default defineVitestConfig({
-  stencilConfig: './stencil.config.ts',
+export default defineConfig({
+  plugins: [stencilVite()],
   test: {
-    projects: [
-      {
-        test: {
-          name: 'spec',
-          include: ['src/**/*.spec.{ts,tsx}'],
-          environment: 'stencil',
-          setupFiles: ['./vitest-setup.ts'],
-        },
-      },
-    ],
-  },
-});
-```
-
-## Test Projects
-
-The recommended approach is to use Vitest's projects feature to separate different types of tests:
-
-### Unit Tests
-
-For testing pure functions and logic without DOM:
-
-```typescript
-{
-  test: {
-    name: 'unit',
-    include: ['src/**/*.unit.{ts,tsx}'],
-    environment: 'node',
-  },
-}
-```
-
-### Spec Tests
-
-For testing components in a simulated DOM environment:
-
-```typescript
-{
-  test: {
-    name: 'spec',
-    include: ['src/**/*.spec.{ts,tsx}'],
-    environment: 'stencil',
-    setupFiles: ['./vitest-setup.ts'],
-  },
-}
-```
-
-### Browser Tests
-
-For testing components in a real browser:
-
-```typescript
-{
-  test: {
-    name: 'browser',
     include: ['src/**/*.test.{ts,tsx}'],
-    setupFiles: ['./vitest-setup.ts'],
     browser: {
       enabled: true,
       provider: playwright(),
@@ -84,31 +31,60 @@ For testing components in a real browser:
       instances: [{ browser: 'chromium' }],
     },
   },
-}
+});
 ```
 
-## Choosing a Node DOM Environment
+### Multiple Browsers
 
-For spec tests, you can choose between different DOM implementations using `environmentOptions`:
+Add an entry to `instances` for each browser to test in:
 
 ```typescript
-{
-  test: {
-    name: 'spec',
-    include: ['src/**/*.spec.{ts,tsx}'],
-    environment: 'stencil',
-    environmentOptions: {
-      stencil: {
-        // Options: 'mock-doc' (default), 'jsdom', 'happy-dom'
-        // *note: jsdom and happy-dom require additional dependencies*
-        domEnvironment: 'jsdom'
-      },
-    },
-  },
-}
+browser: {
+  enabled: true,
+  provider: playwright(),
+  headless: true,
+  instances: [
+    { browser: 'chromium' },
+    { browser: 'firefox' },
+    { browser: 'webkit' },
+  ],
+},
 ```
 
-### Available DOM Environments
+## Node Tests
+
+Tests can also run in Node, against a simulated DOM. They start faster than browser tests and need no browser installed, but a simulated DOM has no layout and only partial CSS support.
+
+Set `environment` to `'stencil'`:
+
+```typescript title="vitest.config.ts"
+import { stencilVite } from '@stencil/unplugin';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  plugins: [stencilVite()],
+  test: {
+    include: ['src/**/*.spec.{ts,tsx}'],
+    environment: 'stencil',
+  },
+});
+```
+
+### Choosing a DOM Environment
+
+The `stencil` environment uses Stencil's own mock-doc by default. Choose another DOM implementation with `environmentOptions`:
+
+```typescript
+test: {
+  include: ['src/**/*.spec.{ts,tsx}'],
+  environment: 'stencil',
+  environmentOptions: {
+    stencil: {
+      domEnvironment: 'jsdom',
+    },
+  },
+},
+```
 
 | Environment | Description |
 | ----------- | ----------- |
@@ -126,51 +102,106 @@ npm install --save-dev happy-dom
 ```
 :::
 
-## Multiple Browser Testing
+## Test Projects
 
-Test across multiple browsers in your browser project:
+Vitest's [projects](https://vitest.dev/guide/projects) let one config run several kinds of test, each with its own files and environment. A common split is plain unit tests for functions, Node tests, and browser tests:
 
-```typescript
-{
+```typescript title="vitest.config.ts"
+import { stencilVite } from '@stencil/unplugin';
+import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
   test: {
-    name: 'browser',
-    include: ['src/**/*.test.{ts,tsx}'],
-    browser: {
-      enabled: true,
-      provider: playwright(),
-      headless: true,
-      instances: [
-        { browser: 'chromium' },
-        { browser: 'firefox' },
-        { browser: 'webkit' },
-      ],
-    },
+    projects: [
+      // Functions and logic, with no DOM
+      {
+        test: {
+          name: 'unit',
+          include: ['src/**/*.unit.ts'],
+          environment: 'node',
+        },
+      },
+      // Components in a simulated DOM
+      {
+        plugins: [stencilVite()],
+        test: {
+          name: 'spec',
+          include: ['src/**/*.spec.{ts,tsx}'],
+          environment: 'stencil',
+        },
+      },
+      // Components in a real browser
+      {
+        plugins: [stencilVite()],
+        test: {
+          name: 'browser',
+          include: ['src/**/*.test.{ts,tsx}'],
+          browser: {
+            enabled: true,
+            provider: playwright(),
+            headless: true,
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+    ],
   },
-}
+});
 ```
 
-## Setup Files
+Run a single project with `vitest --project browser`.
 
-The setup file is used to load your Stencil components before tests run:
+## Coverage
+
+Because components are compiled from source, Vitest's [coverage](https://vitest.dev/guide/coverage) reports map straight to your component files. Install a provider:
+
+```bash npm2yarn
+npm install --save-dev @vitest/coverage-v8
+```
+
+Then run `vitest run --coverage`.
+
+## TypeScript
+
+For your editor and `tsc` to type-check the JSX in your tests, they need your project's `components.d.ts`. A Stencil build writes it, or `stencilVite()` can keep it up to date while tests run:
+
+```typescript
+plugins: [stencilVite({ types: true })],
+```
+
+## Testing Your Built Output
+
+The setups above test components compiled from source. To test the files you publish instead, build first and load the build in a setup file. The `stencil-test` [CLI](./06-cli.md) does both steps, running a Stencil build and then Vitest.
+
+Wrap your config in `defineVitestConfig`, which applies settings from your Stencil config, and add the setup file:
+
+```typescript title="vitest.config.ts"
+import { defineVitestConfig } from '@stencil/vitest/config';
+
+export default defineVitestConfig({
+  stencilConfig: './stencil.config.ts',
+  test: {
+    include: ['src/**/*.spec.{ts,tsx}'],
+    environment: 'stencil',
+    setupFiles: ['./vitest-setup.ts'],
+  },
+});
+```
 
 ```typescript title="vitest-setup.ts"
-// Load Stencil components.
-// Adjust according to your build output of choice
-await import('./dist/test-components/test-components.esm.js');
+// Load your components' lazy-loader build.
+// The path is dist/loader-bundle/<namespace>/<namespace>.js
+await import('./dist/loader-bundle/test-components/test-components.js');
 
 export {};
 ```
 
-### Build Output Options
+Tests then use components without importing them, as the setup file has registered them all.
 
-Depending on your Stencil configuration, you may need to adjust how components are loaded:
+To load a [`standalone`](../../output-targets/main/standalone.md) output in a project that also has `loader-bundle`, set `skipInDev: false` on `standalone` in your Stencil config, or run `stencil-test --prod`. Development builds skip it otherwise. A project with only `standalone` builds it in development too.
 
-- **Default (lazy-load)**: Works with the standard dev build. Production is the default build mode as of Stencil v5 — pass `--dev` to opt into a development build instead.
-- **Custom elements**: If using the `standalone` output target, adjust the setup file accordingly. This output target is skipped in dev builds by default — set `skipInDev: false` on the `standalone` output target if you wish to test it in `--watch` mode.
-
-## TypeScript Configuration
-
-Add the global type definitions to your `tsconfig.json`:
+`stencil-test` also defines a few [global variables](./06-cli.md#global-variables) for your tests. For their types, add `@stencil/vitest/globals` to your `tsconfig.json`:
 
 ```json title="tsconfig.json"
 {
@@ -179,5 +210,3 @@ Add the global type definitions to your `tsconfig.json`:
   }
 }
 ```
-
-This provides type definitions for global variables like `__STENCIL_PROD__`, `__STENCIL_SERVE__`, and `__STENCIL_PORT__`.

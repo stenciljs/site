@@ -16,7 +16,7 @@ One of the more powerful features of the compiler is its ability to generate var
  - [`collection`: transpiled source for downstream re-bundling](./supporting/collection.md), auto-generated in production (formerly the `dist-collection` sub-output of `dist`)
  - [`types`: TypeScript type declarations](./supporting/types.md), auto-generated in production (formerly a sub-output of `dist`/`dist-custom-elements`)
  - [`global-style`](./asset-outputs/global-style.md) and [`assets`](./asset-outputs/assets.md): first-class targets for global stylesheets and component assets
- - `ssr`: server-side rendering (formerly `dist-hydrate-script`) — see [SSR / SSG](./main/ssr/01-overview.md)
+ - `ssr`: server-side rendering (formerly `dist-hydrate-script`) — see [SSR](./main/ssr/01-overview.md)
  - [Documentation generation targets](./documentation-generation/01-overview.md) (`docs-readme`, `docs-json`, `docs-custom-elements-manifest`, and others)
 
 ## Choosing Between `loader-bundle` and `standalone`
@@ -32,10 +32,10 @@ Stencil does some optimization to reduce the number of sequential loads (via sta
 `standalone` builds each component as a direct class extending `HTMLElement`, self-contained by default. You import and register each component explicitly, rather than dropping in a single script tag, which is exactly what a project's own bundler, like [Vite](https://vitejs.dev/), [Webpack](https://webpack.js.org/), or [Rollup](https://rollupjs.org/), resolves well when usage is static and known at build time.
 
 :::note
-The standalone output does ship an [auto-loader](../guides/publishing.md#auto-loader) for DOM-driven loading without a bundler however it is less performant than the dedicated `loader-bundle`.
+The standalone output does ship an [auto-loader](../guides/distribution/publishing.md#auto-loader) for DOM-driven loading without a bundler however it is less performant than the dedicated `loader-bundle`.
 :::
 
-Both can be generated from the same source at the same time; it's up to the consumer which one they use. See [Publishing a Component Library](../guides/publishing.md) for how to wire each one up for consumers.
+Both can be generated from the same source at the same time; it's up to the consumer which one they use. See [Publishing a Component Library](../guides/distribution/publishing.md) for how to wire each one up for consumers.
 
 ## Example:
 

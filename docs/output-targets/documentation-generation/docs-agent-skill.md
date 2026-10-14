@@ -27,7 +27,7 @@ export const config: Config = {
 };
 ```
 
-Like the other documentation output targets, it's skipped during development builds unless you pass `--docs`.
+Like the other documentation output targets, it's skipped during development builds unless you set `skipInDev: false` on it. The [`stencil docs`](../../config/cli.md#stencil-docs) command always generates it.
 
 ## Output
 

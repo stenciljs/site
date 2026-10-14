@@ -29,6 +29,12 @@ strings).
 
 The developer experience is also tuned, and comes with live reload and a small dev server baked into the compiler.
 
+### What Web Components Leave Out
+
+The [Web Component](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) specs are purposely low-level, and on their own they don't provide a framework-quality developer experience. Server-side rendering and progressive enhancement aren't supported by default. And while custom elements technically work with any framework, frameworks get no types for them, and passing them anything other than strings can be awkward.
+
+Stencil covers these gaps: it can [render components on a server](../output-targets/main/ssr/01-overview.md), and it generates [types and wrappers](../framework-integration/01-overview.md) so that components feel native in each framework.
+
 ## How can I use Stencil?
 
 ### Design Systems & Component Libraries

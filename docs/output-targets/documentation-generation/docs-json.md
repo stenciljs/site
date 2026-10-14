@@ -38,7 +38,7 @@ export const config: Config = {
 
 The JSON file output by Stencil conforms to the [`JsonDocs` interface in
 Stencil's public TypeScript
-declarations](https://github.com/ionic-team/stencil/blob/main/src/declarations/stencil-public-docs.ts).
+declarations](https://github.com/stenciljs/core/blob/main/src/declarations/stencil-public-docs.ts).
 
 ## `supplementalPublicTypes`
 
@@ -61,7 +61,7 @@ designate a file of types which should be included in the output of the
 This information will be found in a top-level property called `typeLibrary` on
 the JSON output and will conform to the [`JsonDocsTypeLibrary` interface in
 Stencil's public TypeScript
-declarations](https://github.com/ionic-team/stencil/blob/main/src/declarations/stencil-public-docs.ts).
+declarations](https://github.com/stenciljs/core/blob/main/src/declarations/stencil-public-docs.ts).
 
 Using this option could look something like this:
 
@@ -149,7 +149,7 @@ the CSS property will be provided as well:
 :::note
 This functionality works with both standard CSS and with Sass, although for the
 latter you'll need to have the
-[@stencil/sass](https://github.com/ionic-team/stencil-sass) plugin installed
+[@stencil/sass](https://github.com/stenciljs/sass) plugin installed
 and configured.
 :::
 

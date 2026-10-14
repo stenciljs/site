@@ -64,10 +64,11 @@ Version D.
 Stencil builds Web Components that run natively in all widely used desktop and mobile browsers.
 Custom Elements are natively supported in Chrome, Edge, Firefox, and Safari (including iOS)!
 
-Stencil supports the following browsers:
+Stencil supports the following browsers. Stencil v5 supports browsers that implement ES2022:
 
 | Stencil Version | Chrome | Edge | Firefox | Safari | Internet Explorer | Pre-Chromium Edge |
 |:---------------:|:------:|:----:|:-------:|:------:|:-----------------:|:-----------------:|
+|       V5        |  v94+  | v94+ |  v93+   | v16.4+ |     &#10060;      |     &#10060;      |
 |       V4        |  v79+  | v79+ |  v70+   |  v14+  |     &#10060;      |     &#10060;      |
 |       V3        |  v79+  | v79+ |  v70+   |  v14+  |      &#9989;      |      &#9989;      |
 |       V2        |  v60+  | v79+ |  v63+   | v10.1+ |      &#9989;      |      &#9989;      |
@@ -78,11 +79,12 @@ Stencil acts as a compiler for a project's web components, and works closely wit
 TSX to vanilla JavaScript. To ensure compatibility between the two, Stencil takes an opinionated stance on which version
 of the TypeScript compiler must be used.
 
-Stencil includes a recent copy of the TypeScript compiler in its distributable* to guarantee this compatibility. 
-The Stencil team is committed to keeping its version of TypeScript up to date and, as of Stencil v2.10.0, attempts to be
-within one minor version of the latest TypeScript release.
+Stencil v5 uses the TypeScript compiler installed in your project, and supports TypeScript versions later than 5.0 and
+earlier than 7.0. If your project doesn't list `typescript` in its dependencies, the latest supported version is
+installed with Stencil.
 
-The table below describes recent versions of Stencil and the version of TypeScript each version shipped with.
+Stencil v4 and earlier include a recent copy of the TypeScript compiler in their distributable* to guarantee this
+compatibility. The table below describes those versions of Stencil and the version of TypeScript each version shipped with.
 
 | Stencil Version | TypeScript Version |
 |:---------------:|:------------------:|
@@ -105,14 +107,6 @@ The table below describes recent versions of Stencil and the version of TypeScri
 |     v2.4.0      |       v4.1.3       |
 |     v2.2.0      |       v4.0.5       |
 
-The TypeScript team releases a new minor version of the TypeScript compiler approximately once every three months. To
-accomplish its goal of staying within one minor version of the latest release, Stencil will update its version of
-TypeScript once every three months as well. Updates to the version of TypeScript will often, but not always, occur in a
-[minor version release](./versioning.md#minor-release) of Stencil.
-
-The Stencil team acknowledges that TypeScript minor version releases may contain breaking changes. The Stencil team will
-do everything in its power to avoid propagating breaking changes to its user base.
-
 \* The TypeScript compiler is never included in the output of your Stencil project, and is only used for compilation 
 and type checking purposes.
 
@@ -125,14 +119,35 @@ compatibility tables to describe the interoperability requirements of these piec
 
 ### JavaScript Runtime
 
+Stencil v5 requires Node.js 22 or later, including newer releases such as Node.js 24. Once a Node.js version reaches its [end of life](https://nodejs.org/en/about/previous-releases), a later Stencil release may stop supporting it without that being treated as a breaking change.
+
 | Stencil Version | Node v10 | Node v12 | Node v14 | Node v16 | Node v18 | Node v20 | Node v22 |
 |:---------------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
+|       V5        | &#10060; | &#10060; | &#10060; | &#10060; | &#10060; | &#10060; | &#9989;  |
 |       V4        | &#10060; | &#10060; | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9989;  |
 |       V3        | &#10060; | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9989;  | &#10060; |
 |       V2        | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9888;  | &#10060; | &#10060; |
 |       V1        | &#9989;  | &#9989;  | &#9989;  | &#9989;  | &#10060; | &#10060; | &#10060; |
 
 ### Testing Libraries
+
+Stencil v5 has no built-in test runner. Its testing packages support these versions:
+
+#### Vitest with [`@stencil/vitest`](../testing/vitest/01-overview.md)
+
+| Stencil Version | Vitest v2 | Vitest v3 | Vitest v4 | Vitest v5 |
+|:---------------:|:---------:|:---------:|:---------:|:---------:|
+|       V5        |  &#9989;  |  &#9989;  |  &#9989;  |  &#9989;  |
+|       V4        |  &#9989;  |  &#9989;  |  &#9989;  |  &#9989;  |
+
+#### Playwright with [`@stencil/playwright`](../testing/playwright/01-overview.md)
+
+| Stencil Version | Playwright v1.50+ |
+|:---------------:|:-----------------:|
+|       V5        |      &#9989;      |
+|       V4        |      &#9989;      |
+
+The tables below cover the test runner that was built into Stencil v4 and earlier.
 
 #### Jest with [Jest Stencil Runner](https://github.com/stenciljs/jest-stencil-runner)
 

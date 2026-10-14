@@ -1,746 +1,169 @@
 ---
 title: Properties
 sidebar_label: Properties
-description: Properties
+description: Declare a component's public properties and attributes with the Prop decorator
 slug: /properties
 ---
 
 # Properties
 
-Props are custom attributes/properties exposed publicly on an HTML element. They allow developers to pass data to a
-component to render or otherwise use.
+Props are the public properties of a component. The code that uses a component sets them, as HTML attributes or as JavaScript properties, to pass it data.
 
 ## The Prop Decorator (`@Prop()`)
 
-Props are declared on a component using Stencil's `@Prop()` decorator, like so:
+Declare a prop by decorating a class member with `@Prop()`:
 
 ```tsx
-// First, we import Prop from '@stencil/core'
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop } from '@stencil/core';
 
 @Component({
-    tag: 'todo-list',
-})
-export class TodoList {
-    // Second, we decorate a class member with @Prop()
-    @Prop() name: string;
-    
-    render() {
-        // Within the component's class, its props are
-        // accessed via `this`. This allows us to render
-        // the value passed to `todo-list`
-        return <div>To-Do List Name: {this.name}</div>
-    }
-}
-```
-
-In the example above, `@Prop()` is placed before (decorates) the `name` class member, which is a string. By adding
-`@Prop()` to `name`, Stencil will expose `name` as an attribute on the element, which can be set wherever the component
-is used:
-
-```tsx
-{/* Here we use the component in a TSX file */}
-<todo-list name={"Tuesday's To-Do List"}></todo-list>
-```
-```html
-<!-- Here we use the component in an HTML file -->
-<todo-list name="Tuesday's To-Do List"></todo-list>
-```
-
-In the example above the `todo-list` component is used almost identically in TSX and HTML. The only difference between
-the two is that in TSX, the value assigned to a prop (in this case, `name`) is wrapped in curly braces. In some cases
-however, the way props are passed to a component differs slightly between HTML and TSX.
-
-## Variable Casing
-
-In the JavaScript ecosystem, it's common to use 'camelCase' when naming variables. The example component below has a
-class member, `thingToDo` that is camelCased.
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    // thingToDo is 'camelCased'
-    @Prop() thingToDo: string;
-
-    render() {
-        return <div>{this.thingToDo}</div>;
-    }
-}
-```
-
-Since `thingToDo` is a prop, we can provide a value for it when we use our `todo-list-item` component. Providing a
-value to a camelCased prop like `thingToDo` is nearly identical in TSX and HTML.
-
-When we use our component in a TSX file, an attribute uses camelCase:
-
-```tsx
-<todo-list-item thingToDo={"Learn about Stencil Props"}></todo-list-item>
-```
-
-In HTML, the attribute must use 'dash-case' like so:
-
-```html
-<todo-list-item thing-to-do="Learn about Stencil Props"></todo-list-item>
-```
-
-## Data Flow
-
-Props should be used to pass data down from a parent component to its child component(s).
-
-The example below shows how a `todo-list` component uses three `todo-list-item` child components to render a ToDo list.
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-  tag: 'todo-list',
-})
-export class TodoList {
-  render() {
-    return (
-      <div>
-        <h1>To-Do List Name: Stencil To Do List</h1>
-        <ul> 
-           {/* Below are three Stencil components that are children of `todo-list`, each representing an item on our list */}
-           <todo-list-item thingToDo={"Learn about Stencil Props"}></todo-list-item>
-           <todo-list-item thingToDo={"Write some Stencil Code with Props"}></todo-list-item>
-           <todo-list-item thingToDo={"Dance Party"}></todo-list-item>
-        </ul>
-      </div>
-    )
-  }
-}
-```
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
+  tag: 'todo-list-item',
 })
 export class ToDoListItem {
   @Prop() thingToDo: string;
-  
+
   render() {
     return <li>{this.thingToDo}</li>;
   }
 }
 ```
 
-:::note
-Children components should not know about or reference their parent components.  This allows Stencil to
-efficiently re-render your components. Passing a reference to a component as a prop may cause unintended side effects.
-:::
+Stencil exposes `thingToDo` as a property on the element, and as an attribute. The attribute name is the property name in dash-case, so the component is used like this in HTML:
 
-## Mutability
+```html
+<todo-list-item thing-to-do="Learn about Stencil props"></todo-list-item>
+```
 
-A Prop is by default immutable from inside the component logic. Once a value is set by a user, the component cannot
-update it internally. For more advanced control over the mutability of a prop, please see the 
-[mutable option](#prop-mutability-mutable) section of this document.
+In TSX, use the property name:
+
+```tsx
+<todo-list-item thingToDo="Learn about Stencil props"></todo-list-item>
+```
+
+When a prop changes, the component renders again.
 
 ## Types
 
-Props can be a `boolean`, `number`, `string`, or even an `Object` or `Array`.  The example below expands the 
-`todo-list-item` to add a few more props with different types.
+A prop can have any TypeScript type. A value set as a property, from JavaScript or TSX, is used as it is. An attribute is always a string, so Stencil converts it according to the prop's type:
+
+| Prop type | Attribute | Prop value |
+| --- | --- | --- |
+| `string` | `label="Save"` | `'Save'` |
+| `number` | `count="7"` | `7` |
+| `number` | `count="abc"` | `NaN` |
+| `boolean` | `disabled`, `disabled=""`, `disabled="false"` | `true` |
+| `boolean` | no attribute | `undefined`, or the prop's default |
+| `any`, or a union that includes `string` | `value="42"` | `'42'` |
+| an object or an array | `items='["a"]'` | the string `'["a"]'` |
+
+A boolean prop is `true` whenever its attribute is present, whatever the attribute's value, as with native attributes such as `disabled`. That includes the string `"false"`. To turn a boolean prop off in HTML, leave the attribute out.
+
+### Object and Array Props
+
+Stencil doesn't parse an attribute into an object or an array. Take a list component:
 
 ```tsx
-import { Component, Prop, h } from '@stencil/core';
-// `MyHttpService` is an `Object` in this example
-import { MyHttpService } from '../some/local/directory/MyHttpService';
+import { Component, Prop } from '@stencil/core';
 
 @Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    @Prop() isComplete: boolean;
-    @Prop() timesCompletedInPast: number;
-    @Prop() thingToDo: string;
-    @Prop() myHttpService: MyHttpService;
-}
-```
-
-### Boolean Props
-
-A property on a Stencil component that has a type of `boolean` may be declared as:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    @Prop() isComplete: boolean;
-}
-```
-
-To use this version of `todo-list-item` in HTML, we pass the string `"true"`/`"false"` to the component:
-```html
-<!-- Set isComplete to 'true' -->
-<todo-list-item is-complete="true"></todo-list-item>
-<!-- Set isComplete to 'false' -->
-<todo-list-item is-complete="false"></todo-list-item>
-```
-
-To use this version of `todo-list-item` in TSX, `true`/`false` is used, surrounded by curly braces:
-```tsx
-// Set isComplete to 'true'
-<todo-list-item isComplete={true}></todo-list-item>
-// Set isComplete to 'false'
-<todo-list-item isComplete={false}></todo-list-item>
-```
-
-There are a few ways in which Stencil treats props that are of type `boolean` that are worth noting:
-
-1. The value of a boolean prop will be `false` if provided the string `"false"` in HTML
-
-```html
-<!-- The 'todo-list-item' component will have an isComplete value of `false` -->
-<todo-list-item is-complete="false"></todo-list-item>
-```
-2. The value of a boolean prop will be `true` if provided a string that is not `"false"` in HTML
-
-```html
-<!-- The 'todo-list-item' component will have an isComplete value of -->
-<!-- `true` for each of the following examples -->
-<todo-list-item is-complete=""></todo-list-item>
-<todo-list-item is-complete="0"></todo-list-item>
-<todo-list-item is-complete="False"></todo-list-item>
-```
-3. The value of a boolean prop will be `undefined` if it has no [default value](#default-values) and one of
-the following applies:
-   1. the prop is not included when using the component
-   2. the prop is included when using the component, but is not given a value
-
-```html
-<!-- Both examples using the 'todo-list-item' component will have an --> 
-<!-- isComplete value of `undefined` -->
-<todo-list-item></todo-list-item>
-<todo-list-item is-complete></todo-list-item>
-```
-
-### Number Props
-
-A property on a Stencil component that has a type of `number` may be declared as:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    @Prop() timesCompletedInPast: number;
-}
-```
-
-To use this version of `todo-list-item` in HTML, we pass the numeric value as a string to the component:
-```html
-<!-- Set timesCompletedInPast to '0' -->
-<todo-list-item times-completed-in-past="0"></todo-list-item>
-<!-- Set timesCompletedInPast to '23' -->
-<todo-list-item times-completed-in-past="23"></todo-list-item>
-```
-
-To use this version of `todo-list-item` in TSX, a number surrounded by curly braces is passed to the component:
-```tsx
-// Set timesCompletedInPast to '0'
-<todo-list-item timesCompletedInPast={0}></todo-list-item>
-// Set timesCompletedInPast to '23'
-<todo-list-item timesCompletedInPast={23}></todo-list-item>
-```
-
-### String Props
-
-A property on a Stencil component that has a type of `string` may be declared as:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    @Prop() thingToDo: string;
-}
-```
-
-To use this version of `todo-list-item` in HTML, we pass the value as a string to the component:
-```html
-<!-- Set thingToDo to 'Learn about Stencil Props' -->
-<todo-list-item thing-to-do="Learn about Stencil Props"></todo-list-item>
-<!-- Set thingToDo to 'Write some Stencil Code with Props' -->
-<todo-list-item thing-to-do="Write some Stencil Code with Props"></todo-list-item>
-```
-
-To use this version of `todo-list-item` in TSX, we pass the value as a string to the component. Curly braces aren't
-required when providing string values to props in TSX, but are permitted:
-```tsx
-// Set thingToDo to 'Learn about Stencil Props'
-<todo-list-item thingToDo="Learn about Stencil Props"></todo-list-item>
-// Set thingToDo to 'Write some Stencil Code with Props'
-<todo-list-item thingToDo="Write some Stencil Code with Props"></todo-list-item>
-// Set thingToDo to 'Write some Stencil Code with Props' with curly braces
-<todo-list-item thingToDo={"Learn about Stencil Props"}></todo-list-item>
-```
-
-### Object Props
-
-A property on a Stencil component that has a type of `Object` may be declared as:
-
-```tsx
-// TodoListItem.tsx
-import { Component, Prop, h } from '@stencil/core';
-import { MyHttpService } from '../path/to/MyHttpService';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    // Use `@Prop()` to declare the `httpService` class member
-    @Prop() httpService: MyHttpService;
-}
-```
-```tsx
-// MyHttpService.ts 
-export class MyHttpService {
-    // This implementation intentionally left blank
-}
-```
-
-In TypeScript, `MyHttpService` is both an `Object` and a 'type'. When using user-defined types like `MyHttpService`, the
-type must always be exported using the `export` keyword where it is declared. The reason for this is Stencil needs to
-know what type the prop `httpService` is when passing an instance of `MyHttpService` to `TodoListItem` from a parent
-component.
-
-To set `httpService` in TSX, assign the property name in the custom element's tag to the desired value like so:
-```tsx
-// TodoList.tsx
-import { Component, h } from '@stencil/core';
-import { MyHttpService } from '../MyHttpService';
-
-@Component({
-   tag: 'todo-list',
-   styleUrl: 'todo-list.css',
-   encapsulation: { type: 'shadow' },
-})
-export class ToDoList {
-   private httpService = new MyHttpService();
-
-   render() {
-      return <todo-list-item httpService={this.httpService}></todo-list-item>;
-   }
-}
-```
-Note that the prop name is using `camelCase`, and the value is surrounded by curly braces.
-
-It is not possible to set `Object` props via an HTML attribute like so:
-```html
-<!-- this will not work -->
-<todo-list-item http-service="{ /* implementation omitted */ }"></todo-list-item>
-```
-The reason for this is that Stencil will not attempt to serialize object-like strings written in HTML into a JavaScript object.
-Similarly, Stencil does not have any support for deserializing objects from JSON.
-Doing either can be expensive at runtime, and runs the risk of losing references to other nested JavaScript objects.
-
-Instead, properties may be set via `<script>` tags in a project's HTML:
-```html
-<script>
-   document.querySelector('todo-list-item').httpService = { /* implementation omitted */ };
-</script>
-```
-
-
-### Array Props
-
-A property on a Stencil component that is an Array may be declared as:
-
-```tsx
-// TodoList.tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    @Prop() itemLabels: string[];
-}
-```
-
-To set `itemLabels` in TSX, assign the prop name in the custom element's tag to the desired value like so:
-```tsx
-// TodoList.tsx
-import { Component, h } from '@stencil/core';
-import { MyHttpService } from '../MyHttpService';
-
-@Component({
-   tag: 'todo-list',
-   styleUrl: 'todo-list.css',
-   encapsulation: { type: 'shadow' },
-})
-export class ToDoList {
-   private labels = ['non-urgent', 'weekend-only'];
-
-   render() {
-      return <todo-list-item itemLabels={this.labels}></todo-list-item>;
-   }
-}
-```
-Note that the prop name is using `camelCase`, and the value is surrounded by curly braces.
-
-It is not possible to set `Array` props via an HTML attribute like so:
-```html
-<!-- this will not work -->
-<todo-list-item item-labels="['non-urgent', 'weekend-only']"></todo-list-item>
-```
-The reason for this is that Stencil will not attempt to serialize array-like strings written in HTML into a JavaScript object.
-Doing so can be expensive at runtime, and runs the risk of losing references to other nested JavaScript objects.
-
-Instead, properties may be set via `<script>` tags in a project's HTML:
-```html
-<script>
-   document.querySelector('todo-list-item').itemLabels = ['non-urgent', 'weekend-only'];
-</script>
-```
-
-### Advanced Prop Types
-
-#### `any` Type
-
-TypeScript's [`any` type](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#any) is a special type
-that may be used to prevent type checking of a specific value. Because `any` is a valid type in TypeScript, Stencil
-props can also be given a type of `any`. The example below demonstrates three different ways of using props with type
-`any`:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    // isComplete has an explicit type annotation
-    // of `any`, and no default value
-    @Prop() isComplete: any;
-    // label has an explicit type annotation of
-    // `any` with a default value of 'urgent',
-    // which is a string
-    @Prop() label: any = 'urgent';
-    // thingToDo has no type and no default value,
-    // and will be considered to be type `any` by
-    // TypeScript
-    @Prop() thingToDo;
-
-    render() {
-        return (
-            <ul>
-                <li>isComplete has a value of - {this.isComplete} - and a typeof value of "{typeof this.isComplete}"</li>
-                <li>label has a value of - {this.label} - and a typeof value of "{typeof this.label}"</li>
-                <li>thingToDo has a value of - {this.thingToDo} - and a typeof value of "{typeof this.thingToDo}"</li>
-            </ul>
-        );
-    }
-}
-```
-
-When using a Stencil prop typed as `any` (implicitly or explicitly), the value that is provided to a prop retains its
-own type information. Neither Stencil nor TypeScript will try to change the type of the prop. To demonstrate, let's use
-`todo-list-item` twice, each with different prop values:
-
-```tsx
-{/* Using todo-list-item in TSX using differnt values each time */}
-<todo-list-item isComplete={42} label={null} thingToDo={"Learn about any-typed props"}></todo-list-item>
-<todo-list-item isComplete={"42"} label={1} thingToDo={"Learn about any-typed props"}></todo-list-item>
-```
-
-The following will be rendered from the usage example above: 
-```md
-- isComplete has a value of - 42 - and a typeof value of "number" 
-- label has a value of -  - and a typeof value of "object"
-- thingToDo has a value of - Learn about any-typed props - and a typeof value of "string"
-
-- isComplete has a value of - 42 - and a typeof value of "string"
-- label has a value of - 1 - and a typeof value of "number"
-- thingToDo has a value of - Learn about any-typed props - and a typeof value of "string"
-```
-
-In the first usage of `todo-list-item`, `isComplete` is provided a number value of 42, whereas in the second usage it 
-receives a string containing "42". The types on `isComplete` reflect the type of the value it was provided, 'number' and
-'string', respectively.
-
-Looking at `label`, it is worth noting that although the prop has a [default value](#default-values), it does
-not narrow the type of `label` to be of type 'string'. In the first usage of `todo-list-item`, `label` is provided a
-value of null, whereas in the second usage it receives a number value of 1. The types of the values stored in `label`
-are correctly reported as 'object' and 'number', respectively.
-
-#### Optional Types
-
-TypeScript allows members to be marked optional by appending a `?` at the end of the member's name. The example below
-demonstrates making each a component's props optional:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    // completeMsg is optional, has an explicit type
-    // annotation of `string`, and no default value
-    @Prop() completeMsg?: string;
-    // label is optional, has no explicit type
-    // annotation, but does have a default value
-    // of 'urgent'
-    @Prop() label? = 'urgent';
-    // thingToDo has no type annotation and no 
-    // default value
-    @Prop() thingToDo?;
-
-    render() {
-        return (
-            <ul>
-                <li>completeMsg has a value of - {this.completeMsg} - and a typeof value of "{typeof this.completeMsg}"</li>
-                <li>label has a value of - {this.label} - and a typeof value of "{typeof this.label}"</li>
-                <li>thingToDo has a value of - {this.thingToDo} - and a typeof value of "{typeof this.thingToDo}"</li>
-            </ul>
-        );
-    }
-}
-```
-
-When using a Stencil prop that is marked as optional, Stencil will try to infer the type of the prop if a type is
-not explicitly given.  In the example above, Stencil is able to understand that:
-
-- `completeMsg` is of type string, because it has an explicit type annotation
-- `label` is of type string, because it has a [default value](#default-values) that is of type string
-- `thingToDo` [is of type `any`](#any-type), because it has no explicit type annotation, nor default value
-
-Because Stencil can infer the type of `label`, the following will fail to compile due to a type mismatch:
-
-```tsx
-{/* This fails to compile with the error "Type 'number' is not assignable to type 'string'" for the label prop. */}
-<todo-list-item completeMsg={"true"} label={42} thingToDo={"Learn about any-typed props"}></todo-list-item>
-```
-
-It is worth noting that when using a component in an HTML file, such type checking is unavailable. This is a constraint
-on HTML, where all values provided to attributes are of type string:
-
-```html
-<!-- using todo-list-item in HTML -->
-<todo-list-item complete-msg="42" label="null" thing-to-do="Learn about any-typed props"></todo-list-item>
-```
-renders:
-```md
-- completeMsg has a value of - 42 - and a typeof value of "string"
-- label has a value of - null - and a typeof value of "string"
-- thingToDo has a value of - Learn about any-typed props - and a typeof value of "string"
-```
-
-#### Union Types
-
-Stencil allows props types be [union types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types),
-which allows you as the developer to combine two or more pre-existing types to create a new one. The example below shows
-a `todo-list-item` who accepts a `isComplete` prop that can be either a string or boolean.
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    @Prop() isComplete: string | boolean;
-}
-```
-
-This component can be used in both HTML:
-```html
-<todo-list-item is-complete="true"></todo-list-item>
-<todo-list-item is-complete="false"></todo-list-item>
-<todo-list-item is-complete></todo-list-item>
-<todo-list-item></todo-list-item>
-```
-and TSX:
-```tsx
-<todo-list-item isComplete={true}></todo-list-item>
-<todo-list-item isComplete={false}></todo-list-item>
-```
-
-When using union types, the type of a component's `@Prop()` value can be ambiguous at runtime.
-In the provided example, under what circumstances does `@Prop() isComplete` function as a `string`, and when does it serve as a `boolean`?
-
-When using a component in HTML, the runtime value of a `@Prop()` is a string whenever an attribute is set.
-This is a result of setting the HTML attribute for the custom element.
-```html
-<!-- Since this is HTML, the value of `isComplete` in `ToDoListItem` will be a string -->
-
-<!-- Set isComplete to "true". -->
-<todo-list-item is-complete="true"></todo-list-item>
-<!-- Set isComplete to "false" -->
-<todo-list-item is-complete="false"></todo-list-item>
-<!-- Set isComplete to "" -->
-<todo-list-item is-complete></todo-list-item>
-```
-However, if an attribute is not specified, the runtime value of the property will be `undefined`:
-```html
-<!-- Since `is-complete` is omitted, the value of `isComplete` in `ToDoListItem` will be `undefined` -->
-<todo-list-item></todo-list-item>
-```
-
-When the attribute on a component is set using `setAttribute`, the runtime value of a `@Prop()` is always [coerced to a string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String#string_coercion).
-```html
-<script>
-  // both of these `setAttribute` calls set the property `isComplete` to "true" (string)
-  document.querySelector('todo-list-item').setAttribute('is-complete', true);
-  document.querySelector('todo-list-item').setAttribute('is-complete', "true");
-  // both of these `setAttribute` calls set the property `isComplete` to "false" (string)
-  document.querySelector('todo-list-item').setAttribute('is-complete', false);
-  document.querySelector('todo-list-item').setAttribute('is-complete', "false");
-</script>
-```
-
-However, if the property of a custom element is directly changed, its type will match the value that was provided. 
-```html
-<script>
-  // Set the property `isComplete` to `true` (boolean)
-  document.querySelector('todo-list-item').isComplete = true;
-  // Set the property `isComplete` to "true" (string)
-  document.querySelector('todo-list-item').isComplete = "true";
-  // Set the property `isComplete` to `false` (boolean)
-  document.querySelector('todo-list-item').isComplete = false;
-  // Set the property `isComplete` to "false" (string)
-  document.querySelector('todo-list-item').isComplete = "false";
-</script>
-```
-
-When using a component in TSX, a `@Prop()`'s type will match the value that was provided.
-```tsx
-// Since this is TSX, the value of `isComplete` in `ToDoListItem`
-// depends on the type of the value passed to the component.
-//
-// Set the property `isComplete` to `true` (boolean)
-<todo-list-item isComplete={true}></todo-list-item>
-// Set the property `isComplete` to "true" (string)
-<todo-list-item isComplete={"true"}></todo-list-item>
-// Set the property `isComplete` to `false` (boolean)
-<todo-list-item isComplete={false}></todo-list-item>
-// Set the property `isComplete` to "false" (string)
-<todo-list-item isComplete={"false"}></todo-list-item>
-```
-
-## Default Values
-
-Stencil props can be given a default value as a fallback in the event a prop is not provided:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'component-with-some-props',
-})
-export class ComponentWithSomeProps {
-    @Prop() aNumber = 42;
-    @Prop() aString = 'defaultValue';
-
-    render() {
-        return <div>The number is {this.aNumber} and the string is {this.aString}</div>
-    }
-}
-```
-Regardless of if we use this component in HTML or TSX, "The number is 42 and the string is defaultValue" is displayed
-when no values are passed to our component:
-```html
-<component-with-some-props></component-with-some-props>
-```
-
-The default values on a component can be overridden by specifying a value for a prop with a default value. For the
-example below, "The number is 7 and the string is defaultValue" is rendered. Note how the value provided to `aNumber`
-overrides the default value, but the default value of `aString` remains the same:
-```html
-<component-with-some-props a-number="7"></component-with-some-props>
-```
-
-### Inferring Types from Default Values
-
-When a default value is provided, Stencil is able to infer the type of the prop from the default value:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-@Component({
-    tag: 'component-with-many-props',
-})
-export class ComponentWithManyProps {
-    // both props below are of type 'boolean'
-    @Prop() boolean1: boolean;
-    @Prop() boolean2 = true;
-
-    // both props below are of type 'number'
-    @Prop() number1: number;
-    @Prop() number2 = 42;
-    
-    // both props below are of type 'string'
-    @Prop() string1: string;
-    @Prop() string2 = 'defaultValue';
-}
-```
-
-## Required Properties
-
-By placing a `!` after a prop name, Stencil mark that the attribute/property as required. This ensures that when the
-component is used in TSX, the property is used:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-   tag: 'todo-list-item',
-})
-export class ToDoListItem {
-   // Note the '!' after the variable name.
-   @Prop() thingToDo!: string;
-}
-```
-
-## Prop Validation
-
-To do validation of a Prop, you can use the [@Watch()](./reactive-data.md#the-watch-decorator-watch) decorator:
-
-```tsx
-import { Component, Prop, Watch, h } from '@stencil/core';
-
-@Component({
-   tag: 'todo-list-item',
+  tag: 'todo-list',
 })
 export class TodoList {
-  // Mark the prop as required, to make sure it is provided when we use `todo-list-item`.
-  // We want stricter guarantees around the contents of the string, so we'll use `@Watch` to perform additional validation.
-  @Prop() thingToDo!: string;
+  @Prop() items: string[] = [];
 
-  @Watch('thingToDo')
-  validateName(newValue: string, _oldValue: string) {
-    // don't allow `thingToDo` to be the empty string  
-    const isBlank = typeof newValue !== 'string' || newValue === '';
-    if (isBlank) { 
-        throw new Error('thingToDo is a required property and cannot be empty') 
-    };
-    // don't allow `thingToDo` to be a string with a length of 1
-    const has2chars = typeof newValue === 'string' && newValue.length >= 2;
-    if (!has2chars) {
-       throw new Error('thingToDo must have a length of more than 1 character')
-    };
+  render() {
+    return (
+      <ul>
+        {this.items.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    );
   }
 }
 ```
 
-Alternatively, you could do validation within a setter. [Read about using `get()` / `set()` methods with decorated props](#prop-getters-and-setters)
+Pass it an array by setting the property, from TSX or from JavaScript:
+
+```tsx
+<todo-list items={['Learn about props', 'Write a component']}></todo-list>
+```
+
+```js
+document.querySelector('todo-list').items = ['Learn about props', 'Write a component'];
+```
+
+An `items` attribute in HTML would give the component a string, and `this.items.map` would fail. To accept the attribute as well, add an [`@AttrDeserialize()`](./serialization-deserialization.md) method that turns the string into the value:
+
+```tsx
+@AttrDeserialize('items')
+parseItems(value: string) {
+  return JSON.parse(value);
+}
+```
+
+```html
+<todo-list items='["Learn about props", "Write a component"]'></todo-list>
+```
+
+The same method can change how any attribute is converted, whatever the prop's type.
+
+A prop marked optional with `?` is converted in the same way as its type.
+
+## Default Values
+
+Give a prop an initial value to use when none is passed. TypeScript infers the prop's type from it:
+
+```tsx
+@Prop() size = 42;
+@Prop() variant = 'primary';
+```
+
+```html
+<!-- size is 42 -->
+<my-button></my-button>
+
+<!-- size is 9 -->
+<my-button size="9"></my-button>
+```
+
+## Required Properties
+
+Place a `!` after a prop's name to mark it as required:
+
+```tsx
+@Prop() thingToDo!: string;
+```
+
+TSX that uses the component without the prop then fails to type-check, in your own project and in projects that use your component's types. Nothing checks the prop when the component runs. To do that, see [Prop Validation](#prop-validation).
+
+## Prop Validation
+
+To check a prop's value, use the [`@Watch()`](./reactive-data.md#the-watch-decorator-watch) decorator. A watch method runs when the prop changes. Add `immediate: true` to have it check the first value as well:
+
+```tsx
+import { Component, Prop, Watch } from '@stencil/core';
+
+@Component({
+  tag: 'todo-list-item',
+})
+export class ToDoListItem {
+  @Prop() thingToDo!: string;
+
+  @Watch('thingToDo', { immediate: true })
+  validateThingToDo(newValue: string) {
+    if (typeof newValue !== 'string' || newValue === '') {
+      throw new Error('thingToDo is required and cannot be empty');
+    }
+  }
+}
+```
+
+A [setter](#prop-getters-and-setters) can validate a value too, and can also reject or change it.
 
 ## @Prop() Options
 
-The `@Prop()` decorator accepts an optional argument to specify certain options to modify how a prop on a component
-behaves. `@Prop()`'s optional argument is an object literal containing one or more of the following fields: 
+`@Prop()` takes an optional object of options:
 
 ```tsx
 export interface PropOptions {
@@ -752,269 +175,102 @@ export interface PropOptions {
 
 ### Attribute Name (`attribute`)
 
-Properties and component attributes are strongly connected but not necessarily the same thing. While attributes are an
-HTML concept, properties are a JavaScript concept inherent to Object-Oriented Programming.
-
-In Stencil, the `@Prop()` decorator applied to a **property** will instruct the Stencil compiler to also listen for
-changes in a DOM attribute.
-
-Usually, the name of a property is the same as the attribute, but this is not always the case. Take the following
-component as example:
+Set `attribute` to use an attribute name other than the dash-case form of the property name:
 
 ```tsx
-import { Component, Prop, h } from '@stencil/core';
-// `MyHttpService` is an `Object` in this example
-import { MyHttpService } from '../some/local/directory/MyHttpService';
-
-@Component({
-   tag: 'todo-list-item',
-})
-export class ToDoListItem {
-   @Prop() isComplete: boolean;
-   @Prop() thingToDo: string;
-   @Prop() httpService: MyHttpService;
-}
+@Prop({ attribute: 'complete' }) isComplete: boolean;
 ```
-
-This component has **3 properties**, but the compiler will create **only 2 attributes**: `is-complete` and
-`thing-to-do`.
 
 ```html
-<todo-list-item is-complete="false" thing-to-do="Read Attribute Naming Section of Stencil Docs"></todo-list-item>
+<todo-list-item complete></todo-list-item>
 ```
 
-Notice that the `httpService` type is not a primitive (e.g. not a `number`, `boolean`, or `string`). Since DOM
-attributes can only be strings, it does not make sense to have an associated DOM attribute called `"http-service"`.
-Stencil will not attempt to serialize object-like strings written in HTML into a JavaScript object.
-See [Object Props](#object-props) for guidance as to how to configure `httpService`.
+### Prop Mutability
 
-At the same time, the `isComplete` & `thingToDo` properties follow 'camelCase' naming, but attributes are 
-case-insensitive, so the attribute names will be `is-complete` & `thing-to-do` by default.
+A prop is meant to be set from outside the component. A component can still assign to one of its own props, and the component renders again when it does. In a development build, Stencil logs a warning in the browser console each time:
 
-Fortunately, this "default" behavior can be changed using the `attribute` option of the `@Prop()` decorator:
+```
+@Prop() "open" on <my-dialog> is immutable but was modified from within the component.
+```
+
+If the component is meant to change the prop, such as an `open` prop that the component sets to `false` when it closes itself, declare that with `mutable: true`. The warning goes away:
 
 ```tsx
-import { Component, Prop, h } from '@stencil/core';
-// `MyHttpService` is an `Object` in this example
-import { MyHttpService } from '../some/local/directory/MyHttpService';
+@Prop({ mutable: true }) open = false;
 
-@Component({
-   tag: 'todo-list-item',
-})
-export class ToDoListItem {
-   @Prop({ attribute: 'complete' }) isComplete: boolean;
-   @Prop({ attribute: 'thing' }) thingToDo: string;
-   @Prop({ attribute: 'my-service' }) httpService: MyHttpService;
-}
+private close = () => {
+  this.open = false;
+};
 ```
 
-By using this option, we are being explicit about which properties have an associated DOM attribute and the name of it
-when using the component in HTML.
-
-```html
-<todo-list-item complete="false" thing="Read Attribute Naming Section of Stencil Docs" my-service="{}"></todo-list-item>
-```
-
-### Prop Mutability (`mutable`)
-
-A Prop is by default immutable from inside the component logic.
-However, it's possible to explicitly allow a Prop to be mutated from inside the component, by declaring it as mutable, as in the example below:
+Stencil compares a prop's old and new values by reference, for props and for [state](./state.md) alike. Changing an array or an object in place leaves the reference the same, so the component doesn't render again. Assign a new array or object instead:
 
 ```tsx
-import { Component, Prop, h } from '@stencil/core';
+// Doesn't render again
+this.items.push('Stencil');
 
-@Component({
-   tag: 'todo-list-item',
-})
-export class ToDoListItem {
-   @Prop({ mutable: true }) thingToDo: string;
-
-   componentDidLoad() {
-      this.thingToDo = 'Ah! A new value!';
-   }
-}
-```
-
-#### Mutable Arrays and Objects
-
-Stencil compares Props by reference in order to efficiently rerender components.
-Setting `mutable: true` on a Prop that is an object or array allows the _reference_ to the Prop to change inside the component and trigger a render.
-It does not allow a mutable change to an existing object or array to trigger a render. 
-
-For example, to update an array Prop:
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-   tag: 'my-component',
-})
-export class MyComponent {
-   @Prop({mutable: true}) contents: string[] = [];
-   timer: NodeJS.Timer;
-
-   connectedCallback() {
-      this.timer = setTimeout(() => {
-         // this does not create a new array. when stencil
-         // attempts to see if any of its Props have changed,
-         // it sees the reference to its `contents` Prop is
-         // the same, and will not trigger a render
-         
-         // this.contents.push('Stencil')
-         
-         // this does create a new array, and therefore a
-         // new reference to the Prop. Stencil will pick up
-         // this change and rerender
-         this.contents = [...this.contents, 'Stencil'];
-         // after 3 seconds, the component will re-render due
-         // to the reference change in `this.contents`
-      }, 3000);
-   }
-
-   disconnectedCallback() {
-      if (this.timer) {
-         clearTimeout(this.timer);
-      }
-   }
-
-   render() {
-      return <div>Hello, World! I'm {this.contents[0]}</div>;
-   }
-}
-```
-
-In the example above, updating the Prop in place using `this.contents.push('Stencil')` would have no effect.
-Stencil does not see the change to `this.contents`, since it looks at the _reference_ of the Prop, and sees that it has not changed.
-This is done for performance reasons.
-If Stencil had to walk every slot of the array to determine if it changed, it would incur a performance hit.
-Rather, it is considered better for performance and more idiomatic to re-assign the Prop (in the example above, we use the spread operator).
-
-The same holds for objects as well.
-Rather than mutating an existing object in-place, a new object should be created using the spread operator. This object will be different-by-reference and therefore will trigger a re-render:  
-
-
-```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-export type MyContents = {name: string};
-
-@Component({
-   tag: 'my-component',
-})
-export class MyComponent {
-   @Prop({mutable: true}) contents: MyContents;
-   timer: NodeJS.Timer;
-
-   connectedCallback() {
-      this.timer = setTimeout(() => {
-         // this does not create a new object. when stencil
-         // attempts to see if any of its Props have changed,
-         // it sees the reference to its `contents` Prop is
-         // the same, and will not trigger a render
-
-         // this.contents.name = 'Stencil';
-
-         // this does create a new object, and therefore a
-         // new reference to the Prop. Stencil will pick up
-         // this change and rerender
-         this.contents = {...this.contents, name: 'Stencil'};
-         // after 3 seconds, the component will re-render due
-         // to the reference change in `this.contents`
-      }, 3000);
-   }
-
-   disconnectedCallback() {
-      if (this.timer) {
-         clearTimeout(this.timer);
-      }
-   }
-
-   render() {
-      return <div>Hello, World! I'm {this.contents.name}</div>;
-   }
-}
+// Renders again
+this.items = [...this.items, 'Stencil'];
 ```
 
 ### Reflect Properties Values to Attributes (`reflect`)
 
-In some cases it may be useful to keep a Prop in sync with an attribute. In this case you can set the `reflect` option
-in the `@Prop()` decorator to `true`. When a prop is reflected, it will be rendered in the DOM as an HTML attribute.
-
-Take the following component as example:
+By default, setting a property doesn't change the element's attributes. Set `reflect: true` to keep the attribute in step with the property, which lets CSS selectors and other code that reads attributes follow the value:
 
 ```tsx
-import { Component, Prop, h } from '@stencil/core';
-
-@Component({
-    tag: 'todo-list-item',
-})
-export class ToDoListItem {
-    @Prop({ reflect: false }) isComplete: boolean = false;
-    @Prop({ reflect: true }) timesCompletedInPast: number = 2;
-    @Prop({ reflect: true }) thingToDo: string = "Read Reflect Section of Stencil Docs";
-}
+@Prop({ reflect: true }) variant = 'primary';
+@Prop({ reflect: true }) active = false;
 ```
-
-The component in the example above uses [default values](#default-values), and can be used in HTML like so:
-```html
-<!-- Example of using todo-list-item in HTML -->
-<todo-list-item></todo-list-item>
-```
-
-When rendered in the DOM, the properties configured with `reflect: true` will be reflected in the DOM:
 
 ```html
-<todo-list-item times-completed-in-past="2" thing-to-do="Read Reflect Section of Stencil Docs" ></todo-list-item>
+<!-- As rendered. The default value of `variant` is reflected. -->
+<my-button variant="primary"></my-button>
+
+<!-- After `el.active = true` -->
+<my-button variant="primary" active></my-button>
 ```
 
-While the properties not set to "reflect", such as `isComplete`, are not rendered as attributes, it does not mean it's
-not there - the `isComplete` property still contains the `false` value as assigned:
-
-```tsx
-const cmp = document.querySelector('todo-list-item');
-console.log(cmp.isComplete); // it prints 'false'
-```
+A boolean prop is reflected as an attribute with no value when it's `true`, and the attribute is removed when it's `false`.
 
 ### Prop Getters and Setters
 
-`@Prop` decorated members can additionally be used with `get()` and `set()` methods which can be useful for validation 
-([as an alternative to using a @Watch decorator](#prop-validation)), transforming incoming-data or exposing read-only properties. 
+A `@Prop()` can be a getter, with or without a setter. Use one to validate or transform incoming values, or to expose a read-only property:
 
 ```tsx
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop } from '@stencil/core';
 
 @Component({
-    tag: 'get-set-props',
+  tag: 'get-set-props',
 })
 export class GetSetProps {
-    // A read-only prop
-    private internalValue = 'should not change';
-    @Prop()
-    get readOnlyProp () { return this.internalValue; }
+  // A read-only prop. Setting it from outside has no effect.
+  @Prop()
+  get version() {
+    return '1.0';
+  }
 
-    // A validated prop
-    private safeValue: 'this' | 'or maybe this' = 'this';
-    @Prop()
-    get validatedProp () {
-      return this.safeValue;
+  // A validated prop. Values that aren't allowed are ignored.
+  private safeValue: 'this' | 'or maybe this' = 'this';
+  @Prop()
+  get validatedProp() {
+    return this.safeValue;
+  }
+  set validatedProp(incomingValue: any) {
+    if (['this', 'or maybe this'].includes(incomingValue)) {
+      this.safeValue = incomingValue;
     }
-    set validatedProp (incomingDodgyValue: any) {
-      if (['this', 'or maybe this'].includes(incomingDodgyValue)) {
-        this.safeValue = incomingDodgyValue;
-      }
-    }
+  }
 
-    private dateValue: Date = new Date();
-    // A transformed prop
-    @Prop()
-    get transformedProp () {
-      return this.dateValue;
-    }
-    set transformedProp (incomingStringVal: string) {
-      this.dateValue = new Date(Date.parse(incomingStringVal));
-    }
+  // A transformed prop. It accepts a string and stores a Date.
+  private dateValue = new Date();
+  @Prop()
+  get transformedProp() {
+    return this.dateValue;
+  }
+  set transformedProp(incomingValue: string) {
+    this.dateValue = new Date(Date.parse(incomingValue));
+  }
 }
 ```
 
-Most of the documentation referring to [types](#types) and [options](#prop-options) also apply to get / set `@Prop`s 
-(with the exception of [mutable](#prop-mutability-mutable) as this makes little logical sense).
+The `attribute` and `reflect` options work with these props as well.

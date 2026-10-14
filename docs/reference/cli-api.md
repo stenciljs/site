@@ -1,47 +1,19 @@
 ---
-title: Stencil Core CLI API
+title: Stencil CLI API
 sidebar_label: CLI API
-description:  Stencil Core CLI API
+description: The JavaScript API of the @stencil/cli package
 slug: /cli-api
 ---
 
-# Stencil Core CLI API
+# Stencil CLI API
 
-The CLI API can be found at `@stencil/core/cli` and ran by `bin/stencil`.
+The `@stencil/cli` package holds the `stencil` command, and exports the functions that the command is built from. It's installed with `@stencil/core`, and is an ES module:
 
-
-## createNodeLogger()
-
-```tsx
-createNodeLogger(process: any): Logger
+```ts
+import { run } from '@stencil/cli';
 ```
 
-Creates a "logger", based off of NodeJS APIs, that will be used by the compiler and dev-server.
-By default the CLI uses this method to create the NodeJS logger. The NodeJS "process"
-object should be provided as the first argument.
-
-
-## createNodeSystem()
-
-```tsx
-createNodeSystem(process: any): CompilerSystem
-```
-
-Creates the "system", based off of NodeJS APIs, used by the compiler. This includes any and
-all file system reads and writes using NodeJS. The compiler itself is unaware of Node's
-`fs` module. Other system APIs include any use of `crypto` to hash content. The NodeJS "process"
-object should be provided as the first argument.
-
-
-## parseFlags()
-
-```tsx
-parseFlags(args: string[]): ConfigFlags
-```
-
-Used by the CLI to parse command-line arguments into a typed `ConfigFlags` object.
-This is an example of how it's used internally: `parseFlags(process.argv.slice(2))`.
-
+For the command itself and its flags, see the [CLI reference](../config/cli.md).
 
 ## run()
 
@@ -49,14 +21,54 @@ This is an example of how it's used internally: `parseFlags(process.argv.slice(2
 run(init: CliInitOptions): Promise<void>
 ```
 
-Runs the CLI with the given options. This is used by Stencil's default `bin/stencil` file,
-but can be used externally too.
+Runs the CLI. `init` takes the command-line arguments, a logger, and a system, both of which come from [`@stencil/core/sys/node`](./compiler-api.md#stencilcoresysnode). The `stencil` command is this call:
 
+```ts
+import { run } from '@stencil/cli';
+import { createNodeLogger, createNodeSys } from '@stencil/core/sys/node';
+
+run({
+  args: process.argv.slice(2),
+  logger: createNodeLogger(),
+  sys: createNodeSys(),
+});
+```
 
 ## runTask()
 
 ```tsx
-runTask(process: any, config: Config, task: TaskCommand,  sys?: CompilerSystem): Promise<void>
+runTask(
+  coreCompiler: typeof import('@stencil/core/compiler'),
+  config: Config,
+  task: TaskCommand,
+  sys: CompilerSystem,
+  flags?: ConfigFlags,
+): Promise<void>
 ```
 
-Runs individual tasks giving a NodeJS `process`, Stencil `config`, and task command. You can optionally pass in the `sys` that's used by the compiler. See [createNodeSystem()](#createnodesystem) for more details. 
+Runs one task, such as `'build'` or `'docs'`, with a config that's already loaded. `coreCompiler` is the `@stencil/core/compiler` module.
+
+## parseFlags()
+
+```tsx
+parseFlags(args: string[]): ConfigFlags
+```
+
+Parses command-line arguments into a `ConfigFlags` object. The first argument that isn't a flag becomes the task:
+
+```ts
+parseFlags(['build', '--dev', '--watch']);
+// { task: 'build', dev: true, watch: true, args: ['--dev', '--watch'], ... }
+```
+
+## createConfigFlags()
+
+```tsx
+createConfigFlags(init?: Partial<ConfigFlags>): ConfigFlags
+```
+
+Creates a `ConfigFlags` object with every default in place, overridden by the values in `init`.
+
+## Wizard Types
+
+The package also exports the types that a package implements to take part in `stencil init` and `stencil add`, such as `StencilWizardPlugin` and `WizardContext`.

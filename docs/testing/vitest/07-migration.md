@@ -7,84 +7,64 @@ slug: /testing-vitest-migration
 
 # Migration Guide
 
-This guide helps you migrate from the Stencil Test Runner to `@stencil/vitest`.
+Stencil v5 removes the integrated test runner (`stencil test`, with Jest and Puppeteer). This guide moves its tests to [Vitest](https://vitest.dev/).
 
-## Why Migrate?
+There are two ways to migrate spec tests, and one project can use both:
 
-The integrated Stencil Test Runner is deprecated as of Stencil v4.43 and will be removed in Stencil v5. The `@stencil/vitest` package offers several advantages:
+- **[Keep your `newSpecPage()` tests](#keeping-newspecpage-tests)** and run them under Vitest. This is the quickest route for a large existing suite.
+- **[Move to `render()`](#moving-to-render)** from `@stencil/vitest`. Tests written this way run in real browsers as well as Node, and it's the recommended API for new tests.
 
-- **Flexible DOM environments**: Choose between mock-doc, jsdom, or happy-dom
-- **True browser testing**: Run tests in real browsers, not just Puppeteer
-- **Modern test runner**: Vitest provides faster test execution and better DX
-- **Better isolation**: Test against actual build outputs rather than internal compilation
-- **Active maintenance**: Vitest is actively developed with regular updates
+E2E tests written with `newE2EPage()` become [browser tests](#e2e-tests).
 
-## Installation
+## Keeping `newSpecPage()` Tests
 
-First, install the new dependencies:
+`newSpecPage()` is still exported from `@stencil/core/testing`. The `stencilSpecPage()` plugin from `@stencil/unplugin` compiles your components so that it works under Vitest.
 
-```bash npm2yarn
-npm install --save-dev @stencil/vitest vitest
-```
-
-For browser testing:
+Install the dependencies:
 
 ```bash npm2yarn
-npm install --save-dev @vitest/browser-playwright
+npm install --save-dev vitest @stencil/unplugin @stencil/vitest
 ```
 
-## Configuration Changes
+Then create a Vitest config:
 
-### Before: stencil.config.ts
+```typescript title="vitest.config.ts"
+import { stencilSpecPage } from '@stencil/unplugin';
+import { defineConfig } from 'vitest/config';
 
-```typescript
-// stencil.config.ts
-export const config: Config = {
-  testing: {
-    testPathIgnorePatterns: ['node_modules'],
-    setupFilesAfterEnv: ['./test-setup.ts'],
-  },
-};
-```
-
-### After: vitest.config.ts
-
-```typescript
-// vitest.config.ts
-import { defineVitestConfig } from '@stencil/vitest/config';
-import { playwright } from '@vitest/browser-playwright';
-
-export default defineVitestConfig({
-  stencilConfig: './stencil.config.ts',
+export default defineConfig({
+  plugins: [stencilSpecPage()],
   test: {
-    projects: [
-      {
-        test: {
-          name: 'spec',
-          include: ['src/**/*.spec.{ts,tsx}'],
-          environment: 'stencil',
-          setupFiles: ['./vitest-setup.ts'],
-        },
-      },
-      {
-        test: {
-          name: 'browser',
-          include: ['src/**/*.e2e.{ts,tsx}'],
-          setupFiles: ['./vitest-setup.ts'],
-          browser: {
-            enabled: true,
-            provider: playwright(),
-            headless: true,
-            instances: [{ browser: 'chromium' }],
-          },
-        },
-      },
-    ],
+    globals: true,
+    environment: 'node',
+    include: ['src/**/*.spec.{ts,tsx}'],
+    setupFiles: ['./vitest.setup.ts'],
   },
 });
 ```
 
-## Test File Changes
+`globals: true` provides `describe`, `it`, and `expect` without imports, as Jest did.
+
+The setup file registers Stencil's matchers, such as `toEqualHtml()` and `toHaveClass()`, which the old runner registered for you:
+
+```typescript title="vitest.setup.ts"
+import '@stencil/vitest';
+```
+
+Your tests keep their `newSpecPage()` calls and imports. What does change is anything that used Jest's own API, which has a Vitest equivalent under `vi`:
+
+| Jest | Vitest |
+| ---- | ------ |
+| `jest.fn()` | `vi.fn()` |
+| `jest.spyOn()` | `vi.spyOn()` |
+| `jest.mock()` | `vi.mock()` |
+| `jest.useFakeTimers()` | `vi.useFakeTimers()` |
+
+See Vitest's [guide to migrating from Jest](https://vitest.dev/guide/migration.html#jest) for the full list of differences.
+
+## Moving to `render()`
+
+Follow the [Quick Start](./01-overview.md#quick-start) to install and configure `@stencil/vitest`, then convert your tests.
 
 ### Spec Tests
 
@@ -116,11 +96,13 @@ describe('my-component', () => {
 ```tsx
 import { render, h, describe, it, expect } from '@stencil/vitest';
 
+import './my-component';
+
 describe('my-component', () => {
   it('renders', async () => {
     const { root } = await render(<my-component />);
     await expect(root).toEqualHtml(`
-      <my-component>
+      <my-component class="hydrated">
         <mock:shadow-root>
           <div>Hello, World!</div>
         </mock:shadow-root>
@@ -131,6 +113,8 @@ describe('my-component', () => {
 ```
 
 ### E2E Tests
+
+`newE2EPage()` and its Puppeteer browser are removed. The same `render()` tests run in a real browser when your Vitest config enables [browser mode](./02-configuration.md#browser-tests).
 
 **Before:**
 
@@ -164,6 +148,8 @@ describe('my-component e2e', () => {
 ```tsx
 import { render, h, describe, it, expect } from '@stencil/vitest';
 
+import './my-component';
+
 describe('my-component e2e', () => {
   it('renders', async () => {
     const { root } = await render(<my-component />);
@@ -182,6 +168,8 @@ describe('my-component e2e', () => {
   });
 });
 ```
+
+To test whole pages, such as routing between them, use [`@stencil/playwright`](../playwright/01-overview.md) instead.
 
 ## API Mapping
 
@@ -247,24 +235,25 @@ Most matchers work the same way:
 ```json
 {
   "scripts": {
-    "test": "stencil-test",
-    "test:watch": "stencil-test --watch",
-    "test:spec": "stencil-test --project spec",
-    "test:e2e": "stencil-test --project browser"
+    "test": "vitest run",
+    "test:watch": "vitest"
   }
 }
 ```
 
+If you split your tests into [projects](./02-configuration.md#test-projects), run one with `vitest run --project browser`.
+
 ## Key Differences
 
-### No Component Registration
+### Components Are Imported
 
-With `@stencil/vitest`, you don't need to pass component classes to the render function. Components are loaded via your setup file:
+`render()` takes no list of component classes. Each test file imports the source files of the components it uses, which registers them:
 
-```typescript
-// vitest-setup.ts
-await import('./dist/test-components/test-components.esm.js');
+```tsx
+import './my-component';
 ```
+
+A component that's rendered by another one needs importing too.
 
 ### JSX-Based Rendering
 
@@ -293,48 +282,11 @@ const button = await page.find('my-component >>> button');
 const button = root.shadowRoot?.querySelector('button');
 ```
 
-### Async Assertions
-
-Some assertions are now async:
-
-```tsx
-// Before
-expect(element).toEqualHtml('...');
-
-// After
-await expect(element).toEqualHtml('...');
-```
-
 ## Troubleshooting
 
 ### Components Not Rendering
 
-Ensure your setup file imports the correct build output:
-
-```typescript
-// Check that the path matches your actual build output
-await import('./dist/test-components/test-components.esm.js');
-```
-
-### TypeScript Errors
-
-Add the type definitions to your tsconfig.json:
-
-```json
-{
-  "compilerOptions": {
-    "types": ["@stencil/vitest/globals"]
-  }
-}
-```
-
-### Shadow DOM Access
-
-Remember to use optional chaining when accessing shadow DOM:
-
-```tsx
-const button = root.shadowRoot?.querySelector('button');
-```
+An element that stays empty and never gets the `hydrated` class isn't registered. Check that the test file imports that component's source file.
 
 ### Waiting for Updates
 

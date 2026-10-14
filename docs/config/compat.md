@@ -87,13 +87,13 @@ setting their initial state, leading to double renders and unnecessary event dis
 
 ### additionalTagTransformers
 
-Auto-apply `transformTag` to most static tag names within your component library (including CSS selectors), rather than calling it manually. Use `'prod'` to enable only in production builds. Refer to the [Tag Transformation](../guides/tag-transformation.md) page for more information — tag transformation itself (`setTagTransformer()`/`transformTag()`) is always available at runtime and doesn't need a config flag; this option only controls the auto-apply behavior.
+Auto-apply `transformTag` to most static tag names within your component library (including CSS selectors), rather than calling it manually. Use `'prod'` to enable only in production builds. Refer to the [Tag Transformation](../guides/distribution/tag-transformation.md) page for more information — tag transformation itself (`setTagTransformer()`/`transformTag()`) is always available at runtime and doesn't need a config flag; this option only controls the auto-apply behavior.
 
 ## Removed in v5
 
 A few `extras` options from Stencil v4 have no `compat` equivalent — they were removed outright rather than renamed:
 
-- **`tagNameTransform`** — no longer a config flag. Tag transformation is always available via [`setTagTransformer()`/`transformTag()`](../guides/tag-transformation.md); see `additionalTagTransformers` above for the CSS/selector auto-apply behavior.
+- **`tagNameTransform`** — no longer a config flag. Tag transformation is always available via [`setTagTransformer()`/`transformTag()`](../guides/distribution/tag-transformation.md); see `additionalTagTransformers` above for the CSS/selector auto-apply behavior.
 - **`experimentalImportInjection`** — use [`enableImportInjection`](#enableimportinjection), which now defaults to `true`.
 - **`experimentalScopedSlotChanges`**, **`experimentalSlotFixes`**, **`slotChildNodesFix`**, **`scopedSlotTextContentFix`**, **`appendChildSlotFix`**, **`cloneNodeFix`** — consolidated into [`lightDomPatches`](#lightdompatches) above.
 - **`scriptDataOpts`** — removed with no replacement, along with the legacy `<script data-opts="...">` bootstrap path it read from.

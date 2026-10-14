@@ -138,7 +138,7 @@ Practically speaking, there is little disadvantage in using a `@AttrDeserialize(
 
 The use-cases around using `@PropSerialize()` is slightly less obvious as in general, [it is not considered best practice to reflect complex data (like objects or arrays) as attributes](https://web.dev/articles/custom-elements-best-practices#aim-to-only-accept-rich-data-objects,-arrays-as-properties.) 
 
-The following example illustrates a practical use case for `@PropSerialize()` using the [hydrate script output](../guides/hydrate-app.md) on a server we can fetch and serialize complex data to an attribute. When the same component loads in a browser, the component can de-serialize the data immediately without having to do another fetch. 
+The following example illustrates a practical use case for `@PropSerialize()` using the [`ssr` output target](../output-targets/main/ssr/01-overview.md) on a server we can fetch and serialize complex data to an attribute. When the same component loads in a browser, the component can de-serialize the data immediately without having to do another fetch. 
 
 ```tsx
 import { AttrDeserialize, Build, Component, h, Prop, PropSerialize } from '@stencil/core';

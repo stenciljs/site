@@ -157,6 +157,16 @@
       "statusCode": 301
     },
     {
+      "source": "/v5/hydrate-app",
+      "destination": "/docs/v5/ssr",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/static-site-generation-server-side-rendering-ssr",
+      "destination": "/docs/v5/rendering-strategies",
+      "statusCode": 301
+    },
+    {
       "source": "/v5/extends",
       "destination": "/docs/v5/mixins-and-controllers",
       "statusCode": 301

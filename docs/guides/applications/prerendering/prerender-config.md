@@ -38,8 +38,8 @@ export const config: PrerenderConfig = {
 
 | Config | Description | Default |
 |--------|-------------|---------|
-| `afterHydrate(document, url)` | Run after each `document` is hydrated, but before it is serialized into an HTML string. Hook is passed the `document` and its `URL`. |  |
-| `beforeHydrate(document, url)` | Run before each `document` is hydrated. Hook is passed the `document` it's `URL`. |  |
+| `afterSsr(document, url)` | Run after each `document` is hydrated, but before it is serialized into an HTML string. Hook is passed the `document` and its `URL`. |  |
+| `beforeSsr(document, url)` | Run before each `document` is hydrated. Hook is passed the `document` it's `URL`. |  |
 | `afterSerializeTemplate(html)` | Runs after the template Document object has serialize into an HTML formatted string. Returns an HTML string to be used as the base template for all prerendered pages. |  |
 | `beforeSerializeTemplate(document)` | Runs before the template Document object is serialize into an HTML formatted string. Returns the Document to be serialized which will become the base template html for all prerendered pages. |  |
 | `canonicalUrl(url)` | A hook to be used to generate the canonical `<link>` tag which goes in the `<head>` of every prerendered page. Returning `null` will not add a canonical url tag to the page. |  |
@@ -48,23 +48,25 @@ export const config: PrerenderConfig = {
 | `filterAnchor(attrs, base)` | Return `true` the given `<a>` element should be crawled or not. |  |
 | `filterUrl(url, base)` | Return `true` if the given URL should be prerendered or not. |  |
 | `filePath(url, filePath)` | Returns the file path which the prerendered HTML content should be written to. |  |
-| `hydrateOptions(url)` | Returns the hydrate options to use for each individual prerendered page. |  |
+| `prerenderOptions(url)` | Returns the options to use for each individual prerendered page. See [below](#individual-page-options). |  |
 | `loadTemplate(filePath)` | Returns the template file's content. The template is the base HTML used for all prerendered pages. |  |
+| `robotsTxt(opts)` | Returns the content of the generated `robots.txt`, as a string, or `{ content, filePath }` to also change where it's written. Return `null` to skip it. By default, allows everything and links to the sitemap. |  |
+| `sitemapXml(opts)` | Returns the content of the generated `sitemap.xml`, as a string, or `{ content, filePath }`. Return `null` to skip it. By default, lists every prerendered URL. |  |
 | `normalizeUrl(href, base)` | Used to normalize the page's URL from a given a string and the current page's base URL. Largely used when reading an anchor's `href` attribute value and normalizing it into a `URL`. |  |
 | `staticSite` | Static Site Generated (SSG). Does not include Stencil's client-side JavaScript, custom elements or preload modules. | `false` |
 | `trailingSlash` | If the prerendered URLs should have a trailing "/"" or not | `false` |
 
 
-## Individual Page Hydrate Options
+## Individual Page Options
 
 Beyond settings for the entire prerendering process with `prerender.config.ts`, you can also
-set individual hydrate options per each page. The `hydrateOptions(url)` hook can be used to further configure each page. Below is an example of the prerender config with the `hydrateOptions()` hook, which returns options for each page.
+set options for each page. The `prerenderOptions(url)` hook returns the options for a given page:
 
 ```tsx
 import { PrerenderConfig } from '@stencil/core';
 
 export const config: PrerenderConfig = {
-  hydrateOptions(url) {
+  prerenderOptions(url) {
     return {
       prettyHtml: true
     };
@@ -78,12 +80,12 @@ export const config: PrerenderConfig = {
 | `addModulePreloads` | Adds `<link rel="modulepreload">` for modules that will eventually be requested. | `true` |
 | `approximateLineWidth` | Sets an approximate line width the HTML should attempt to stay within. Note that this is "approximate", in that HTML may often not be able to be split at an exact line width. Additionally, new lines created is where HTML naturally already has whitespace, such as before an attribute or spaces between words. | `100` |
 | `canonicalUrl` | Sets the `href` attribute on the `<link rel="canonical">` tag within the `<head>`. If the value is not defined it will ensure a canonical link tag is no included in the `<head>`. |  |
-| `clientHydrateAnnotations` | Include the HTML comments and attributes used by the client-side JavaScript to read the structure of the HTML and rebuild each component. | `true` |
+| `clientSsrAnnotations` | Include the HTML comments and attributes used by the client-side JavaScript to read the structure of the HTML and rebuild each component. | `true` |
 | `constrainTimeouts` | Constrain `setTimeout()` to 1ms, but still async. Also only allows `setInterval()` to fire once, also constrained to 1ms. | `true` |
 | `cookie` | Sets `document.cookie`. |  |
 | `direction` | Sets the `dir` attribute on the top level `<html>`. |  |
 | `excludeComponents` | Component tag names listed here will not be prerendered, nor will hydrated on the client-side. Components listed here will be ignored as custom elements and treated no differently than a `<div>`. |  |
-| `inlineExternalStyleSheets` | External stylesheets from `<link rel="stylesheet">` are instead inlined into `<style>` elements. | `true` |
+| `inlineExternalStyleSheets` | External stylesheets from `<link rel="stylesheet">` are instead inlined into `<style>` elements. | `false` |
 | `language` | Sets the `lang` attribute on the top level `<html>`. |  |
 | `maxHydrateCount` | Maximum number of components to hydrate on one page. | `300` |
 | `minifyScriptElements` | Minify JavaScript content within `<script>` elements. | `true` |

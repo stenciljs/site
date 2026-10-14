@@ -16,7 +16,7 @@ The `standalone` output target creates custom elements that directly extend `HTM
 
 Standalone components can be cherry-picked and defined individually, bundled and defined all at once, or defined automatically via the auto-loader as they appear in the DOM - see [Consumption](#consumption) below. See [Choosing Between `loader-bundle` and `standalone`](../01-overview.md#choosing-between-loader-bundle-and-standalone) for when each output target is the better fit.
 
-Publishing this output requires the right `package.json` fields pointing at it - see [Standalone](../../guides/publishing.md#standalone) in the publishing guide for the exact `exports` map.
+Publishing this output requires the right `package.json` fields pointing at it - see [Standalone](../../guides/distribution/publishing.md#standalone) in the publishing guide for the exact `exports` map.
 
 To generate components using the `standalone` output target, add it to a project's `stencil.config.ts` file like so:
 
@@ -186,4 +186,4 @@ A `MutationObserver` watches the page and defines each custom element the first 
 
 ## Assets
 
-Component asset resolution works the same as every other output target - see the [Assets guide](../../guides/assets.md) for `assetsDirs`, `getAssetPath()`, `setAssetPath()`, and [making the asset files themselves servable to a consumer using a bundler](../../guides/assets.md#3-make-assets-available-in-consuming-applications).
+Component asset resolution works the same as every other output target - see the [Assets guide](../../guides/distribution/assets.md) for `assetsDirs`, `getAssetPath()`, `setAssetPath()`, and [making the asset files themselves servable to a consumer using a bundler](../../guides/distribution/assets.md#3-make-assets-available-in-consuming-applications).

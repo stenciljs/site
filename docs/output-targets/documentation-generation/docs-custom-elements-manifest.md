@@ -19,13 +19,35 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'docs-custom-elements-manifest',
-      file: 'path/to/cem.json'
     }
   ]
 };
 ```
 
+The manifest is written to `dist/custom-elements.json`. To write it somewhere else, set `file`:
+
+```tsx
+{
+  type: 'docs-custom-elements-manifest',
+  file: 'dist/docs/custom-elements.json'
+}
+```
+
 The JSON file output by Stencil conforms to the [CEM Schema interface](https://github.com/webcomponents/custom-elements-manifest/blob/main/schema.d.ts).
+
+## Publishing the Manifest
+
+Tools find a package's manifest through the [`customElements` field](https://github.com/webcomponents/custom-elements-manifest#referencing-manifests-from-npm-packages) in its `package.json`. Stencil sets that field to the manifest's path on every build:
+
+```json title="package.json"
+{
+  "customElements": "dist/custom-elements.json"
+}
+```
+
+The build warns if the `files` array in your `package.json` doesn't include the manifest, since it would then be left out of the published package.
+
+If your library sets [`generateExportMaps`](../../config/01-overview.md#generateexportmaps), the manifest is also exported as `my-library/custom-elements.json`.
 
 ## Properties, Methods, Events, and Attributes
 
@@ -55,24 +77,20 @@ CSS file like the following:
 Then you'd get the following in the JSON output:
 
 ```json title="Example docs-custom-elements-manifest Output"
-[
+"cssProperties": [
   {
-    "cssProperties": [
-      {
-        "name": "background",
-        "description": "Background of the button"
-      },
-      {
-        "name": "background-activated",
-        "description": "Background of the button when activated"
-      },
-      {
-        "name": "background-focused",
-        "description": "Background of the button when focused"
-      }
-    ]
+    "name": "--background",
+    "description": "Background of the button"
+  },
+  {
+    "name": "--background-activated",
+    "description": "Background of the button when activated"
+  },
+  {
+    "name": "--background-focused",
+    "description": "Background of the button when focused"
   }
-]   
+]
 ```
 
 ## Slots and CSS Parts
@@ -162,14 +180,15 @@ export class MyElement {
 This would show up in the generated JSON file like so:
 
 ```json
-"customStates": [
+"cssStates": [
+  {
+    "name": "archived",
+    "initialValue": false,
+    "description": "If this item is older than 6 months old. Use via `:state(archived)`"
+  },
   {
     "name": "new",
-    "description": ""
-  },
-  {    
-    "name": "archived",
-    "description": "If this item is older than 6 months old. Use via `:state(archived)"
+    "initialValue": true
   }
 ]
 ```
@@ -203,11 +222,11 @@ You could use it like this:
 ````
 
 
-You'd get the following in the JSON output under the `"usage"` key:
+You'd get the following in the JSON output under the `"demos"` key. Each `url` is the example's path in your project:
 
 ```json
 "demos": [{
-  "url": "my-button-usage.md",
+  "url": "src/components/my-button/usage/my-button-usage.md",
   "description": "# How to use `my-button`\n\nA button is often a great help in adding interactivity to an app!\n\nYou could use it like this:\n\n```html\n<my-button>My Button!</my-button>\n```\n"
 }]
 ```

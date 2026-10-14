@@ -1,49 +1,206 @@
 ---
-title: Static Site Generation
+title: SSR Output Target
 sidebar_label: Overview
-slug: /static-site-generation
+description: Render Stencil components to HTML on a server
+slug: /ssr
 ---
 
-# Static Site Generation with Stencil
+# SSR Output Target
 
-One of the best ways to build fast, interactive web sites and web apps is to utilize Static Site Generation instead of Server Side Rendering (known as SSR) or Client Side Rendering (known as Single Page Apps, or SPAs).
+The `ssr` output target builds a server-side rendering module for your component library. Given an HTML string or a document, it renders every Stencil component inside it and returns the resulting HTML. Shadow DOM components are rendered as [Declarative Shadow DOM](https://web.dev/articles/declarative-shadow-dom) by default, and the browser hydrates the markup once your components' JavaScript loads.
 
-Static Site Generation (SSG) means building and rendering components and routes at build time (aka prerendering) rather than server request time (SSR) or at client run-time (SPA). Because a route is already prerendered, all of the content for the route is available to search engines and clients _immediately_, so SEO and performance are maximized.
+The module has no Node.js dependencies, so it runs in Node.js 22+, Deno, Bun, Cloudflare Workers, and other runtimes with web-standard APIs. To render from a non-JavaScript server, see [`ssr-wasm`](../ssr-wasm/01-overview.md).
 
-Static Site Generation doesn't mean your pages have to be and/or _stay_ static! Stencil utilizes hydration to efficiently load client-side components at runtime to get the best of both worlds.
+```tsx title="stencil.config.ts"
+outputTargets: [
+  {
+    type: 'ssr',
+  },
+];
+```
 
-Since Static Site Generation prerenders components, there are some tradeoffs and things to keep in mind, but most components can be easily prerendered without much modification.
+:::note
+Formerly `dist-hydrate-script` in Stencil v4.
+:::
 
-Stencil makes SSG easy, so read on to see how to incorporate it into your apps.
+To render every page of a site built with the [`www` output target](../www.md) to HTML at build time, see [Prerendering](../../../guides/applications/prerendering/01-overview.md).
 
-## Benefits of Static Site Generation
+## Output
 
-- Great [Lighthouse](https://developers.google.com/web/tools/lighthouse/) scores
-- Faster time to [Largest Contentful Paint (LCP)](https://web.dev/lcp/)
-- Better [Search Engine Optimization (SEO)](https://support.google.com/webmasters/answer/7451184)
-- Provides functionality for users with JavaScript disabled
+```tree
+dist/ssr
+├── index.js
+└── index.d.ts
+```
 
-## How Static Site Generation and Prerendering Works
+Expose the module to consumers through your package's `exports`:
 
-**Build Hydrate App**: The first step in prerendering is for the compiler to generate a "hydrate" app, which is a single directory to be used by Node.js. The "hydrate" app is automatically generated when the `--prerender` CLI flag is provided and by default the app is saved to `dist/hydrate`. Prerendering uses the hydrate app internally, however it can be used directly at a lower-level. [Learn more about the Hydrate App](../../../guides/hydrate-app.md)
+```json title="package.json"
+{
+  "exports": {
+    "./ssr": {
+      "types": "./dist/ssr/index.d.ts",
+      "import": "./dist/ssr/index.js"
+    }
+  }
+}
+```
 
-**Fork Prerender Tasks to Available CPUs**: Stencil can efficiently divide out the prerendering to each of the current machine's CPUs using [Node.js' Child Process API](https://nodejs.org/api/child_process.html). By tasking each CPU on the machine, the compiler can drastically speed up prerendering times.
+## Rendering
 
-**Prerender Index**: After the compiler has completed the build and created child processes on each available CPU, it will then kick off the prerendering by starting at the single base URL, or the configured entry URLs. Once the page has finished prerendering it'll be written to the configured `www` directory as an `index.html` file.
+```ts
+import { renderToString } from 'my-library/ssr';
 
-**Crawl App**: During each page prerender, Stencil also collects the anchor elements and URLs used within the page. With this information, it's able to inform the main thread of which pages should be prerendered next. The main thread is in charge of orchestrating all of the URLs, and the job is finished once all of the pages have been crawled and prerendered.
+const { html } = await renderToString(`
+  <html>
+    <body>
+      <my-button variant="primary">Save</my-button>
+    </body>
+  </html>
+`);
+```
 
-**Deploy Static Files to Production**: Now that all of the pages have been prerendered and written as static HTML files, the `www` directory can now be deployed to a server. A significant difference from prerendering and Server-side Rendering (SSR), is that the HTTP server is just serving up static HTML files rather than dynamically generating the HTML on the server.
+The module exports three rendering functions:
 
-**Static HTML Response**: With the static HTML files deploy to a server, visitors of each prerendered page first receive the HTML with inline styles, and no blocking JS or CSS. Additionally, the compiler is already aware of the exact modules the visitor will need for this page, and will asynchronously preload the modules using [link `modulepreload`](https://html.spec.whatwg.org/multipage/links.html#link-type-modulepreload).
+| Function | Returns | Use |
+|---|---|---|
+| `renderToString(html, options?)` | `Promise<SsrResults>` | Render an HTML string or document and serialize it. The rendered HTML is in `results.html`. |
+| `streamToString(html, options?)` | `ReadableStream<string>` | The same as `renderToString`, as a stream. |
+| `ssrDocument(doc, options?)` | `Promise<SsrResults>` | Render into an existing document without serializing it (`results.html` is `null`). Use this when your server already has a `Document` and serializes it itself. |
 
-**Client-side Hydration**: After the HTML and inlined styles have rendered the first paint, the next step is for the same nodes within the DOM to be hydrated by the client-side JavaScript. Each component within the page will asynchronously hydrate using the initial order they were found in the DOM structure. Next, as each component lazily hydrates they're able to reuse the existing nodes found in the DOM.
+`streamToString()` emits strings. To use it as a web `Response` body, encode it first:
 
-## Tooling
+```ts
+import { streamToString } from 'my-library/ssr';
 
-To be clear, Stencil does _not_ use `Puppeteer` or `jsdom` for prerendering. Puppeteer is great for End-to-End
-testing, but for performance reasons it's not ideal to quickly generate a large website with hundreds or thousands of pages. Additionally, `jsdom` is often used for unit testing, but in our experience it's difficult to use with async components and its global environment nature.
+export default {
+  async fetch(request: Request) {
+    const html = await loadPageTemplate(request);
+    const body = streamToString(html).pipeThrough(new TextEncoderStream());
+    return new Response(body, { headers: { 'content-type': 'text/html' } });
+  },
+};
+```
 
-Instead, Stencil uses its own internal DOM APIs which strictly follow the web standards, but optimized for prerendering, Static Site Generation and Server-side Rendering. By doing so, developers can still use all the same APIs they're already familiar with, but they'll seamlessly work within a NodeJS environment too. This means developers often do not have to write code differently in how they're building components, but rather they focus only on writing one type of component, and coding it using the standards they already know. To reiterate, developers do not have to learn a new API for prerendering. It's just the same web APIs your components are already using.
+The module also exports `setTagTransformer()`, for when components are registered under [transformed tag names](../../../guides/distribution/tag-transformation.md) on the client, so the server renders the same tags.
 
-Every component, machine and environment will perform differently, so it's difficult to provide a consistent benchmark. However, what we do know is that [Ionic's Documentation site](https://ionicframework.com/docs) has hundreds of pages and Stencil is able to prerender the entire site in a few seconds.
+To render components inside a framework's server rendering, see [SSR in Frameworks](./frameworks.md).
+
+## Config
+
+### dir
+
+*default: `dist/ssr`*
+
+Where the module is written.
+
+### cjs
+
+*default: `false`*
+
+Also write a CommonJS build, as `index.cjs`.
+
+### external
+
+*default: `[]`*
+
+Module IDs to leave as imports instead of bundling into the module. `fs`, `path`, and `crypto` are always external.
+
+### minify
+
+*default: `false`*
+
+Minify the module.
+
+### empty
+
+*default: `true`*
+
+Empty [`dir`](#dir) before each build.
+
+### skipInDev
+
+*default: `true`, or `false` when the dev server runs with `--ssr`*
+
+Skip this output during development builds.
+
+## Render Options
+
+Every rendering function accepts these options:
+
+| Option | Description | Default |
+|---|---|---|
+| `serializeShadowRoot` | How shadow DOM components are rendered - see [below](#serializeshadowroot). | `'declarative-shadow-dom'` |
+| `staticComponents` | Tags to render on the server but never hydrate on the client. Useful for components with no client-side behavior, such as a footer. | |
+| `excludeComponents` | Tags to skip entirely. They're treated like any unknown element, on the server and the client. | |
+| `clientSsrAnnotations` | Include the comments and attributes the client uses to hydrate the rendered markup. | `true` |
+| `url` | Sets `location.href`. | |
+| `title` | Sets `document.title`. | |
+| `language` | Sets the `lang` attribute on `<html>`. | |
+| `direction` | Sets the `dir` attribute on `<html>`. | |
+| `canonicalUrl` | Sets the `href` of the `<link rel="canonical">` tag. | |
+| `cookie` | Sets `document.cookie`. | |
+| `referrer` | Sets `document.referrer`. | |
+| `userAgent` | Sets `navigator.userAgent`. | |
+| `resourcesUrl` | The base URL components use to resolve [assets](../../../guides/distribution/assets.md). | `'./'` |
+| `removeScripts` | Remove every `<script>` from the document. | `false` |
+| `removeUnusedStyles` | Remove CSS not used by any element in the document. | `true` |
+| `maxHydrateCount` | The most components rendered on one page. | `300` |
+| `timeout` | Milliseconds to wait for rendering to finish before failing. | `15000` |
+| `buildId` | Added as `<html data-stencil-build="...">`. | random |
+| `runtimeLogging` | Print component console output to the server's console. | `false` |
+
+`renderToString()` and `streamToString()` also accept options for the serialized HTML:
+
+| Option | Description | Default |
+|---|---|---|
+| `fullDocument` | Serialize a complete document. Set to `false` to return only the rendered components. | `true` |
+| `beforeSsr(document)` | Runs before rendering. Use it to set properties that can't be expressed as attributes. | |
+| `afterSsr(document)` | Runs after rendering, before serialization. | |
+| `prettyHtml` | Indent the output. | `false` |
+| `approximateLineWidth` | Wrap lines at about this width, where the HTML allows it. | no wrapping |
+| `removeHtmlComments` | Remove comments. Stencil's own hydration comments are kept. | `false` |
+| `removeAttributeQuotes` | Remove quotes from attribute values where possible. | `false` |
+| `removeBooleanAttributeQuotes` | Write boolean attributes as `hidden` instead of `hidden=""`. | `false` |
+| `removeEmptyAttributes` | Remove empty `class`, `dir`, `id`, `lang`, `name`, and `title` attributes. | `true` |
+
+`beforeSsr` is the way to pass complex data to a component on the server:
+
+```ts
+await renderToString(html, {
+  beforeSsr(doc) {
+    doc.querySelector('my-chart').data = new Map(/* ... */);
+  },
+});
+```
+
+### serializeShadowRoot
+
+Controls how `encapsulation: { type: 'shadow' }` components are rendered:
+
+- `'declarative-shadow-dom'` - inside a `<template shadowrootmode="open">`, including the component's styles.
+- `'scoped'` - as light DOM with [scoped](../../../components/styling.md#scoped) styles, written once to the document `<head>`. The client converts it to a real shadow root during hydration.
+- An object, to choose per component:
+  ```ts
+  serializeShadowRoot: {
+    scoped: ['my-button'],
+    default: 'declarative-shadow-dom',
+  }
+  ```
+- `false` - don't render shadow DOM components on the server.
+
+Declarative Shadow DOM repeats a component's styles in every instance. For a component used many times on a page, `'scoped'` sends its styles once.
+
+## Results
+
+`renderToString()` and `ssrDocument()` resolve to an object that includes:
+
+| Property | Contents |
+|---|---|
+| `html` | The rendered HTML (`null` from `ssrDocument()`) |
+| `diagnostics` | Errors and warnings from rendering |
+| `components` | Every component rendered |
+| `hydratedCount` | How many components were rendered |
+| `title` | The document's title |
+| `httpStatus` | `200`, or the value of a `<meta http-equiv="status">` tag if the page has one - for example, set by a not-found component |
+| `anchors`, `imgs`, `scripts`, `styles` | Elements found in the rendered document |

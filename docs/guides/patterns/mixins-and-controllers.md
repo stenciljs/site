@@ -7,7 +7,7 @@ slug: /mixins-and-controllers
 
 # Mixins & Reactive Controllers
 
-Stencil composes component logic through `Mixin()`, a function that folds one or more mixin factories over a base class. A mixin factory is a function that takes a base class and returns a new class extending it: `(Base) => class extends Base { ... }`. See the [`Mixin()` reference](../components/api.md#mixin) for its full type signature.
+Stencil composes component logic through `Mixin()`, a function that folds one or more mixin factories over a base class. A mixin factory is a function that takes a base class and returns a new class extending it: `(Base) => class extends Base { ... }`. See the [`Mixin()` reference](../../components/api.md#mixin) for its full type signature.
 
 ## Combine your own mixin factories
 
@@ -131,7 +131,7 @@ export class MouseController implements ReactiveController {
 }
 ```
 
-If using the [`loader-bundle`](../output-targets/main/loader-bundle.md) output target, a controller that also needs the real host element (e.g. `@lit/context`'s `ContextProvider` which dispatches DOM events), cannot use a field initializer (like the `MouseController` above), but must instead use `connectedCallback()`.
+If using the [`loader-bundle`](../../output-targets/main/loader-bundle.md) output target, a controller that also needs the real host element (e.g. `@lit/context`'s `ContextProvider` which dispatches DOM events), cannot use a field initializer (like the `MouseController` above), but must instead use `connectedCallback()`.
 In the loader-bundle, `this` and the host element are different objects until `connectedCallback` runs: `this` has `addController` / `requestUpdate` / `updateComplete`, the element does not yet. 
 
 ```typescript
@@ -156,7 +156,7 @@ The `??=` guard matters: `connectedCallback` can run again if the element discon
 
 ### Reactive controller lifecycle hooks
 
-`ReactiveController` supports numerous `host` lifecycle hooks, all optional - mirroring the same load/render/update split [`componentWillLoad`, `componentWillRender`, and `componentWillUpdate`](../components/component-lifecycle.md) use on the component itself.
+`ReactiveController` supports numerous `host` lifecycle hooks, all optional - mirroring the same load/render/update split [`componentWillLoad`, `componentWillRender`, and `componentWillUpdate`](../../components/component-lifecycle.md) use on the component itself.
 
 import LifecycleMethodsChart from '@site/src/components/LifecycleMethodsChart';
 import TableAnchor from '@site/src/components/TableAnchor';

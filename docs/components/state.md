@@ -98,6 +98,8 @@ The example above also makes use of the
 that was created using `setInterval` in `connectedCallback()`. This isn't necessary for using `@State`, but is a general
 good practice when using `setInterval`.
 
+`@State()` belongs to one component instance. To share a value between components, see [Signals](../guides/patterns/signals.md).
+
 ## When to Use `@State()`?
 
 `@State()` should be used for all class members that should trigger a rerender when they change. However, not all

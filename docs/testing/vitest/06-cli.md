@@ -7,7 +7,7 @@ slug: /testing-vitest-cli
 
 # CLI
 
-The `stencil-test` CLI wraps both Stencil builds with Vitest testing, providing a seamless testing experience.
+The `stencil-test` CLI runs a Stencil build and then Vitest. Use it when your tests load your [built output](./02-configuration.md#testing-your-built-output). Tests that compile components from source with `@stencil/unplugin` need no build, and run with the `vitest` command directly.
 
 ## Setup
 

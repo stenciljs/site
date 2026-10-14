@@ -7,12 +7,14 @@ slug: /stencil-store
 
 # @stencil/store
 
-[Store](https://github.com/ionic-team/stencil-store) is a lightweight shared state library by the stencil core team. It implements a simple key/value map that efficiently re-renders components when necessary.
+[Store](https://github.com/stenciljs/store) is a lightweight shared state library by the stencil core team. It implements a simple key/value map that efficiently re-renders components when necessary.
 
 - Lightweight
 - Zero dependencies
 - Simple API, like a reactive Map
 - Best performance
+
+For a single shared value, or a value that code outside Stencil needs to follow, see [Signals](./signals.md#signals-or-stencilstore).
 
 ## Installation
 

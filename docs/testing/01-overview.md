@@ -13,7 +13,7 @@ In order to ensure that your Stencil components work in the way you expect, Sten
 
 Stencil supports the following for testing components:
 
-- [@stencil/vitest](./vitest/01-overview.md): First-class testing utilities for Stencil components powered by Vitest. Supports unit tests, spec tests with your choice of node DOM (jsdom, happy-dom, mock-doc), and browser tests with screenshot capabilities. **This is the recommended testing solution for most Stencil projects.**
+- [@stencil/vitest](./vitest/01-overview.md): First-class testing utilities for Stencil components powered by Vitest. Tests run in real browsers, with screenshot capabilities, or in Node with your choice of DOM (jsdom, happy-dom, mock-doc). **This is the recommended testing solution for most Stencil projects.**
 - [@stencil/playwright](./playwright/01-overview.md): An automated end-to-end testing framework that can run across all major browsers. Use this for full application testing, routing tests, and scenarios requiring proper browser initialization.
 
-Coming from Stencil v4's integrated test runner (`--spec`/`--e2e`, Jest and Puppeteer)? That runner is removed in v5 — see the [vitest migration guide](./vitest/07-migration.md).
+Coming from Stencil v4's integrated test runner (`--spec`/`--e2e`, Jest and Puppeteer)? That runner is removed in v5. See the [vitest migration guide](./vitest/07-migration.md), which also covers keeping your `newSpecPage()` tests.

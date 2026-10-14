@@ -146,9 +146,23 @@ export class APIComponent {
 
 *default: `false`*
 
-Stencil will generate [export maps](https://nodejs.org/api/packages.html#packages_exports) that correspond with various output target outputs. The root
-entry point uses smart defaults (see [Package.json Validation](../output-targets/01-overview.md#packagejson-validation)) —
-`loader-bundle` takes priority over `standalone` if both are configured — and entry points are also added for the lazy-loader (if using the `loader-bundle` output target) and for each component (if using `standalone`).
+Set to `true` to have production builds write an [`exports` map](https://nodejs.org/api/packages.html#package-entry-points) into your `package.json`, with an entry for each thing your library publishes:
+
+| Entry | Points at | Generated when |
+|---|---|---|
+| `.` | The `loader-bundle` entry, or `standalone`'s if there's no `loader-bundle` | either is configured |
+| `./loader` | The lazy loader | `loader-bundle` |
+| `./standalone` | The `standalone` output's index | `standalone` |
+| `./<tag>` | One entry per component, for example `./my-button` | `standalone` |
+| `./components` | The type definitions for every component | `types` |
+| `./ssr` | The server-side rendering module | `ssr` |
+| `./assets/*` | Component assets and global stylesheets | assets or `global-style` |
+
+```tsx
+generateExportMaps: true
+```
+
+Once a package has an `exports` map, consumers can only import the paths it lists, so `my-library/dist/...` imports stop resolving. Add any extra entries you need to `package.json` yourself. Stencil keeps entries it didn't generate, and removes the entry of a component that no longer exists.
 
 ## globalScript
 
@@ -368,6 +382,16 @@ Will generate the following comment:
  */
 ```
 
+## signalBacking
+
+*default: `false`*
+
+Stores each component's `@Prop()` and `@State()` values in [signals](../guides/patterns/signals.md#back-props-and-state-with-signals). Components need no changes. Other code can then subscribe to a component's props, and `@Effect()` methods track the component's own members.
+
+```tsx
+signalBacking: true
+```
+
 ## sourceMap
 
 *default: `'dev'`*
@@ -412,7 +436,7 @@ across the frames to efficiently render and reduce layout thrashing. By default,
 `async` is used. It's recommended to also try each setting to decide which works
 best for your use-case. In all cases, if your app has many CPU intensive tasks causing the
 main thread to periodically lock-up, it's always recommended to try
-[Web Workers](../guides/workers.md) for those tasks.
+[Web Workers](../guides/patterns/workers.md) for those tasks.
 
 * `congestionAsync`: DOM reads and writes are scheduled in the next frame to prevent layout
   thrashing. When the app is heavily tasked and the queue becomes congested it will then
@@ -424,14 +448,14 @@ main thread to periodically lock-up, it's always recommended to try
 * `async`: DOM read and writes are scheduled in the next frame to prevent layout thrashing.
   During intensive CPU tasks it will not reschedule rendering to happen in the next frame.
   `async` is ideal for most apps, and if the app has many intensive tasks causing the main
-  thread to lock-up, it's recommended to try [Web Workers](../guides/workers.md)
+  thread to lock-up, it's recommended to try [Web Workers](../guides/patterns/workers.md)
   rather than the congestion async queue.
 
 * `immediate`: Makes writeTask() and readTask() callbacks to be executed synchronously. Tasks
   are not scheduled to run in the next frame, but do note there is at least one microtask.
   The `immediate` setting is ideal for apps that do not provide long-running and smooth
   animations. Like the async setting, if the app has intensive tasks causing the main thread
-  to lock-up, it's recommended to try [Web Workers](../guides/workers.md).
+  to lock-up, it's recommended to try [Web Workers](../guides/patterns/workers.md).
 
 ```tsx
 taskQueue: 'async'

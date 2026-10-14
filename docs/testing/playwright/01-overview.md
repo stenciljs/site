@@ -3,12 +3,6 @@ title: Playwright Overview
 sidebar_label: Overview
 ---
 
-:::note
-The Stencil Playwright adapter is currently an experimental package. Breaking changes may be introduced at any time.
-
-The Stencil Playwright adapter is designed to only work with **version 4.13.0 and higher** of Stencil!
-:::
-
 [Playwright](https://playwright.dev/) is an automated end-to-end testing framework built to run on all modern browser engines and operating systems.
 Playwright leverages the DevTools protocol to provide reliable tests that run in actual browsers.
 
@@ -18,7 +12,15 @@ To add Playwright to an existing Stencil project, leverage the [Stencil Playwrig
 is a tool built by the Stencil team to help Stencil and Playwright work better together. The best part is you'll write your tests using the same APIs
 as defined and documented by Playwright. So, be sure to [check out their documentation](https://playwright.dev/docs/writing-tests) for help writing your first tests!
 
-To install the Stencil Playwright adapter in an existing Stencil project, follow these steps:
+The quickest way to set up is the wizard. Run it from your Stencil project:
+
+```bash
+stencil add @stencil/playwright
+```
+
+It installs the adapter and Playwright, creates `playwright.config.ts`, adds `ESNext.Disposable` to your `tsconfig.json`, and adds a `test:e2e` script to your `package.json`. Afterwards, install the Playwright browser binaries with `npx playwright install`.
+
+To set up by hand instead, follow these steps:
 
 1. Install the necessary dependencies:
 
@@ -70,41 +72,30 @@ To install the Stencil Playwright adapter in an existing Stencil project, follow
    to start due to the build error.
    :::
 
-1. Ensure the Stencil project has a [`www` output target](../../output-targets/main/www.md). Playwright relies on pre-compiled output running in a dev server
+1. Ensure the Stencil project has a [`www`](../../output-targets/main/www.md), [`loader-bundle`](../../output-targets/main/loader-bundle.md), or [`standalone`](../../output-targets/main/standalone.md) output target. Playwright relies on pre-compiled output running in a dev server
    to run tests against. When using the `createConfig()` helper, a configuration for the dev server will be automatically created based on
-   the Stencil project's `www` output target config and [dev server config](../../config/dev-server.md). If no `www` output target is specified,
-   tests will not be able to run.
+   the Stencil project's output target config and [dev server config](../../config/dev-server.md). If the project has more than one, the first of `www`, `loader-bundle`, and `standalone` is used.
 
-1. Add the `copy` option to the `www` output target config:
+1. If you use the `page.goto` pattern with HTML test pages, make sure the dev server can serve them:
 
-   ```ts title="stencil.config.ts"
-   {
-      type: 'www',
-      serviceWorker: null,
-      copy: [{ src: '**/*.html' }, { src: '**/*.css' }]
-   }
-   ```
+   - With a `www` output target, Stencil writes every HTML file under `src` to the `www` directory, keeping its path. If those pages load other
+     files, such as CSS, add a `copy` task for them:
 
-   This will clone all HTML and CSS files to the `www` output directory so they can be served by the dev server. If you put all testing related
-   files in specific directory(s), you can update the `copy` task glob patterns to only copy those files:
+     ```ts title="stencil.config.ts"
+     {
+        type: 'www',
+        copy: [{ src: '**/test/*.css' }]
+     }
+     ```
 
-   ```ts title="stencil.config.ts"
-   {
-      type: 'www',
-      serviceWorker: null,
-      copy: [{ src: '**/test/*.html' }, { src: '**/test/*.css' }]
-   }
-   ```
-
-   :::note
-   If the `copy` property is not set, you will not be able to use the `page.goto` testing pattern!
-   :::
+   - With only a `loader-bundle` output target, the dev server serves your project's root directory, and `page.goto` takes the path from there,
+     such as `/src/components/my-component/my-component.e2e.html`.
 
 1. Test away! Check out the [e2e testing page](./02-e2e-testing.md) for more help getting started writing tests.
 
 ## Migrating to Playwright
 
-Coming from Stencil v4's integrated test runner (`stencil test --e2e`, Puppeteer-based)? That runner is removed in v5 — Playwright is now the e2e testing tool. Add a Playwright CLI call to your project's `package.json` test script:
+Coming from Stencil v4's integrated test runner (`stencil test --e2e`, Puppeteer-based)? That runner is removed in v5, and Playwright is now the e2e testing tool. Add a Playwright CLI call to your project's `package.json` test script:
 
 ```json title="package.json"
 {

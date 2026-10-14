@@ -11,10 +11,12 @@ slug: /testing-vitest-writing-tests
 
 ## Rendering Components
 
-Use the `render` function to render a component for testing:
+Import the source file of each component the test uses, which registers it, then use the `render` function. The examples on the rest of this page leave the imports out:
 
 ```tsx
 import { render, h, describe, it, expect } from '@stencil/vitest';
+
+import './my-component';
 
 describe('my-component', () => {
   it('renders', async () => {

@@ -1,111 +1,162 @@
 ---
 title: Stencil CLI
 sidebar_label: CLI
-description: Stencil CLI
+description: The stencil command and its flags
 slug: /cli
 ---
 
 # Command Line Interface (CLI)
 
-Stencil's command line interface (CLI) is how developers can build their projects, run tests, and more.
-Stencil's CLI is included in the compiler, and can be invoked with the `stencil` command in a project where `@stencil/core` is installed.
+The `stencil` command builds your project, runs the dev server, scaffolds new projects and components, and more. It's available in any project with `@stencil/core` installed, through your package manager's scripts or `npx stencil`.
 
-## `stencil build`
+Flags can be written in dash-case or camelCase (`--max-workers` or `--maxWorkers`). Boolean flags can be turned off with a `no-` prefix (`--no-cache`).
 
-Builds a Stencil project. The flags below are the available options for the `build` command.
+These flags work with every command:
 
 | Flag | Description | Alias |
 |------|-------------|-------|
-| `--ci` | Run a build using recommended settings for a Continuous Integration (CI) environment. Defaults the number of workers to 4, allows for extra time if taking screenshots via the tests and modifies the console logs. | |
-| `--config` | Path to the `stencil.config.ts` file. This flag is not needed in most cases since Stencil will find the config. Additionally, a Stencil config is not required. | `-c` |
-| `--debug` | Adds additional runtime code to help debug, and sets the log level for more verbose output. | |
-| `--dev` | Runs a development build. | |
-| `--docs` | Generate all docs based on the component types, properties, methods, events, JSDocs, CSS Custom Properties, etc. | |
-| `--es5` | Creates an ES5 compatible build. By default ES5 builds are not created during development in order to improve build times. However, ES5 builds are always created during production builds. Use this flag to create ES5 builds during development. | |
-| `--log` | Write logs for the `stencil build` into `stencil-build.log`. The log file is written in the same location as the config. | |
-| `--prerender` | Prerender the application using the `www` output target after the build has completed. | |
-| `--prod` | Runs a production build which will optimize each file, improve bundling, remove unused code, minify, etc. A production build is the default, this flag is only used to override the `--dev` flag. | |
-| `--max-workers` | Max number of workers the compiler should use. Defaults to use the same number of CPUs the Operating System has available. | |
-| `--next` | Opt-in to test the "next" Stencil compiler features. | |
-| `--no-cache` | Disables using the cache. | |
-| `--no-open` | By default the `--serve` command will open a browser window. Using the `--no-open` command will not automatically open a browser window. | |
-| `--port` | Port for the [Integrated Dev Server](./dev-server.md). Defaults to `3333`. | `-p` |
-| `--serve` | Starts the [Integrated Dev Server](./dev-server.md). | |
-| `--stats` | Write stats about the project to `stencil-stats.json`. The stats file is written in the same location as the config. | |
-| `--verbose` | Logs additional information about each step of the build. | |
-| `--watch` | Watches files during development and triggers a rebuild when files are updated. | |
+| `--config` | Path to the config file. Only needed if it isn't a `stencil.config.ts` in the project root. | `-c` |
+| `--log-level` | How much is logged: `debug`, `info`, `warn`, or `error`. | |
+| `--debug` | Sets the log level to `debug`. | |
+| `--verbose` | The same as `--debug`. | |
+| `--ci` | For continuous integration environments: turns off colors and the new-version check, and uses at most 4 workers. | |
+| `--help` | Shows the help text. | `-h` |
+| `--version` | Prints the installed Stencil version. | `-v` |
 
-## `stencil docs`
+## `stencil build`
 
-Performs a one-time generation of documentation for your project.
-For more information on documentation generation, please see the [Documentation Generation section](../output-targets/documentation-generation/01-overview.md).
+Builds the project. A build is a production build unless `--dev` is passed.
 
-:::info
-This command runs with dev mode enabled, which does not run a full build. As a result, documentation that needs to be built first, like CSS styles, will not be generated. You will need to run `npx stencil build --docs` to generate documentation that requires building.
-:::
+| Flag | Description | Alias |
+|------|-------------|-------|
+| `--dev` | Runs a development build: faster, unminified, and skipping the outputs only needed for publishing. | |
+| `--watch` | Rebuilds when files change. | |
+| `--serve` | Starts the [dev server](./dev-server.md). Requires `--watch`. | |
+| `--port` | The dev server's port. | `-p` |
+| `--address` | The address the dev server listens on. | |
+| `--open` | Opens the dev server's URL in your browser. | |
+| `--ssr` | Server-renders each page the dev server serves. | |
+| `--prerender` | [Prerenders](../guides/applications/prerendering/01-overview.md) the `www` output after the build. | |
+| `--service-worker` | Generates the `www` output's service worker in a development build, which skips it otherwise. | |
+| `--stats` | Writes build stats to `stencil-stats.json`, or to a path you give it. | |
+| `--log` | Writes the build log to `stencil-build.log`. | |
+| `--no-cache` | Builds without the build cache. | |
+| `--max-workers` | The number of worker threads to use, up to 16. Defaults to 8. | |
+| `--profile` | Adds performance marks to the build, for profiling components in the browser's developer tools. | |
+
+The usual development command builds, watches, and serves:
+
+```bash
+stencil build --dev --watch --serve
+```
+
+Before building, Stencil checks your config for options from an older major version, and offers to run [`stencil migrate`](#stencil-migrate) if it finds any.
+
+## `stencil serve`
+
+Starts the [dev server](./dev-server.md) on its own, without building or watching. Use it to serve an existing build.
+
+| Flag | Description | Alias |
+|------|-------------|-------|
+| `--root` | The directory to serve. Defaults to the current directory. | |
+| `--port` | The port to listen on. | `-p` |
+| `--address` | The address to listen on. | |
+| `--open` | Opens the URL in your browser. | |
+
+```bash
+stencil serve --root www
+```
+
+## `stencil init`
+
+Starts the project wizard. In an empty directory it scaffolds a new project. In an existing Stencil project it offers integrations to add, the same as `stencil add`. See [Getting Started](../getting-started/01-getting-started.md).
+
+## `stencil add`
+
+Installs and sets up an integration in an existing project, such as a testing tool or a [framework output target](../framework-integration/01-overview.md). Run it with no arguments to pick from a list, or name a package:
+
+```bash
+stencil add @stencil/vitest
+```
+
+Any package can take part by shipping its own setup wizard.
+
+`stencil init` and `stencil add` are interactive, and don't run in CI environments.
 
 ## `stencil generate`
 
 Alias: `stencil g`
 
-Starts the interactive generator for a new Stencil component.
-The generator will ask you for a name for your component, and whether any stylesheets or testing files should be generated.
+Starts the interactive generator for a new component. It asks for the tag name, whether to create a regular or a [CSS-only](../components/css-only.md) component, the stylesheet format, and which extra files to create, such as a usage example or tests.
 
-If you wish to skip the interactive generator, a component tag name may be provided on the command line:
-```shell
-stencil generate my-new-component
+Pass the tag name to skip that question:
+
+```bash
+stencil generate my-button
 ```
 
-All components will be generated within the `src/components` folder.
-Within `src/components`, a directory will be created with the same name as the component tag name you provided containing the generated files.
-For example, if you specify `page-home` as the component tag name, the files will be generated in `src/components/page-home`:
-```plain
+The component is created in a directory named after its tag, inside `src/components`:
+
+```tree
 src
 └── components
-    └── page-home
-        ├── page-home.css
-        ├── page-home.e2e.ts
-        ├── page-home.spec.ts
-        └── page-home.tsx
+    └── my-button
+        ├── my-button.css
+        └── my-button.tsx
 ```
 
-It is also possible to specify one or more sub-folders to generate the component in.
-For example, if you specify `pages/page-home` as the component tag name, the files will be generated in `src/components/pages/page-home`:
-```shell
-stencil generate pages/page-home
+Add one or more folders to the name to nest it:
+
+```bash
+stencil generate forms/my-input
 ```
-The command above will result in the following directory structure:
-```plain
+
+```tree
 src
 └── components
-    └── pages
-        └── page-home
-            ├── page-home.css
-            ├── page-home.e2e.ts
-            ├── page-home.spec.ts
-            └── page-home.tsx
+    └── forms
+        └── my-input
+            ├── my-input.css
+            └── my-input.tsx
 ```
 
-## `stencil help`
+## `stencil docs`
 
-Aliases: `stencil --help`, `stencil -h`
+Generates every [documentation output target](../output-targets/documentation-generation/01-overview.md) in your config, without building anything else. A production `stencil build` generates them too. A development build skips them, unless an output target sets `skipInDev: false`.
 
-Prints various tasks that can be run and their associated flags to the terminal.
+| Flag | Description | Alias |
+|------|-------------|-------|
+| `--docs-json` | Also writes a [`docs-json`](../output-targets/documentation-generation/docs-json.md) file to the given path. | |
+| `--watch` | Regenerates the documentation when source files change. | |
 
-## `stencil test`
+The command exits with an error code if the build has errors, and warns if your config has no documentation output targets.
 
-Tests a Stencil project. The flags below are the available options for the `test` command.
+## `stencil prerender`
 
-| Flag | Description |
-|------|-------------|
-| `--spec` | Tests `.spec.ts` files using [Jest](https://jestjs.io/). |
-| `--e2e` | Tests `.e2e.ts` files using [Puppeteer](https://developers.google.com/web/tools/puppeteer) and [Jest](https://jestjs.io/). |
-| `--no-build` | Skips the build process before running end-to-end tests. When using this flag, it is assumed that your Stencil project has been built prior to running `stencil test`. Unit tests do not require this flag. |
-| `--devtools` | Opens the dev tools panel in Chrome for end-to-end tests. Setting this flag will disable `--headless` |
-| `--headless` | Sets the headless mode to use in Chrome for end-to-end tests. `--headless` and `--headless=true` will enable the "old" headless mode in Chrome, that was used by default prior to Chrome v112. `--headless=new` will enable the new headless mode introduced in Chrome v112. See [this article](https://developer.chrome.com/articles/new-headless/) for more information on Chrome's new headless mode. |
+Prerenders your `www` output with an [`ssr` module](../output-targets/main/ssr/01-overview.md) that's already built, without rebuilding the project:
+
+```bash
+stencil prerender dist/ssr/index.js
+```
+
+## `stencil migrate`
+
+Updates your project for the breaking changes in the latest major version, rewriting renamed and removed config options and APIs.
+
+| Flag | Description | Alias |
+|------|-------------|-------|
+| `--dry-run` | Shows what would change, without modifying any files. | |
+
+## `stencil info`
+
+Prints details about your environment: operating system, Node.js, and the versions of Stencil and the tools it's built on. Include this output when reporting a bug.
 
 ## `stencil version`
 
-Aliases: `stencil -v`, `stencil --version`
+Prints the installed Stencil version.
 
-Prints the version of Stencil to the terminal.
+## `stencil help`
+
+Alias: `-h`
+
+Lists the commands and their most common flags.

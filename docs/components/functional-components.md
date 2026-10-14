@@ -108,5 +108,5 @@ There are a few major differences between functional components and class compon
 When deciding whether to use functional components, one concept to keep in mind is that often the UI of your application can be a function of its state, i. e., given the same state, it always renders the same UI. If a component has to hold state, deal with events, etc, it should probably be a class component. If a component's purpose is to simply encapsulate some markup so it can be reused across your app, it can probably be a functional component (especially if you're using a component library and thus don't need to style it).
 
 :::caution
-Stencil does not support re-exporting a functional component from a "barrel file" and dynamically rendering it in another component. This is a [known limitation](https://github.com/ionic-team/stencil/issues/5246) within Stencil. Instead, either use class components and remove the import or import the functional component directly.
+Stencil does not support re-exporting a functional component from a "barrel file" and dynamically rendering it in another component. This is a [known limitation](https://github.com/stenciljs/core/issues/5246) within Stencil. Instead, either use class components and remove the import or import the functional component directly.
 :::

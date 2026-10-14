@@ -87,7 +87,7 @@ export class MyName {
 }
 ```
 
-For more check out the docs for [form-association in Stencil](../components/form-associated.md).
+For more check out the docs for [form-association in Stencil](../../components/form-associated.md).
 
 ## Advanced forms
 

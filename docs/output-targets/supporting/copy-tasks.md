@@ -16,10 +16,18 @@ operations which Stencil will automatically perform as part of the build. This
 could be useful if, for instance, you had some static assets like images which
 should be distributed alongside your components.
 
+For files that belong to a component, such as an icon it displays, use the component's [`assetsDirs`](../../guides/distribution/assets.md) instead. Stencil copies those for you, through the [`assets`](../asset-outputs/assets.md) output target.
+
 The `copy` attribute on these output targets expects an array of objects corresponding to the following `CopyTask` interface:
 
-```ts reference title="CopyTask"
-https://github.com/ionic-team/stencil/blob/6ed2d4e285544945949ad8e4802fe7f70e392636/src/declarations/stencil-public-compiler.ts#L1594-L1665
+```ts title="CopyTask"
+interface CopyTask {
+  src: string;
+  dest?: string;
+  ignore?: string[];
+  warn?: boolean;
+  keepDirStructure?: boolean;
+}
 ```
 
 ## Options
@@ -44,11 +52,11 @@ __Type:__ `string`
 
 #### `ignore`
 
-An optional array of glob patterns to exclude from the copy operation.
+An optional array of glob patterns to exclude from the copy operation. They're added to the patterns that Stencil always excludes:
+
+`['**/__mocks__/**', '**/__fixtures__/**', '**/dist/**', '**/.{idea,git,cache,output,temp}/**', '**/.ds_store', '**/.gitignore', '**/desktop.ini', '**/thumbs.db']`
 
 __Type:__ `string[]`
-
-__Default:__ `['**\/__mocks__/**', '**\/__fixtures__/**', '**\/dist/**', '**\/.{idea,git,cache,output,temp}/**', '.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db']`
 
 #### `warn`
 

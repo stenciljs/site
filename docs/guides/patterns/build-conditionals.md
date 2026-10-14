@@ -1,6 +1,7 @@
 ---
 title: Build Conditionals
 description: Build Conditionals
+slug: /guides/build-conditionals
 ---
 
 # Build Conditionals

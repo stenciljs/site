@@ -163,7 +163,7 @@ Schedules a new render of the given instance or element even if no state changed
 
 ### **getAssetPath()**: 
  
- Gets the path to local assets. Refer to the [Assets](../guides/assets.md#getassetpath) page for usage info.
+ Gets the path to local assets. Refer to the [Assets](../guides/distribution/assets.md#getassetpath) page for usage info.
 
   __Type:__ `(path: string) => string`<br />
   __Example:__
@@ -185,7 +185,7 @@ Schedules a new render of the given instance or element even if no state changed
 
 ### **setAssetPath()**: 
 
-Sets the path for Stencil to resolve local assets. Refer to the [Assets](../guides/assets.md#setassetpath) page for usage info.
+Sets the path for Stencil to resolve local assets. Refer to the [Assets](../guides/distribution/assets.md#setassetpath) page for usage info.
 
   __Type:__ `(path: string) => string`<br />
   __Example:__
@@ -305,8 +305,8 @@ If your Stencil component library uses `Mixin()` (or `extends`) and *might* be u
 The static-analysis that Stencil uses to find mixed-in classes does not work within 3rd party (node_module) barrel files.
 :::
 
-For detailed guidance on using `Mixin()` to compose behavior into a component, including when to write your own mixin factories versus reactive controllers, see the [Mixins & Reactive Controllers](../guides/mixins-and-controllers.md) guide.
+For detailed guidance on using `Mixin()` to compose behavior into a component, including when to write your own mixin factories versus reactive controllers, see the [Mixins & Reactive Controllers](../guides/patterns/mixins-and-controllers.md) guide.
 
-### [**setTagTransformer()** and **transformTag()**](../guides/tag-transformation.md): 
+### [**setTagTransformer()** and **transformTag()**](../guides/distribution/tag-transformation.md): 
 
-Manage tag name transformation at runtime. Refer to the [Tag Transformation](../guides/tag-transformation.md) page for usage info.
+Manage tag name transformation at runtime. Refer to the [Tag Transformation](../guides/distribution/tag-transformation.md) page for usage info.

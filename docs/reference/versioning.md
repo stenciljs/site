@@ -24,11 +24,8 @@ changing and why will be included with the release candidates.
 
 A minor release will be published when a new feature is added or API changes that are non-breaking are introduced.
 We will heavily test any changes so that we are confident with the release, but with new code comes the potential for
-new issues*. Minor releases are scheduled to occur at least **once a month**, although this cadence may vary according 
+new issues. Minor releases are scheduled to occur at least **once a month**, although this cadence may vary according 
 to team priorities.
-
-\* This statement applies to the Stencil team upgrading its version of TypeScript as well. For more information, please
-see the team's [support policy regarding TypeScript](./support-policy.md#typescript-support)
 
 ### Patch Release
 
@@ -39,5 +36,5 @@ to team priorities. There may be times where patch releases need to released mor
 ## Changelog
 
 To see a list of all notable changes to Stencil, please refer to the [releases
-page](https://github.com/ionic-team/stencil/releases). This contains an ordered
+page](https://github.com/stenciljs/core/releases). This contains an ordered
 list of all bug fixes and new features under each release.

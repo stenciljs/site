@@ -5,6 +5,9 @@ description: Getting Started
 slug: /getting-started
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Getting Started
 
 ## Starting a New Project
@@ -18,12 +21,39 @@ Make sure you've installed and/or updated Node before continuing.
 
 The `stencil init` wizard scaffolds a new Stencil project. Run it through your package manager's `create`/`init` convention:
 
-```bash npm2yarn
-npm create stencil@5
+<Tabs groupId="npm2yarn">
+<TabItem value="npm" label="npm">
+
+```bash
+npm init stencil@next
 ```
 
+</TabItem>
+<TabItem value="yarn" label="Yarn">
+
+```bash
+yarn create stencil@next
+```
+
+</TabItem>
+<TabItem value="pnpm" label="pnpm">
+
+```bash
+pnpm create stencil@next
+```
+
+</TabItem>
+<TabItem value="bun" label="Bun">
+
+```bash
+bun create stencil@next
+```
+
+</TabItem>
+</Tabs>
+
 :::note
-While v5 is in preview, keep the explicit `@5` (or `@next`/`@alpha`) version - plain `npm create stencil` still resolves to the current stable v4 line until v5 reaches general availability.
+While v5 is in preview, keep the `@next` tag. Without it, you get the Stencil v4 project generator.
 :::
 
 `stencil init` is context-aware: run in an empty directory, it scaffolds a new project. Run inside an existing Stencil project, it switches to "add capabilities" mode instead, letting you install and configure integrations (testing, styling, framework output targets) you didn't set up initially - the same picker [`stencil add`](#adding-capabilities-later) shows when you run it with no arguments.
@@ -187,7 +217,7 @@ Run without arguments, `stencil add` prompts you to pick from known integrations
 
 ## Next Steps
 
-You've built and rendered your first component. Getting it into another project means publishing it - see [Publishing to NPM](../guides/publishing.md) for packaging, publishing, and how consumers pull your components into their own projects.
+You've built and rendered your first component. Getting it into another project means publishing it - see [Publishing to NPM](../guides/distribution/publishing.md) for packaging, publishing, and how consumers pull your components into their own projects.
 
 If you also want consumers to get idiomatic React, Angular, or Vue components instead of raw custom elements, see [Framework Integration](../framework-integration/01-overview.md) for generating those wrapper packages on top of your published library.
 

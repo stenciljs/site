@@ -84,7 +84,7 @@ src/
     └── todo-list.tsx
 ```
 
-Below, the `todo-list` component will correctly load the `sunset.jpg` image from the `assets/` directory, using Stencil's [`getAssetPath()`](../guides/assets.md#getassetpath).
+Below, the `todo-list` component will correctly load the `sunset.jpg` image from the `assets/` directory, using Stencil's [`getAssetPath()`](../guides/distribution/assets.md#getassetpath).
 
 ```tsx
 import { Component, Prop, getAssetPath, h } from '@stencil/core';
@@ -110,9 +110,9 @@ export class TodoList {
 In the example above, the following allows `todo-list` to display the provided asset:
 1. The `TodoList`'s `@Component()` decorator has the `assetsDirs` property, and lists the file's sibling directory, `assets/`.
    This will copy the `assets` directory over to the distribution directory.
-2. Stencil's [`getAssetPath()`](../guides/assets.md#getassetpath) is used to retrieve the path to the image to be used in the `<img>` tag
+2. Stencil's [`getAssetPath()`](../guides/distribution/assets.md#getassetpath) is used to retrieve the path to the image to be used in the `<img>` tag
 
-For more information on configuring assets, please see Stencil's [Assets Guide](../guides/assets.md)
+For more information on configuring assets, please see Stencil's [Assets Guide](../guides/distribution/assets.md)
 
 
 ### encapsulation
@@ -354,4 +354,4 @@ The `my-parent-component` includes a reference to the `my-embedded-component` in
 
 ## Component Architecture Patterns
 
-Stencil supports advanced component architecture patterns including class inheritance and composition. Learn more about organizing component logic with controllers in the [Mixins & Reactive Controllers](../guides/mixins-and-controllers.md) guide.
+Stencil supports advanced component architecture patterns including class inheritance and composition. Learn more about organizing component logic with controllers in the [Mixins & Reactive Controllers](../guides/patterns/mixins-and-controllers.md) guide.

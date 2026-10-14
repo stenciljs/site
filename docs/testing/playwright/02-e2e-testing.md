@@ -49,8 +49,7 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: null,
-      copy: [{ src: '**/test/*.html' }, { src: '**/test/*.css' }],
+      copy: [{ src: '**/test/*.css' }],
     },
   ],
 };
@@ -63,8 +62,7 @@ export const config: Config = {
     <meta charset="utf8" />
 
     <!-- Replace with the path to your entrypoint -->
-    <script src="../../../build/test-app.esm.js" type="module"></script>
-    <script src="../../../build/test-app.js" nomodule></script>
+    <script src="/build/test-app.js" type="module"></script>
   </head>
   <body>
     <my-component first="Stencil"></my-component>
@@ -72,10 +70,11 @@ export const config: Config = {
 </html>
 ```
 
-In the above snippet, where it says "replace with the path to your entrypoint", the `src` attributes for the `script` tags should be the _relative_ path from the `www` output
-target's [output directory (`dir` option)](../../output-targets/main/www.md#config) to the namespaced entry file. The entry file will have the name
-`<namespace>.esm.js` for ESM output and `<namespace>.js` for CJS output. The "namespace" value is the kebab-case value of the `namespace` from your
-[Stencil config](../../config/01-overview.md#namespace).
+In the above snippet, where it says "replace with the path to your entrypoint", the `src` attribute of the `script` tag is the path to your components'
+entry file, `build/<namespace>.js`, from the root of the `www` output target's [output directory (`dir` option)](../../output-targets/main/www.md#config).
+The "namespace" value is the lowercase form of the `namespace` from your [Stencil config](../../config/01-overview.md#namespace).
+
+Stencil writes this HTML file to the same path under the `www` directory, so `page.goto()` loads it from there.
 
 ```ts title="my-component.e2e.ts"
 import { expect } from '@playwright/test';

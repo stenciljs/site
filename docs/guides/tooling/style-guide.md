@@ -10,11 +10,7 @@ slug: /style-guide
 This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing Stencil components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your team's own preference.
 
 :::note
-In order to enforce this (or your team's) style guide, we recommend leveraging a static analysis tool like [ESLint](https://eslint.org/). [@stencil-community/eslint-plugin](https://www.npmjs.com/package/@stencil-community/eslint-plugin) provides rules specifically for writing Stencil components.
-:::
-
-:::note
-This guide once recommended TSLint as a static analysis tool. TSLint has been deprecated by its maintaining organization in favor of ESLint and is no longer recommended by the Stencil team.
+In order to enforce this (or your team's) style guide, we recommend leveraging a static analysis tool like [ESLint](https://eslint.org/). [@stencil/eslint-plugin](https://www.npmjs.com/package/@stencil/eslint-plugin) provides rules specifically for writing Stencil components.
 :::
 
 ## File structure
@@ -23,7 +19,7 @@ This guide once recommended TSLint as a static analysis tool. TSLint has been de
 - One component per directory. Though it may make sense to group similar components into the same directory, we've found it's easier to document components when each one has its own directory.
 - Implementation (.tsx) and styles of a component should live in the same directory.
 
-Example from ionic-core:
+Example:
 
 ```bash
 ├── my-card
@@ -31,10 +27,7 @@ Example from ionic-core:
 │   ├── my-card.md.css
 │   ├── my-card.css
 │   ├── my-card.tsx
-│   └── test
-│       └── basic
-│           ├── e2e.js
-│           └── index.html
+│   └── my-card.test.tsx
 ├── my-card-content
 │   ├── my-card-content.ios.css
 │   ├── my-card-content.md.css
@@ -136,6 +129,8 @@ export class Something {
    * do not have the @Prop() decorator, they will not be exposed
    * publicly on the host element, but only used internally.
    */
+  isAnimating = false;
+  isRightSide = false;
   num: number;
   someText = 'default';
 
@@ -195,7 +190,7 @@ export class Something {
   disconnectedCallback() {}
   componentWillLoad() {}
   componentDidLoad() {}
-  componentShouldUpdate(newVal: any, oldVal: any, propName: string) {}
+  componentShouldUpdate(changes: ComponentShouldUpdateChanges<this>) {}
   componentWillUpdate() {}
   componentDidUpdate() {}
   componentWillRender() {}
@@ -208,7 +203,7 @@ export class Something {
    * starting a listener method with "on".
    * Always use two lines.
    */
-  @Listen('click', { enabled: false })
+  @Listen('click')
   onClick(ev: UIEvent) {
     console.log('hi!')
   }
@@ -236,7 +231,7 @@ export class Something {
    * Internal business logic. These methods cannot be
    * called from the host element.
    */
-  prepareAnimation(): Promise<void> {
+  async prepareAnimation(): Promise<void> {
     // ...
   }
 

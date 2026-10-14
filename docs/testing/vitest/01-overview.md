@@ -7,129 +7,112 @@ slug: /testing-vitest
 
 # Overview
 
-`@stencil/vitest` provides first-class testing utilities for Stencil components, powered by [Vitest](https://vitest.dev/).
+`@stencil/vitest` provides testing utilities for Stencil components, powered by [Vitest](https://vitest.dev/): a `render()` function, matchers for custom elements, and spies for events, methods, props, and lifecycle hooks.
 
-This package offers a comprehensive testing solution that supports:
-- **Unit tests** in a Node environment for testing pure functions and logic
-- **Spec tests** using a Node DOM of your choice (mock-doc, jsdom, or happy-dom)
-- **Browser tests** using real browsers via Playwright or WebdriverIO for true integration testing, accessibility tests, and visual regression testing
+Paired with `@stencil/unplugin`, which compiles your components as each test imports them, there's no Stencil build to run before your tests. The same test code runs in:
+
+- **A real browser**, through Vitest's browser mode. Components get real layout, styling, and events, so this is the recommended setup.
+- **Node**, with a simulated DOM (Stencil's mock-doc, jsdom, or happy-dom). Tests start faster and need no browser installed.
 
 ## Quick Start
+
+The quickest way to set up is the wizard. Run it from your Stencil project:
+
+```bash
+stencil add @stencil/vitest
+```
+
+It asks whether your tests should run in a browser or in Node, and how components should be loaded, then installs the dependencies, writes `vitest.config.ts`, and adds `test` scripts to your `package.json`. Choose **Plugin (source)** when it asks how to load components, for the setup described on this page. The [`stencil init` wizard](../../getting-started/01-getting-started.md) offers the same steps when you create a project.
+
+The rest of this section sets up browser tests by hand.
 
 ### 1. Install
 
 ```bash npm2yarn
-npm install --save-dev @stencil/vitest vitest
+npm install --save-dev @stencil/vitest @stencil/unplugin vitest @vitest/browser-playwright playwright
 ```
 
-For browser testing, also install a browser provider:
+Then download the browser the tests run in:
 
-```bash npm2yarn
-npm install --save-dev @vitest/browser-playwright
-# or
-npm install --save-dev @vitest/browser-webdriverio
+```bash
+npx playwright install chromium
 ```
 
 ### 2. Create `vitest.config.ts`
 
 ```typescript title="vitest.config.ts"
-import { defineVitestConfig } from '@stencil/vitest/config';
+import { stencilVite } from '@stencil/unplugin';
 import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
 
-export default defineVitestConfig({
-  stencilConfig: './stencil.config.ts',
+export default defineConfig({
+  plugins: [stencilVite()],
   test: {
-    projects: [
-      // Unit tests - node environment for functions / logic
-      {
-        test: {
-          name: 'unit',
-          include: ['src/**/*.unit.{ts,tsx}'],
-          environment: 'node',
-        },
-      },
-      // Spec tests - via a node DOM of your choice
-      {
-        test: {
-          name: 'spec',
-          include: ['src/**/*.spec.{ts,tsx}'],
-          environment: 'stencil',
-          setupFiles: ['./vitest-setup.ts'],
-        },
-      },
-      // Browser tests
-      {
-        test: {
-          name: 'browser',
-          include: ['src/**/*.test.{ts,tsx}'],
-          setupFiles: ['./vitest-setup.ts'],
-          browser: {
-            enabled: true,
-            provider: playwright(),
-            headless: true,
-            instances: [{ browser: 'chromium' }],
-          },
-        },
-      },
-    ],
+    include: ['src/**/*.test.{ts,tsx}'],
+    browser: {
+      enabled: true,
+      provider: playwright(),
+      headless: true,
+      instances: [{ browser: 'chromium' }],
+    },
   },
 });
 ```
 
-### 3. Load Your Components
+`stencilVite()` reads your `stencil.config.ts` and compiles each component when a test imports it.
 
-Create a setup file to load your Stencil components:
+### 3. Write Tests
 
-```typescript title="vitest-setup.ts"
-// Load Stencil components.
-// Adjust according to your build output of choice
-await import('./dist/test-components/test-components.esm.js');
+Import the component's source file, then render it. Importing the file registers the custom element, so also import any other components that yours renders:
 
-export {};
-
-// Note: you may need `buildDist: true` in your stencil.config
-// or `--prod` to use an output other than the browser lazy-loader
-```
-
-### 4. Write Tests
-
-```tsx title="src/components/my-button/my-button.spec.tsx"
+```tsx title="src/components/my-button/my-button.test.tsx"
 import { render, h, describe, it, expect } from '@stencil/vitest';
 
+import './my-button';
+
 describe('my-button', () => {
-  it('renders with text', async () => {
-    const { root, waitForChanges } = await render(<my-button label="Click me" />);
-    root.click();
-    await waitForChanges();
+  it('renders its label', async () => {
+    const { root } = await render(<my-button label="Save" />);
     await expect(root).toEqualHtml(`
       <my-button class="hydrated">
         <mock:shadow-root>
-          <button class="button button--secondary button--small" type="button">
-            <slot></slot>
-          </button>
+          <button>SAVE</button>
         </mock:shadow-root>
-        Small
       </my-button>
     `);
+  });
+
+  it('emits myPress when clicked', async () => {
+    const { root, spyOnEvent, waitForChanges } = await render(<my-button label="Save" />);
+    const spy = spyOnEvent('myPress');
+
+    root.shadowRoot?.querySelector('button')?.click();
+    await waitForChanges();
+
+    expect(spy).toHaveReceivedEventTimes(1);
   });
 });
 ```
 
-### 5. Run Tests
+### 4. Run Tests
 
-Add the following scripts to your `package.json`:
+Add scripts to your `package.json`:
 
 ```json title="package.json"
 {
   "scripts": {
-    "test": "stencil-test",
-    "test:watch": "stencil-test --watch",
-    "test:e2e": "stencil-test --project browser",
-    "test:spec": "stencil-test --project spec"
+    "test": "vitest run",
+    "test:watch": "vitest"
   }
 }
 ```
 
+## Next Steps
+
+- [Configuration](./02-configuration.md): run tests in Node, in several browsers, or against your built output.
+- [Writing Tests](./03-writing-tests.md) and the [API reference](./04-api.md).
+- [Mocking & Spying](./05-mocking.md).
+
 ## Migration from Stencil Test Runner
 
-If you're migrating from the Stencil Test Runner, see the [Migration Guide](./07-migration.md) for detailed instructions on updating your tests.
+If you're coming from the test runner built into Stencil v4, see the [Migration Guide](./07-migration.md). Existing `newSpecPage()` tests can keep running under Vitest.

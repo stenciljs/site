@@ -20,16 +20,14 @@ It's quite common for multiple versions of a component library to be loaded into
 
 In this scenario the second version of the library will fail to load and throw an error, crashing the application.
 
-[Scoped custom element registries](https://wicg.github.io/webcomponents/proposals/Scoped-Custom-Element-Registries.html) 
-are a proposed web standard that would allow multiple versions of the same 
-component library to be loaded into an application without conflicts. 
-However at the time of writing [vendor adoption is limited](https://caniuse.com/wf-scoped-custom-element-registries).
+Stencil gives applications two ways to avoid the clash:
 
-Until scoped custom element registries are more widely supported, Stencil provides runtime tag transformation utilities for use when authoring and consuming web components.
+- **Tag transformation** registers a library's components under different tag names, such as `<your-button>`. It works in every browser, and the application writes the new tag names in its markup.
+- **[Scoped custom element registries](#scoped-custom-element-registries)** keep the tag names, and define the components in a separate registry that applies to only part of the page. They rely on a newer browser feature.
 
 ## `setTagTransformer` and `transformTag`
 
-As of Stencil v4.39, Stencil makes available two utilities to help manage dynamic tag names:
+Stencil has two utilities to manage dynamic tag names:
 
 1) `setTagTransformer` allows application developers (your component library consumers) to assign a tag transformer function.
 2) `transformTag` is mainly used *within* your component libraries - transforming any static string tag names using the tag transformer function assigned via `setTagTransformer` (Alternatively, you can auto apply `transformTag` to all tag names via the [`compat.additionalTagTransformers` config option](#compatadditionaltagtransformers).)
@@ -37,35 +35,27 @@ As of Stencil v4.39, Stencil makes available two utilities to help manage dynami
 
 ### Using `setTagTransformer`
 
-Stencil exports `setTagTransformer` which you can optionally make available to application developers:
-
-1) Make `setTagTransformer` available by exporting it from your component library's main entry point (e.g. `src/index.ts`):
-
-```ts
-// Within your lib's `src/index.ts` expose `setTagTransformer`
-export { setTagTransformer } from '@stencil/core';
-```
-
-2) Application developers can then import and use `setTagTransformer` (*before component definition*)
+Your library's outputs export `setTagTransformer` for application developers to use. They must call it *before* the components are defined.
 
 #### Usage via the `loader-bundle` output
 
+`setTagTransformer` is exported from the loader:
+
 ```html
-<!-- Setup a tag transformer -->
 <script type="module">
-  import { setTagTransformer } from 'https://cdn.jsdelivr.net/npm/@component/library/dist/loader-bundle/index.js';
-    
+  import { defineCustomElements, setTagTransformer } from 'https://cdn.jsdelivr.net/npm/@component/library/dist/loader-bundle/loader/index.js';
+
+  // Setup a tag transformer
   setTagTransformer((tag) => {
     if (tag.startsWith('my-')) {
       return tag.replace('my-', 'your-');
     }
     return tag;
   });
-</script>
 
-<!-- Use the lazy loader as normal -->
- 
-<script type="module" src="https://cdn.jsdelivr.net/npm/@component/library/dist/loader-bundle/my-app.js"></script>
+  // Define components as normal
+  defineCustomElements();
+</script>
 
 <body>
   <your-button></your-button> 
@@ -75,9 +65,11 @@ export { setTagTransformer } from '@stencil/core';
 
 #### Usage via the `standalone` output
 
+`setTagTransformer` is exported from the output's index file:
+
 ```js
-import { setTagTransformer } from '@component/library';
-import { defineCustomElement } from '@component/library/my-component.js';
+import { setTagTransformer } from '@component/library/dist/standalone';
+import { defineCustomElement } from '@component/library/dist/standalone/my-button.js';
 
 // setup a tag transformer
 
@@ -95,9 +87,10 @@ defineCustomElement();
 
 #### Usage via `ssr` output (on a Node.js server)
 
+The [`ssr` module](../../output-targets/main/ssr/01-overview.md) exports its own `setTagTransformer`. Once it's set, `renderToString` renders the transformed tags it finds in the HTML:
+
 ```js
-import { renderToString } from '@component/library/v1/hydrate/index.mjs';
-import { setTagTransformer, renderToString as renderToStringV2 } from '@component/library/v2/hydrate/index.mjs';
+import { renderToString, setTagTransformer } from '@component/library/dist/ssr';
 
 // setup a tag transformer
 
@@ -108,25 +101,17 @@ setTagTransformer((tag) => {
   return tag;
 })
 
-/** 
- * // handle incoming / outgoing html e.g.
- * const incomingHtmlString = `
- * <html>
- *  </body>
- *    <my-button></my-button> <!-- from v1.0.0 -->
- *    <your-button></your-button> <!-- from v2.0.0 -->
- *  </body>
- * </html>
- * `;
- */
-return await renderToStringV2(
-  (await renderToString(incomingHtmlString)).html
-).html;
+const { html } = await renderToString(`
+  <html>
+    <body>
+      <your-button></your-button>
+    </body>
+  </html>
+`);
 ```
 
 ### Using `transformTag`
 
-If you make `setTagTransformer` available, 
 Stencil also exports `transformTag` which you can use within your component code; 
 transforming static tag names via any assigned tag transformer function.
 
@@ -160,7 +145,7 @@ export class MyComponent {
 #### Notes on CSS
 
 Unless using `compat.additionalTagTransformers`, 
-you need to be thoughtful when writing CSS selectors within a component library that exposes `setTagTransformer`. 
+you need to be thoughtful when writing CSS selectors within your component library. 
 
 For example, if `my-button` is transformed to `your-button` this won't work:
 
@@ -219,10 +204,6 @@ document.createElement(transformTag('my-element'));
 document.querySelectorAll('my-element');
 // becomes
 document.querySelectorAll(transformTag('my-element'));
-
-document.createElement('my-element');
-// becomes
-document.createElement(transformTag('my-element'));
 ```
 
 Incoming CSS like:
@@ -245,6 +226,39 @@ ${transformTag('my-element')}::before {}
 ${transformTag('my-element')}.active:hover {}
 ```
 
+## Scoped Custom Element Registries
+
+A [scoped custom element registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry) is a registry the application creates itself, separate from `window.customElements`. Components defined in it keep their tag names, and exist only in the parts of the page that use that registry, such as a shadow root. Two versions of a library can then each define `<my-button>` in a registry of their own.
+
+Scoped registries are a newer browser feature, so [check that the browsers you support have it](https://caniuse.com/wf-scoped-custom-element-registries).
+
+Pass a registry to `setRegistry`, which is exported from the same places as `setTagTransformer`, before the components are defined:
+
+```js
+import { defineCustomElements, setRegistry } from '@component/library/dist/loader-bundle/loader';
+
+const registry = new CustomElementRegistry();
+setRegistry(registry);
+await defineCustomElements();
+
+// Use the registry for part of the page
+const root = document.querySelector('#admin').attachShadow({
+  mode: 'open',
+  customElementRegistry: registry,
+});
+root.innerHTML = '<my-button></my-button>';
+```
+
+The library's components are now defined in `registry` only. A `<my-button>` elsewhere in the document isn't upgraded by this library, which leaves that name free for another version. Components that render other components from the library use the same registry.
+
+With the `standalone` output, import `setRegistry` from the output's index file, or pass the registry to each component's `defineCustomElement()`:
+
+```js
+import { defineCustomElement } from '@component/library/dist/standalone/my-button.js';
+
+defineCustomElement({ registry });
+```
+
 ## Framework integrations
 
 The tag transformation also works for the Stencil framework integrations but requires a bit of extra setup that is framework specific.
@@ -260,7 +274,7 @@ reactOutputTarget({
 }),
 ```
 
-Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your React lib. It generates a new file called `tag-transformer.ts`. This file depends on the `setTagTransformer` exported from the index file in your main web components package. So make sure you export that as described in the sections above. To export the tag-transformer to your consumers you need to add an export in the package.json of your React package.
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your React lib. It generates a new file called `tag-transformer.ts`. To export the tag-transformer to your consumers you need to add an export in the package.json of your React package.
 
 ```json
  "exports": {
@@ -346,7 +360,7 @@ vueOutputTarget({
 }),
 ```
 
-Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Vue lib. It generates a new file called `tag-transformer.ts`. This file depends on the `setTagTransformer` exported from the index file in your main web components package. So make sure you export that as described in the sections above. To export the tag-transformer to your consumers you need to add an export in the package.json of your Vue package.
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Vue lib. It generates a new file called `tag-transformer.ts`. To export the tag-transformer to your consumers you need to add an export in the package.json of your Vue package.
 
 ```json
  "exports": {
@@ -383,7 +397,7 @@ angularOutputTarget({
 }),
 ```
 
-Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Angular lib. It generates a new file called `tag-transformer.ts`. This file depends on the `setTagTransformer` exported from the index file in your main web components package. So make sure you export that as described in the sections above.
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Angular lib. It generates a new file called `tag-transformer.ts`.
 
 Because Angular has no hooks for template compilation (e.g. in an Angular template, `<my-button>`, cannot be intercepted and re-written at runtime to be `<my-button-v1>`) the output to produces a build-time script which consumers can use as a postinstall script for example. Make sure to make it available via:
 
