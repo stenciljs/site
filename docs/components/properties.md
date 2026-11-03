@@ -139,7 +139,7 @@ TSX that uses the component without the prop then fails to type-check, in your o
 
 ## Prop Validation
 
-To check a prop's value, use the [`@Watch()`](./reactive-data.md#the-watch-decorator-watch) decorator. A watch method runs when the prop changes. Add `immediate: true` to have it check the first value as well:
+To check a prop's value, use the [`@Watch()`](./reactive-data.md) decorator. A watch method runs when the prop changes. Add `immediate: true` to have it check the first value as well:
 
 ```tsx
 import { Component, Prop, Watch } from '@stencil/core';

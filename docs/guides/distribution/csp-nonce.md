@@ -10,9 +10,9 @@ A [Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/H
 
 Stencil adds some of your components' styles to the page in `<style>` elements. A policy whose `style-src` doesn't allow `'unsafe-inline'` blocks those elements, and the browser's console reports that an inline style violates the policy. This affects:
 
-- components that use [`scoped` encapsulation, or none](../../components/styling.md)
+- components that use [`scoped` encapsulation, or none](../../components/styling/01-overview.md)
 - the style the [lazy loader](../../output-targets/main/loader-bundle.md) adds to hide components until they've loaded
-- styles in [server-rendered](../../output-targets/main/ssr/01-overview.md) HTML
+- styles in [server-rendered](../../output-targets/main/ssr.md) HTML
 
 Shadow DOM components rendered in the browser aren't affected, because their styles are applied as [constructable stylesheets](https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/CSSStyleSheet).
 
@@ -69,7 +69,7 @@ If your library sets [`generateExportMaps`](../../config/01-overview.md#generate
 
 ## Server-Side Rendering
 
-Server-rendered HTML contains `<style>` elements for the components on the page, and these need the nonce as well. Include the meta tag in the document you pass to [`renderToString()`](../../output-targets/main/ssr/01-overview.md), and Stencil adds the nonce to them:
+Server-rendered HTML contains `<style>` elements for the components on the page, and these need the nonce as well. Include the meta tag in the document you pass to [`renderToString()`](../../output-targets/main/ssr.md), and Stencil adds the nonce to them:
 
 ```ts
 import { renderToString } from 'my-lib/dist/ssr';

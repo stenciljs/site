@@ -27,7 +27,7 @@ my-design-system/
 
 ### New Project
 
-Run the [`stencil init` wizard](../getting-started/01-getting-started.md), pick **React** under framework integrations, and accept the monorepo workspace prompt. It creates the structure above with both packages configured.
+Run the [`stencil init` wizard](../introduction/02-installation.md), pick **React** under framework integrations, and accept the monorepo workspace prompt. It creates the structure above with both packages configured.
 
 ### Existing Project
 
@@ -133,7 +133,56 @@ A custom event named `myPress` becomes an `onMyPress` prop. Write event names in
 
 ## Server-Side Rendering
 
-With `hydrateModule` set, the output target also generates server versions of the components for Next.js. See [SSR in Frameworks](../output-targets/main/ssr/frameworks.md#nextjs) for the full setup.
+For Next.js, the output target can generate server versions of your React wrappers, which render their Stencil component during Next.js's own server rendering. Next.js renders React Server Components one at a time, so there's no whole page of HTML to pass through `renderToString()`, the approach [other server frameworks](../output-targets/main/ssr.md#using-it-in-a-server-framework) use.
+
+Add the [`ssr`](../output-targets/main/ssr.md) output target and set `hydrateModule` and `clientModule` on the React output target:
+
+```ts title="stencil.config.ts"
+import { Config } from '@stencil/core';
+import { reactOutputTarget } from '@stencil/react-output-target';
+
+export const config: Config = {
+  outputTargets: [
+    { type: 'ssr' },
+    reactOutputTarget({
+      outDir: '../component-library-react/src',
+      // your library's ssr module
+      hydrateModule: 'component-library/ssr',
+      // the package the client-side wrappers are published as
+      clientModule: 'component-library-react',
+    }),
+  ],
+};
+```
+
+This generates `components.ts` for the client and `components.server.ts` for the server. Expose the server entry point from your React package:
+
+```json title="component-library-react/package.json"
+{
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./next": {
+      "types": "./dist/components.server.d.ts",
+      "import": "./dist/components.server.js"
+    }
+  }
+}
+```
+
+Then import components from that entry point in your Next.js app:
+
+```tsx title="app/page.tsx"
+import { MyComponent } from 'component-library-react/next';
+
+export default function Home() {
+  return <MyComponent first="Max" last="Mustermann" />;
+}
+```
+
+See the React output target's [`hydrateModule`](#hydratemodule) and [`excludeServerSideRenderingFor`](#excludeserversiderenderingfor) options for more control.
 
 ## API
 
@@ -175,7 +224,7 @@ The directory of the `standalone` output, relative to your Stencil project. Defa
 
 **Type: `string`**
 
-The import path of your library's [`ssr` module](../output-targets/main/ssr/01-overview.md): `my-library/dist/ssr`, or `my-library/ssr` if your library sets [`generateExportMaps`](../config/01-overview.md#generateexportmaps). Setting it enables server-side rendering, and requires [`clientModule`](#clientmodule) and the `ssr` output target.
+The import path of your library's [`ssr` module](../output-targets/main/ssr.md): `my-library/dist/ssr`, or `my-library/ssr` if your library sets [`generateExportMaps`](../config/01-overview.md#generateexportmaps). Setting it enables server-side rendering, and requires [`clientModule`](#clientmodule) and the `ssr` output target.
 
 ### clientModule
 
@@ -195,7 +244,7 @@ Tag names to render on the client only, when server-side rendering is enabled.
 
 **Default: `'declarative-shadow-dom'`**
 
-How shadow DOM components are rendered on the server. See [`serializeShadowRoot`](../output-targets/main/ssr/01-overview.md#serializeshadowroot).
+How shadow DOM components are rendered on the server. See [`serializeShadowRoot`](../output-targets/main/ssr.md#serializeshadowroot).
 
 ### transformTag
 
@@ -203,4 +252,4 @@ How shadow DOM components are rendered on the server. See [`serializeShadowRoot`
 
 **Default: `false`**
 
-Generates a `tag-transformer.ts` file alongside the components, so consumers can register them under different tag names. See [Tag Transformation](../guides/distribution/tag-transformation.md#react).
+Generates a `tag-transformer.ts` file alongside the components, so consumers can register them under different tag names. See [Tag Transformation](../guides/distribution/tag-name-clashes/tag-transformation.md#react).

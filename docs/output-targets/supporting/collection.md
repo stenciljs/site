@@ -78,7 +78,15 @@ A downstream Stencil project discovers your collection through your package's `c
 
 `component-starter`-scaffolded projects set this by default, so most libraries don't need to add it by hand.
 
-The consuming project then opts in, either by listing your package in its [`collections`](../../config/01-overview.md#collections) config, or with a side-effect import anywhere in its source:
+The consuming project then opts in, in one of two ways. It can list your package in its [`collections`](../../config/01-overview.md#collections) config:
+
+```ts title="stencil.config.ts"
+export const config: Config = {
+  collections: ['my-library'],
+};
+```
+
+Or it can import your package for its side effects, anywhere in its source:
 
 ```ts
 import 'my-library';

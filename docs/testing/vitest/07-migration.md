@@ -94,7 +94,7 @@ describe('my-component', () => {
 **After:**
 
 ```tsx
-import { render, h, describe, it, expect } from '@stencil/vitest';
+import { render, describe, it, expect } from '@stencil/vitest';
 
 import './my-component';
 
@@ -114,7 +114,7 @@ describe('my-component', () => {
 
 ### E2E Tests
 
-`newE2EPage()` and its Puppeteer browser are removed. The same `render()` tests run in a real browser when your Vitest config enables [browser mode](./02-configuration.md#browser-tests).
+`newE2EPage()` and its Puppeteer browser are removed. The same `render()` tests run in a real browser when your Vitest config enables [browser mode](./02-configuration.md#browser-tests). To test whole pages instead, in several browsers, see [Migrating E2E Tests to Playwright](../playwright/04-migration.md).
 
 **Before:**
 
@@ -146,7 +146,7 @@ describe('my-component e2e', () => {
 **After:**
 
 ```tsx
-import { render, h, describe, it, expect } from '@stencil/vitest';
+import { render, describe, it, expect } from '@stencil/vitest';
 
 import './my-component';
 

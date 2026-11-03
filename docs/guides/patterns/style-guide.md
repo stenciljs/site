@@ -10,7 +10,7 @@ slug: /style-guide
 This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing Stencil components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your team's own preference.
 
 :::note
-In order to enforce this (or your team's) style guide, we recommend leveraging a static analysis tool like [ESLint](https://eslint.org/). [@stencil/eslint-plugin](https://www.npmjs.com/package/@stencil/eslint-plugin) provides rules specifically for writing Stencil components.
+To enforce parts of this (or your team's) style guide automatically, see [Linting](../tooling/linting.md).
 :::
 
 ## File structure

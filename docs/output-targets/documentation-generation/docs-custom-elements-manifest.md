@@ -105,7 +105,7 @@ For instance, if you had a `my-button` component with a slot you might document
 it like so:
 
 ```tsx title="src/components/my-button/my-button.tsx"
-import { Component, h } from '@stencil/core';
+import { Component } from '@stencil/core';
 
 /**
  * @slot buttonContent - Slot for the content of the button
@@ -158,7 +158,7 @@ and JSDoc comments.
 For example:
 
 ```tsx title="src/components/my-element/my-element.tsx"
-import { Component, h, AttachInternals } from '@stencil/core';
+import { Component, AttachInternals } from '@stencil/core';
 /**
  * My Element component
  */

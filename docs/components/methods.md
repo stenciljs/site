@@ -9,10 +9,6 @@ slug: /methods
 
 The `@Method()` decorator is used to expose methods on the public API. Functions decorated with the `@Method()` decorator can be called directly from the element, i.e. they are intended to be callable from the outside!
 
-:::note
-Developers should try to rely on publicly exposed methods as little as possible, and instead default to using properties and events as much as possible. As an app scales, we've found it's easier to manage and pass data through @Prop rather than public methods.
-:::
-
 ```tsx
 import { Method } from '@stencil/core';
 

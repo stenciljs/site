@@ -7,7 +7,7 @@ slug: /faq
 
 # FAQ
 
-For what Stencil is and why it exists, see the [overview](../concepts/01-overview.md) and [Stencil's goals](../concepts/02-goals-and-objectives.md).
+For what Stencil is and why it exists, see the [overview](../introduction/01-overview.md) and [Stencil's goals](../concepts/02-goals-and-objectives.md).
 
 ## What Stencil Provides
 
@@ -40,6 +40,10 @@ None. Each build includes the small part of Stencil's runtime that its component
 ### Can data be passed to Web Components?
 
 Yes. As with any DOM element, you can set arrays, objects, strings, and numbers on a component's [properties](../components/properties.md). Attributes carry strings, which Stencil converts to the property's type.
+
+### How do slots work without shadow DOM?
+
+Stencil mimics them. In `scoped` and `none` components, Stencil's runtime moves slotted content into place and emulates the slot API, so you write `<slot>` the same way in every encapsulation mode. See [Slots Without Shadow DOM](../components/slots.md#slots-without-shadow-dom).
 
 ### What browsers can support Stencil components?
 

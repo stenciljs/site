@@ -7,7 +7,7 @@ slug: /applications
 
 # Using Stencil for an Application
 
-Stencil is built for component libraries, and it can also build a whole website or web app. The app's pages and its components live in one project, and Stencil builds them into a directory of static files that any web server can host.
+Stencil is built for component libraries, and it can also build a whole website or web app. The app's pages and its components live in one project, and Stencil builds them into a directory of static files that any web server can host. See [Rendering Strategies](../../concepts/rendering-strategies.md) for when its pages should render in the browser, on a server, or at build time.
 
 ## Set Up the `www` Output
 
@@ -22,7 +22,7 @@ export const config: Config = {
 };
 ```
 
-When you create a project with the [`stencil init` wizard](../../getting-started/01-getting-started.md), choose **WWW** as an output to get this setup.
+When you create a project with the [`stencil init` wizard](../../introduction/02-installation.md), choose **WWW** as an output to get this setup.
 
 The app's entry page is `src/index.html`. It loads your components with one script, named after your `namespace` in lowercase:
 
@@ -142,4 +142,4 @@ With either router, a URL that the router handles has no file behind it on the s
 - **[Prerendering](./prerendering/01-overview.md)** renders each page to HTML at build time, so that it displays before any JavaScript runs.
 - **[Service workers](./service-workers.md)** cache the app's files, for fast repeat visits and offline use.
 - **[Copy tasks](../../output-targets/supporting/copy-tasks.md)** copy static files, such as images, into `www`.
-- **[Build conditionals](../patterns/build-conditionals.md)** keep development-only code out of your production build.
+- **[Build conditionals](../../components/build-conditionals.md)** keep development-only code out of your production build.

@@ -87,7 +87,7 @@ src/
 Below, the `todo-list` component will correctly load the `sunset.jpg` image from the `assets/` directory, using Stencil's [`getAssetPath()`](../guides/distribution/assets.md#getassetpath).
 
 ```tsx
-import { Component, Prop, getAssetPath, h } from '@stencil/core';
+import { Component, Prop, getAssetPath } from '@stencil/core';
 
 @Component({
   tag: 'todo-list',
@@ -139,8 +139,8 @@ type Encapsulation =
 **Details:**<br/>
 `encapsulation` controls how a component's styles and DOM are isolated from the rest of the page. Stencil supports three encapsulation types:
 
-- `shadow`: uses the browser's native [Shadow DOM](./styling.md#shadow). Styles and internal markup are fully isolated from the rest of the page.
-- `scoped`: uses [scoped CSS](./styling.md#scoped). Stencil generates a unique class for your styles so they don't leak out, but the component's DOM stays in the light DOM and light-DOM styles can still leak in.
+- `shadow`: uses the browser's native [Shadow DOM](./styling/01-overview.md#shadow). Styles and internal markup are fully isolated from the rest of the page.
+- `scoped`: uses [scoped CSS](./styling/01-overview.md#scoped). Stencil generates a unique class for your styles so they don't leak out, but the component's DOM stays in the light DOM and light-DOM styles can still leak in.
 - `none` (default): no style encapsulation. The component's markup and styles behave like any other element on the page.
 
 See [Component Archetypes](../concepts/component-archetypes.md) for when to use each.
@@ -281,7 +281,7 @@ export class TodoList {
 }
 ```
 
-Read more on styling modes in the Components [Styling](./styling.md#style-modes) section.
+Read more on styling modes in the Components [Styling](./styling/style-modes.md) section.
 
 ### styles
 
@@ -316,7 +316,7 @@ Components can be composed easily by adding the HTML tag to the JSX code. Since 
 Here's an example of using a component within another component:
 
 ```tsx
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop } from '@stencil/core';
 
 @Component({
   tag: 'my-embedded-component'
@@ -333,7 +333,7 @@ export class MyEmbeddedComponent {
 ```
 
 ```tsx
-import { Component, h } from '@stencil/core';
+import { Component } from '@stencil/core';
 
 @Component({
   tag: 'my-parent-component'

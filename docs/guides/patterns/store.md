@@ -45,7 +45,7 @@ export default state;
 **component.tsx:**
 
 ```tsx
-import { Component, h } from '@stencil/core';
+import { Component } from '@stencil/core';
 import state from '../store';
 
 @Component({

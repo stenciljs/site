@@ -54,7 +54,7 @@ If your Stencil project is within a monorepo structure, you may want (or need) t
 
 :::
 
-This will create a configuration to open a Chrome debugger instance on port 3333 (the default port used by the Stencil dev server). To use this configuration, start a Stencil dev server (running `npm start` in a [Stencil component starter project](../../getting-started/01-getting-started.md)) and then run the configuration from the VS Code debugger tab. At this point, any breakpoints set in the component source code will pause browser execution when hit.
+This will create a configuration to open a Chrome debugger instance on port 3333 (the default port used by the Stencil dev server). To use this configuration, start a Stencil dev server (running `npm start` in a [Stencil component starter project](../../introduction/02-installation.md)) and then run the configuration from the VS Code debugger tab. At this point, any breakpoints set in the component source code will pause browser execution when hit.
 
 :::note
 If your Stencil project is [configured to use a different port](../../config/dev-server.md) for the dev server, you will need to update the `url` property in the debugger configuration with the correct port.
@@ -68,7 +68,7 @@ Since this step runs in a Node.js process instead of a browser, debugging can't 
 
 ### Overview
 
-The `stencil build --prerender` command will first build the [`ssr` script](../../output-targets/main/ssr/01-overview.md) for a NodeJS environment, then prerender the site using the build. For a production build this is probably ideal.
+The `stencil build --prerender` command will first build the [`ssr` script](../../output-targets/main/ssr.md) for a NodeJS environment, then prerender the site using the build. For a production build this is probably ideal.
 
 However, while debugging you may not need to keep rebuilding the `ssr` script, but you only need to debug through the prerendering process. Stencil creates a file in `dist/ssr` that is used to actually execute your components.
 

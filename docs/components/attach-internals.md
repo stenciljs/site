@@ -23,7 +23,7 @@ Note that `ElementInternals` on a [closed shadow root](./component.md#encapsulat
 You can use the `@AttachInternals` decorator to define [Custom States](https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet) for your component.
 
 ```tsx
-import { Component, h, AttachInternals } from '@stencil/core';
+import { Component, AttachInternals } from '@stencil/core';
 /**
  * My Element component
  */

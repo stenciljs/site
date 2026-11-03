@@ -1,29 +1,14 @@
 ---
-title: Tag Transformation 
+title: Tag Transformation
 sidebar_label: Tag Transformation
-description: Tag Transformation
+sidebar_position: 2
+description: Register components under different tag names to avoid clashes
 slug: /tag-transformation
 ---
 
 # Tag Transformation
 
-## Background
-
-Web components use a global registry to define and look-up custom elements (accessible via `window.customElements`). 
-If an application tries to define 2 custom elements with the same tag name (e.g. `customElements.define('my-component', MyComponent)` x2) 
-an error will be thrown and the application will fail.
-
-It's quite common for multiple versions of a component library to be loaded into an application. For example:
-
-- Application root loads version `v1.0.0` of `@component/library` which defines `<my-button>`
-- `/admin` loads version `v2.0.0` of `@component/library` which also defines `<my-button>` with breaking changes
-
-In this scenario the second version of the library will fail to load and throw an error, crashing the application.
-
-Stencil gives applications two ways to avoid the clash:
-
-- **Tag transformation** registers a library's components under different tag names, such as `<your-button>`. It works in every browser, and the application writes the new tag names in its markup.
-- **[Scoped custom element registries](#scoped-custom-element-registries)** keep the tag names, and define the components in a separate registry that applies to only part of the page. They rely on a newer browser feature.
+Tag transformation registers your components under different tag names, so a second copy of a library can't clash with the first. See [Avoiding Tag Name Clashes](./01-overview.md) for how it compares with scoped registries.
 
 ## `setTagTransformer` and `transformTag`
 
@@ -87,7 +72,7 @@ defineCustomElement();
 
 #### Usage via `ssr` output (on a Node.js server)
 
-The [`ssr` module](../../output-targets/main/ssr/01-overview.md) exports its own `setTagTransformer`. Once it's set, `renderToString` renders the transformed tags it finds in the HTML:
+The [`ssr` module](../../../output-targets/main/ssr.md) exports its own `setTagTransformer`. Once it's set, `renderToString` renders the transformed tags it finds in the HTML:
 
 ```js
 import { renderToString, setTagTransformer } from '@component/library/dist/ssr';
@@ -116,7 +101,7 @@ Stencil also exports `transformTag` which you can use within your component code
 transforming static tag names via any assigned tag transformer function.
 
 ```tsx
-import { h, Component, Element, transformTag } from '@stencil/core';
+import { Component, Element, transformTag } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
@@ -162,7 +147,7 @@ For example, if `my-button` is transformed to `your-button` this won't work:
 Instead, structure your components to use other selectors:
 
 ```tsx
-import { h, Component, Host } from '@stencil/core';
+import { Component, Host } from '@stencil/core';
 
 @Component({
   tag: 'my-button',
@@ -224,39 +209,6 @@ Is transformed for use at runtime to:
 ${transformTag('my-element')}::before {}
 
 ${transformTag('my-element')}.active:hover {}
-```
-
-## Scoped Custom Element Registries
-
-A [scoped custom element registry](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry) is a registry the application creates itself, separate from `window.customElements`. Components defined in it keep their tag names, and exist only in the parts of the page that use that registry, such as a shadow root. Two versions of a library can then each define `<my-button>` in a registry of their own.
-
-Scoped registries are a newer browser feature, so [check that the browsers you support have it](https://caniuse.com/wf-scoped-custom-element-registries).
-
-Pass a registry to `setRegistry`, which is exported from the same places as `setTagTransformer`, before the components are defined:
-
-```js
-import { defineCustomElements, setRegistry } from '@component/library/dist/loader-bundle/loader';
-
-const registry = new CustomElementRegistry();
-setRegistry(registry);
-await defineCustomElements();
-
-// Use the registry for part of the page
-const root = document.querySelector('#admin').attachShadow({
-  mode: 'open',
-  customElementRegistry: registry,
-});
-root.innerHTML = '<my-button></my-button>';
-```
-
-The library's components are now defined in `registry` only. A `<my-button>` elsewhere in the document isn't upgraded by this library, which leaves that name free for another version. Components that render other components from the library use the same registry.
-
-With the `standalone` output, import `setRegistry` from the output's index file, or pass the registry to each component's `defineCustomElement()`:
-
-```js
-import { defineCustomElement } from '@component/library/dist/standalone/my-button.js';
-
-defineCustomElement({ registry });
 ```
 
 ## Framework integrations

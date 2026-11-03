@@ -120,7 +120,7 @@ Then you'd get the following in the JSON output:
 ]
 ```
 
-If the style sheet is configured to be used with [a specific mode](../../components/styling.md), the mode associated with
+If the style sheet is configured to be used with [a specific mode](../../components/styling/01-overview.md), the mode associated with
 the CSS property will be provided as well:
 
 ```diff title="Example docs-json Output with Mode"
@@ -165,7 +165,7 @@ For instance, if you had a `my-button` component with a slot you might document
 it like so:
 
 ```tsx title="src/components/my-button/my-button.tsx"
-import { Component, h } from '@stencil/core';
+import { Component } from '@stencil/core';
 
 /**
  * @slot buttonContent - Slot for the content of the button
@@ -218,7 +218,7 @@ and JSDoc comments.
 For example:
 
 ```tsx title="src/components/my-element/my-element.tsx"
-import { Component, h, AttachInternals } from '@stencil/core';
+import { Component, AttachInternals } from '@stencil/core';
 /**
  * My Element component
  */
@@ -305,7 +305,7 @@ This can be useful if your team has your own documentation conventions which you
 If, for example, we had a component with custom JSDoc tags like this:
 
 ```tsx
-import { Component, h } from '@stencil/core';
+import { Component } from '@stencil/core';
 
 /**
  * @customDescription This is just the best button around!

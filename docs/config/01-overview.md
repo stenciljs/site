@@ -7,7 +7,7 @@ slug: /config
 
 # Stencil Config
 
-In most cases, the `stencil.config.ts` file does not require any customization since Stencil comes with great default values out-of-the-box. In general, it's preferred to keep the config as minimal as possible. In fact, you could even delete the `stencil.config.ts` file entirely and an app would compile just fine. But at the same time, the compiler can be configured at the lowest levels using this config. Below are the many *optional* config properties.
+Most projects need little or no configuration. Stencil's defaults cover the common case: a project with no `stencil.config.ts` at all builds as a component library, with the [`loader-bundle`](../output-targets/main/loader-bundle.md) output. Keep the config as small as you can. Every property below is optional.
 
 Example `stencil.config.ts`:
 
@@ -129,7 +129,7 @@ export const config: Config = {
 Now when you build your components with this environment variable set, you can import it in your component as follows:
 
 ```ts
-import { Component, h, Env, Host } from '@stencil/core';
+import { Component, Env, Host } from '@stencil/core';
 
 @Component({
   tag: 'api-component',
@@ -166,7 +166,7 @@ Once a package has an `exports` map, consumers can only import the paths it list
 
 ## globalScript
 
-The global script config option takes a file path as a string.
+The global script config option takes a file path as a string. If it isn't set, Stencil uses `src/global.ts` or `src/global.js` when one exists.
 
 The global script runs once before your library/app loads, so you can do things like setting up a connection to an external service or configuring a library you are using.
 
@@ -206,7 +206,7 @@ export default function() {
 
 *default: `undefined`*
 
-A top-level path to a global stylesheet, predating the [`global-style` output target](../output-targets/asset-outputs/global-style.md). Setting `globalStyle` auto-generates a `global-style` output target for you, so it still works, but new projects should [configure `global-style` directly](../components/styling.md#global-styles) instead - it supports more than one global stylesheet, a custom output filename, and control over shadow-root injection, none of which `globalStyle` alone gives you.
+A top-level path to a global stylesheet, predating the [`global-style` output target](../output-targets/asset-outputs/global-style.md). Setting `globalStyle` auto-generates a `global-style` output target for you, so it still works, but new projects should [configure `global-style` directly](../components/styling/global-styles.md) instead - it supports more than one global stylesheet, a custom output filename, and control over shadow-root injection, none of which `globalStyle` alone gives you.
 
 ```tsx
 globalStyle: 'src/global/app.css'

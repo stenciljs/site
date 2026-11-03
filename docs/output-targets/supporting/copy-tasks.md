@@ -40,6 +40,8 @@ The source file path for a copy operation. This may be an absolute or relative p
 
 If the path is a relative path it will be treated as relative to `Config.srcDir`.
 
+A `src` outside `srcDir`, such as `../node_modules/my-lib/dist`, needs a `dest` (and no `keepDirStructure`), or the build fails: the copy would otherwise be written outside the output directory.
+
 __Type:__ `string`
 
 #### `dest`
@@ -55,6 +57,8 @@ __Type:__ `string`
 An optional array of glob patterns to exclude from the copy operation. They're added to the patterns that Stencil always excludes:
 
 `['**/__mocks__/**', '**/__fixtures__/**', '**/dist/**', '**/.{idea,git,cache,output,temp}/**', '**/.ds_store', '**/.gitignore', '**/desktop.ini', '**/thumbs.db']`
+
+When `src` is a directory, the patterns are matched against paths inside it. A file or directory named directly as `src` is always copied, so to copy something these patterns exclude, give it its own task, e.g. `{ src: 'assets/vendor/dist', dest: 'assets/vendor/dist' }`.
 
 __Type:__ `string[]`
 

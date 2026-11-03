@@ -9,7 +9,7 @@ slug: /vue
 
 **Supports: Vue 3 • Stencil v5**
 
-`@stencil/vue-output-target` generates a Vue component for each of your Stencil components. Consumers of your library get real Vue components: typed props, typed events, `v-model` on your form controls, and optional server-side rendering in Nuxt.
+`@stencil/vue-output-target` generates a Vue component for each of your Stencil components. Consumers of your library get real Vue components: typed props, typed events, and `v-model` on your form controls.
 
 Vue 3 can also render custom elements without wrappers. If typed props and events are all your consumers need, [Framework Types](./framework-types.md) is a lighter option.
 
@@ -27,7 +27,7 @@ my-design-system/
 
 ### New Project
 
-Run the [`stencil init` wizard](../getting-started/01-getting-started.md), pick **Vue** under framework integrations, and accept the monorepo workspace prompt. It creates the structure above with both packages configured.
+Run the [`stencil init` wizard](../introduction/02-installation.md), pick **Vue** under framework integrations, and accept the monorepo workspace prompt. It creates the structure above with both packages configured.
 
 ### Existing Project
 
@@ -146,7 +146,7 @@ export * from './plugin.js';
 
 If your library sets [`generateExportMaps`](../config/01-overview.md#generateexportmaps), import the loader from `my-library/loader` instead.
 
-The plugin is your code, and Stencil never regenerates it. It's the place for any setup your library needs before its components are defined, such as [`setNonce()`](../guides/distribution/csp-nonce.md) or [`setTagTransformer()`](../guides/distribution/tag-transformation.md), which the loader also exports.
+The plugin is your code, and Stencil never regenerates it. It's the place for any setup your library needs before its components are defined, such as [`setNonce()`](../guides/distribution/csp-nonce.md) or [`setTagTransformer()`](../guides/distribution/tag-name-clashes/tag-transformation.md), which the loader also exports.
 
 ## Building
 
@@ -218,10 +218,6 @@ vueOutputTarget({
 
 When the event fires, the new value is read from the element's `value` property (the `targetAttr`). To read it from the event instead, set `eventAttr` to its path on the event, for example `eventAttr: 'detail.value'`.
 
-## Server-Side Rendering
-
-With `hydrateModule` set, the generated components render on the server in Nuxt. See [SSR in Frameworks](../output-targets/main/ssr/frameworks.md#nuxt).
-
 ## API
 
 ### proxiesFile
@@ -290,16 +286,10 @@ Write each component to its own file, with `proxiesFile` re-exporting them all. 
 
 Tag names to leave out of the Vue library.
 
-### hydrateModule
-
-**Type: `string`**
-
-The import path of your library's [`ssr` module](../output-targets/main/ssr/01-overview.md): `my-library/dist/ssr`, or `my-library/ssr` if your library sets [`generateExportMaps`](../config/01-overview.md#generateexportmaps). Setting it enables server-side rendering.
-
 ### transformTag
 
 **Type: `boolean`**
 
 **Default: `false`**
 
-Generates a `tag-transformer.ts` file alongside the components, so consumers can register them under different tag names. See [Tag Transformation](../guides/distribution/tag-transformation.md#vue).
+Generates a `tag-transformer.ts` file alongside the components, so consumers can register them under different tag names. See [Tag Transformation](../guides/distribution/tag-name-clashes/tag-transformation.md#vue).

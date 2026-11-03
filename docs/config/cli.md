@@ -69,7 +69,7 @@ stencil serve --root www
 
 ## `stencil init`
 
-Starts the project wizard. In an empty directory it scaffolds a new project. In an existing Stencil project it offers integrations to add, the same as `stencil add`. See [Getting Started](../getting-started/01-getting-started.md).
+Starts the project wizard. In an empty directory it scaffolds a new project. In an existing Stencil project it offers integrations to add, the same as `stencil add`. See [Getting Started](../introduction/02-installation.md).
 
 ## `stencil add`
 
@@ -133,7 +133,7 @@ The command exits with an error code if the build has errors, and warns if your 
 
 ## `stencil prerender`
 
-Prerenders your `www` output with an [`ssr` module](../output-targets/main/ssr/01-overview.md) that's already built, without rebuilding the project:
+Prerenders your `www` output with an [`ssr` module](../output-targets/main/ssr.md) that's already built, without rebuilding the project:
 
 ```bash
 stencil prerender dist/ssr/index.js

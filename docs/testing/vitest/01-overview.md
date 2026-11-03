@@ -22,7 +22,7 @@ The quickest way to set up is the wizard. Run it from your Stencil project:
 stencil add @stencil/vitest
 ```
 
-It asks whether your tests should run in a browser or in Node, and how components should be loaded, then installs the dependencies, writes `vitest.config.ts`, and adds `test` scripts to your `package.json`. Choose **Plugin (source)** when it asks how to load components, for the setup described on this page. The [`stencil init` wizard](../../getting-started/01-getting-started.md) offers the same steps when you create a project.
+It asks whether your tests should run in a browser or in Node, and how components should be loaded, then installs the dependencies, writes `vitest.config.ts`, and adds `test` scripts to your `package.json`. Choose **Plugin (source)** when it asks how to load components, for the setup described on this page. The [`stencil init` wizard](../../introduction/02-installation.md) offers the same steps when you create a project.
 
 The rest of this section sets up browser tests by hand.
 
@@ -66,7 +66,7 @@ export default defineConfig({
 Import the component's source file, then render it. Importing the file registers the custom element, so also import any other components that yours renders:
 
 ```tsx title="src/components/my-button/my-button.test.tsx"
-import { render, h, describe, it, expect } from '@stencil/vitest';
+import { render, describe, it, expect } from '@stencil/vitest';
 
 import './my-button';
 

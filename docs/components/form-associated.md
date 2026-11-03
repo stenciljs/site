@@ -1,283 +1,143 @@
 ---
 title: Form-Associated Components
 sidebar_label: Form-Associated Components
-description: Form-Associated Stencil Components
+description: Build components that take part in HTML forms like native controls
 slug: /form-associated
 ---
 
-# Building Form-Associated Components in Stencil
+# Form-Associated Components
 
-As of v4.5.0, Stencil has support for form-associated custom elements. This
-allows Stencil components to participate in a rich way in HTML forms,
-integrating with native browser features for validation and accessibility while
-maintaining encapsulation and control over their styling and presentation.
+A form-associated component takes part in an HTML `<form>` like a native control: its value is submitted with the form, it can be required or invalid, and it responds when the form is reset or disabled.
 
-## Creating a Form-Associated Component
+To make a component form-associated, add the [`@AttachInternals()`](./attach-internals.md) decorator. It gives the component an [`ElementInternals`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals) object, which is how it talks to its form.
 
-A form-associated Stencil component is one that uses the [`@AttachInternals()` decorator](./attach-internals.md), like so:
-
-```tsx
-import { Component, AttachInternals } from '@stencil/core';
-
-@Component({
-  tag: 'my-face',
-})
-export class MyFACE {
-  @AttachInternals() internals: ElementInternals;
-}
-```
-
-Decorating a property with `@AttachInternals()` automatically marks the element as form-associated via the
-[`formAssociated`](https://html.spec.whatwg.org/#custom-elements-face-example)
-static property — there's no separate `@Component()` option to set. (To attach `ElementInternals` for something like [Custom States](./attach-internals.md#custom-states) *without* form association, use `@AttachInternals({ formAssociated: false })`.) By itself, though, this is not terribly useful.
-
-In order to meaningfully interact with a `<form>` element that is an ancestor
-of our custom element we'll need to get access to an
-[`ElementInternals`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals)
-object corresponding to our element instance. Stencil provides a decorator,
-`@AttachInternals`, which does just this, allowing you to decorate a property on
-your component and bind an `ElementInternals` object to that property which you
-can then use to interact with the surrounding form.
-
-:::info
-Under the hood the `AttachInternals` decorator makes use of the very similarly
-named
-[`attachInternals`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals)
-method on `HTMLElement` to associate your Stencil component with an ancestor
-`<form>` element. During compilation, Stencil will generate code that calls
-this method at an appropriate point in the component lifecycle for both
-[loader-bundle](../output-targets/main/loader-bundle.md) and [standalone](../output-targets/main/standalone.md) builds.
+:::note
+You usually need this only for components with [shadow DOM](./styling/01-overview.md#choosing-an-encapsulation-strategy). A `scoped` or `none` component renders its `<input>` into the light DOM, where it's already part of the surrounding form: pass the component's `name` on to it, and the form submits, validates, and disables it with no extra code. Make one of these components form-associated only when the host element itself should act as the control, for example to match `:invalid` or be the target of a `<label>`. In that case, leave `name` off the inner `<input>`, or its value is submitted twice.
 :::
 
-A Stencil component using this API to implement a custom text input could look
-like this:
+## Example
 
-```tsx title="src/components/custom-text-input.tsx"
-import { Component, h, AttachInternals, State } from '@stencil/core';
+This text input submits its value, and reports itself as invalid when it's `required` and empty:
+
+```tsx title="src/components/my-input/my-input.tsx"
+import { AttachInternals, Component, Prop, State } from '@stencil/core';
 
 @Component({
-  tag: 'custom-text-input',
+  tag: 'my-input',
   encapsulation: { type: 'shadow' },
 })
-export class CustomTextInput {
-  @State() value: string;
-
+export class MyInput {
   @AttachInternals() internals: ElementInternals;
 
-  handleChange(event) {
-    this.value = event.target.value;
-    this.internals.setFormValue(event.target.value);
+  /** Whether the field must have a value. */
+  @Prop() required = false;
+
+  @State() value = '';
+
+  private input?: HTMLInputElement;
+
+  componentDidLoad() {
+    this.setValue('');
   }
 
-  componentWillLoad() {
-    this.internals.setFormValue("a default value");
+  private setValue(value: string) {
+    this.value = value;
+    this.internals.setFormValue(value);
+
+    if (this.required && !value) {
+      this.internals.setValidity({ valueMissing: true }, 'Please fill in this field.', this.input);
+    } else {
+      this.internals.setValidity({});
+    }
   }
 
   render() {
     return (
       <input
-        type="text"
+        ref={(el) => (this.input = el)}
         value={this.value}
-        onInput={(event) => this.handleChange(event)}
+        onInput={(ev) => this.setValue((ev.target as HTMLInputElement).value)}
       />
-    )
+    );
   }
 }
 ```
 
-If this component is rendered within a `<form>` element like so:
-
+Use it in a form like any other input:
 
 ```html
 <form>
-  <custom-text-input name="my-custom-input"></custom-text-input>
+  <my-input name="email" required></my-input>
+  <button>Submit</button>
 </form>
 ```
 
-then it will automatically be linked up to the surrounding form. The
-`ElementInternals` object found at `this.internals` will have a bunch of
-methods on it for interacting with that form and getting key information out of
-it.
+- [`setFormValue()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setFormValue) sets the value the form submits, under the element's `name` (`email` here).
+- [`setValidity()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setValidity) marks the element valid or invalid. While it's invalid, the element matches `:invalid` in CSS and the form won't submit. On a submit attempt, the browser shows the message at the inner `<input>`, which is passed as the last argument.
 
-In our `<custom-text-input>` example above we use the
-[`setFormValue`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setFormValue)
-method to set a value in the surrounding form. This will read the `name`
-attribute off of the element and use it when setting the value, so the value
-typed by a user into the `input` will added to the form under the
-`"my-custom-input"` name.
-
-This example just scratches the surface, and a great deal more is possible with
-the `ElementInternals` API, including [setting the element's
-validity](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setValidity),
-reading the validity state of the form, reading other form values, and more.
+`ElementInternals` has more to offer, such as reading the element's `form`, `labels`, and `validity`. See the [MDN reference](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals) for the full API.
 
 ## Lifecycle Callbacks
 
-Stencil allows developers building form-associated custom elements to define a
-[standard series of lifecycle
-callbacks](https://html.spec.whatwg.org/multipage/custom-elements.html#custom-element-reactions)
-which enable their components to react dynamically to events in their
-lifecycle. These could allow fetching data when a form loads, changing styles
-when a form's `disabled` state is toggled, resetting form data cleanly, and more.
+The browser calls these methods on a form-associated component when something happens to it or its form. Define any of them on the component class:
 
-### `formAssociatedCallback`
+| Callback | Called when |
+|---|---|
+| `formAssociatedCallback(form)` | The element is added to a form, or removed from one (`form` is then `null`). |
+| `formDisabledCallback(disabled)` | The element is disabled or enabled, directly or by a disabled `<fieldset>` around it. |
+| `formResetCallback()` | The form is reset. |
+| `formStateRestoreCallback(state, mode)` | The browser restores or autofills the element's value. See [below](#restoring-state). |
 
-This callback is called when the browser both associates the element with and
-disassociates the element from a form element. The function is called with the
-form element as an argument. This could be used to set an `ariaLabel` when the
-form is ready to use, like so:
+Adding two of them to the example lets it disable its inner `<input>` along with itself, and clear its value on reset:
 
-```tsx title='src/components/form-associated-cb.tsx'
-import { Component, h, AttachInternals } from '@stencil/core';
+```tsx title="src/components/my-input/my-input.tsx"
+@State() disabled = false;
 
-@Component({
-  tag: 'form-associated',
-})
-export class FormAssociatedCmp {
-  @AttachInternals()
-  internals: ElementInternals;
+formDisabledCallback(disabled: boolean) {
+  this.disabled = disabled;
+}
 
-  formAssociatedCallback(form) {
-    form.ariaLabel = 'formAssociated called';
-  }
+formResetCallback() {
+  this.setValue('');
+}
 
-  render() {
-    return <input type="text" />;
-  }
+render() {
+  return (
+    <input
+      ref={(el) => (this.input = el)}
+      value={this.value}
+      disabled={this.disabled}
+      onInput={(ev) => this.setValue((ev.target as HTMLInputElement).value)}
+    />
+  );
 }
 ```
 
-### `formDisabledCallback`
+A disabled element's value isn't submitted, and the element matches `:disabled` in CSS.
 
-This is called whenever the `disabled` state on the element _changes_. This
-could be used to keep a CSS class in sync with the disabled state, like so:
+### Restoring State
 
-```tsx title='src/components/form-disabled-cb.tsx'
-import { Component, h, State, AttachInternals } from '@stencil/core';
+The browser calls `formStateRestoreCallback()` when it fills in the element itself: when restoring a page after navigation, or when autofilling a form. Its `mode` argument is `"restore"` or `"autocomplete"`.
 
-@Component({
-  tag: 'form-disabled-cb',
-})
-export class MyComponent {
-  @AttachInternals() internals: ElementInternals;
-  @State() cssClass: string = "";
+The callback receives the value you passed to `setFormValue()`, unless you also passed a second argument. That second argument, the state, is kept by the browser for restoring but never submitted. Use it for anything the component needs to look right again, such as a date picker's current view:
 
-  formDisabledCallback(disabled: boolean) {
-    if (disabled) {
-      this.cssClass = "background-mode";
-    } else {
-      this.cssClass = "";
-    }
-  }
+```tsx title="src/components/my-date-picker/my-date-picker.tsx"
+@State() view: 'week' | 'month' = 'week';
 
-  render() {
-    return <input type="text" class={this.cssClass}></input>
-  }
+private setValue(date: string) {
+  // submit the date, and keep the view for restoring
+  this.internals.setFormValue(date, `${date}#${this.view}`);
+}
+
+formStateRestoreCallback(state: string) {
+  const [date, view] = state.split('#');
+  this.view = view as 'week' | 'month';
+  this.setValue(date);
 }
 ```
-
-### `formResetCallback`
-
-This is called when the form is reset, and should be used to reset the
-form-associated component's internal state and validation. For example, you
-could do something like the following:
-
-```tsx title="src/components/form-reset-cb.tsx"
-import { Component, h, AttachInternals } from '@stencil/core';
-
-@Component({
-  tag: 'form-reset-cb',
-})
-export class MyComponent {
-  @AttachInternals()
-  internals: ElementInternals;
-
-  formResetCallback() {
-    this.internals.setValidity({});
-    this.internals.setFormValue("");
-  }
-
-  render() {
-    return <input type="text"></input>
-  }
-}
-```
-
-### `formStateRestoreCallback`
-
-This method will be called in the event that the browser automatically fills
-out your form element, an event that could take place in two different
-scenarios. The first is that the browser can restore the state of an element
-after navigating or restarting, and the second is that an input was made using a
-form auto-filling feature. 
-
-In either case, in order to correctly reset itself your form-associated component
-will need the previously selected value, but other state may also be necessary.
-For instance, the form value to be submitted for a date picker component would
-be a specific date, but in order to correctly restore the component's visual
-state it might also be necessary to know whether the picker should display a
-week or month view.
-
-The
-[`setFormValue`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setFormValue)
-method on `ElementInternals`  provides some support for this use-case, allowing
-you to submit both a _value_ and a _state_, where the _state_ is not added to
-the form data sent to the server but could be used for storing some
-client-specific state. For instance, a pseudocode sketch of a date picker
-component that correctly restores whether the 'week' or 'month' view is active
-could look like:
-
-```tsx title="src/components/fa-date-picker.tsx"
-import { Component, h, State, AttachInternals } from '@stencil/core';
-
-@Component({
-  tag: 'fa-date-picker',
-})
-export class MyDatePicker {
-  @State() value: string = "";
-  @State() view: "weeks" | "months" = "weeks";
-
-  @AttachInternals()
-  internals: ElementInternals;
-
-  onInputChange(e) {
-    e.preventDefault();
-    const date = e.target.value;
-    this.setValue(date);
-  }
-
-  setValue(date: string) {
-    // second 'state' parameter is used to store both
-    // the input value (`date`) _and_ the current view
-    this.internals.setFormValue(date, `${date}#${this.view}`);
-  }
-
-  formStateRestoreCallback(state, _mode) {
-    const [date, view] = state.split("#");
-    this.view = view;
-    this.setValue(date);
-  }
-
-  render() {
-    return <div>
-      Mock Date Picker, mode: {this.view}
-      <input class="date-picker" onChange={e => this.onInputChange(e)}></input>
-    </div>
-  }
-}
-```
-
-Note that the `formStateRestoreCallback` also receives a second argument,
-`mode`, which can be either `"restore"` or `"autocomplete"`, indicating the
-reason for the form restoration.
-
-For more on form restoration, including a complete example, check out [this
-great blog post on the
-subject](https://web.dev/articles/more-capable-form-controls#restoring-form-state).
 
 ## Resources
 
 - [WHATWG specification for form-associated custom elements](https://html.spec.whatwg.org/dev/custom-elements.html#form-associated-custom-elements)
 - [ElementInternals and Form-Associated Custom Elements](https://webkit.org/blog/13711/elementinternals-and-form-associated-custom-elements/) from the WebKit blog
-- [Web.dev post detailing how form-associated lifecycle callbacks work](https://web.dev/articles/more-capable-form-controls#lifecycle_callbacks)
-
+- [More capable form controls](https://web.dev/articles/more-capable-form-controls) on web.dev, including lifecycle callbacks and restoring form state

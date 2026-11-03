@@ -229,9 +229,7 @@ Incoming CSS like:
 
 ```css
 :host my-element {}
-
 my-element::before {}
-
 my-element.active:hover {}
 ```
 
@@ -239,10 +237,8 @@ Is transformed for use at runtime to:
 
 ```ts
 `:host ${transformTag('my-element')} {}
-
 ${transformTag('my-element')}::before {}
-
-${transformTag('my-element')}.active:hover {}
+${transformTag('my-element')}.active:hover {}`
 ```
 
 ## Framework integrations

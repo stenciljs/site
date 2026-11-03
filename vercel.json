@@ -180,6 +180,21 @@
       "source": "/v5/custom-elements",
       "destination": "/docs/v5/standalone",
       "statusCode": 301
+    },
+    {
+      "source": "/v5/server-side-rendering",
+      "destination": "/docs/v5/ssr",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/ssr-authoring",
+      "destination": "/docs/v5/ssr",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/build-variables",
+      "destination": "/docs/v5/guides/build-conditionals",
+      "statusCode": 301
     }
   ],
   "rewrites": [

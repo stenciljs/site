@@ -16,7 +16,7 @@ The `Host` functional component can be used at the root of the render function t
 
 ```tsx
 // Host is imported from '@stencil/core'
-import { Component, Host, h } from '@stencil/core';
+import { Component, Host } from '@stencil/core';
 
 @Component({tag: 'todo-list'})
 export class TodoList {
@@ -117,43 +117,4 @@ If you need to update the host element in response to prop or state changes, you
 
 ## Styling
 
-See full information about styling on the [Styling page](./styling.md#shadow).
-
-CSS can be applied to the `<Host>` element by using its component tag defined in the `@Component` decorator.
-
-```tsx
-@Component({
-  tag: 'my-cmp',
-  styleUrl: 'my-cmp.css'
-})
-...
-```
-
-my-cmp.css:
-
-```css
-my-cmp {
-  width: 100px;
-}
-```
-
-### Shadow DOM
-
-Something to beware of is that Styling the `<Host>` element when using shadow DOM does not work quite the same. Instead of using the `my-cmp` element selector you must use `:host`.
-
-```tsx
-@Component({
-  tag: 'my-cmp',
-  styleUrl: 'my-cmp.css',
-  encapsulation: { type: 'shadow' },
-})
-...
-```
-
-my-cmp.css:
-
-```css
-:host {
-  width: 100px;
-}
-```
+To style the host element from your component's stylesheet, see [Styling the Host Element](./styling/01-overview.md#styling-the-host-element).

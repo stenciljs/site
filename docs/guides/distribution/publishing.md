@@ -17,10 +17,10 @@ This covers the npm registry specifically; the same package works the same way o
 
 ## Consuming Your Library
 
-To use your Stencil components in other projects, there are two different output targets to consider: [`loader-bundle`](../../output-targets/main/loader-bundle.md) and [`standalone`](../../output-targets/main/standalone.md). Both can be generated at the same time, using the same source code, and shipped in the same distribution - it's up to the consumer of your component library to decide which build to use. See [Choosing Between `loader-bundle` and `standalone`](../../output-targets/01-overview.md#choosing-between-loader-bundle-and-standalone) for the tradeoffs. If your components reference static assets, see [Assets](../../output-targets/main/standalone.md#assets) for how the asset path is resolved for either output target.
+To use your Stencil components in other projects, there are two different output targets to consider: [`loader-bundle`](../../output-targets/main/loader-bundle.md) and [`standalone`](../../output-targets/main/standalone.md). Both can be generated at the same time, using the same source code, and shipped in the same distribution - it's up to the consumer of your component library to decide which build to use. See [Choosing Between `loader-bundle` and `standalone`](../../output-targets/main/01-overview.md#choosing-between-loader-bundle-and-standalone) for the tradeoffs. If your components reference static assets, see [Assets](../../output-targets/main/standalone.md#assets) for how the asset path is resolved for either output target.
 
 :::note
-If you distribute both, pick one of them as the `main` package.json entry depending on which use case is more prominent - `loader-bundle` takes priority by default if both are configured (see [Package.json Validation](../../output-targets/01-overview.md#packagejson-validation)).
+If you distribute both, pick one of them as the `main` package.json entry depending on which use case is more prominent - `loader-bundle` takes priority by default if both are configured (see [Package.json Validation](../../output-targets/main/01-overview.md#packagejson-validation)).
 :::
 
 ### Lazy Loading
@@ -41,7 +41,7 @@ import { defineCustomElements } from 'my-design-system';
 defineCustomElements();
 ```
 
-Make sure your `package.json` has an `exports` or `module` entry pointing at the loader - either add it yourself (see [Package.json Validation](../../output-targets/01-overview.md#packagejson-validation) for the paths Stencil expects), or set [`generateExportMaps: true`](../../config/01-overview.md#generateexportmaps) and `stencil build` generates the `exports` map for you:
+Make sure your `package.json` has an `exports` or `module` entry pointing at the loader - either add it yourself (see [Package.json Validation](../../output-targets/main/01-overview.md#packagejson-validation) for the paths Stencil expects), or set [`generateExportMaps: true`](../../config/01-overview.md#generateexportmaps) and `stencil build` generates the `exports` map for you:
 
 ```json
 {

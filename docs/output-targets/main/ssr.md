@@ -1,6 +1,7 @@
 ---
 title: SSR Output Target
-sidebar_label: Overview
+sidebar_label: ssr
+sidebar_position: 3
 description: Render Stencil components to HTML on a server
 slug: /ssr
 ---
@@ -9,7 +10,7 @@ slug: /ssr
 
 The `ssr` output target builds a server-side rendering module for your component library. Given an HTML string or a document, it renders every Stencil component inside it and returns the resulting HTML. Shadow DOM components are rendered as [Declarative Shadow DOM](https://web.dev/articles/declarative-shadow-dom) by default, and the browser hydrates the markup once your components' JavaScript loads.
 
-The module has no Node.js dependencies, so it runs in Node.js 22+, Deno, Bun, Cloudflare Workers, and other runtimes with web-standard APIs. To render from a non-JavaScript server, see [`ssr-wasm`](../ssr-wasm/01-overview.md).
+The module has no Node.js dependencies, so it runs in Node.js 22+, Deno, Bun, Cloudflare Workers, and other runtimes with web-standard APIs. To render from a non-JavaScript server, see [`ssr-wasm`](./ssr-wasm.md). To decide between rendering on request and at build time, see [Rendering Strategies](../../concepts/rendering-strategies.md).
 
 ```tsx title="stencil.config.ts"
 outputTargets: [
@@ -23,7 +24,7 @@ outputTargets: [
 Formerly `dist-hydrate-script` in Stencil v4.
 :::
 
-To render every page of a site built with the [`www` output target](../www.md) to HTML at build time, see [Prerendering](../../../guides/applications/prerendering/01-overview.md).
+To render every page of a site built with the [`www` output target](./www.md) to HTML at build time, see [Prerendering](../../guides/applications/prerendering/01-overview.md).
 
 ## Output
 
@@ -82,9 +83,87 @@ export default {
 };
 ```
 
-The module also exports `setTagTransformer()`, for when components are registered under [transformed tag names](../../../guides/distribution/tag-transformation.md) on the client, so the server renders the same tags.
+The module also exports `setTagTransformer()`, for when components are registered under [transformed tag names](../../guides/distribution/tag-name-clashes/tag-transformation.md) on the client, so the server renders the same tags.
 
-To render components inside a framework's server rendering, see [SSR in Frameworks](./frameworks.md).
+## Using It in a Server Framework
+
+The `ssr` module renders Stencil components in any HTML string, so it works with any framework that lets you see a page's HTML on the server before it's sent. The browser then hydrates the rendered components, as long as the page also loads your components' client-side JavaScript, from [`loader-bundle`](./loader-bundle.md) or [`standalone`](./standalone.md).
+
+Most frameworks let you run code on each response, usually as middleware or a response hook. Pass the page's HTML through `renderToString()` there:
+
+```ts
+import { renderToString } from 'my-library/ssr';
+
+// the shape of this hook varies by framework
+async function onResponse(response: Response): Promise<Response> {
+  if (!response.headers.get('content-type')?.includes('text/html')) {
+    return response;
+  }
+  const { html } = await renderToString(await response.text());
+  return new Response(html, response);
+}
+```
+
+`renderToString()` needs the whole document, so run it on the complete response, not on streamed chunks.
+
+### Next.js
+
+React Server Components render each component separately, so there's no single page of HTML to pass through a hook. The React output target generates server versions of your wrappers instead: see [React: Server-Side Rendering](../../framework-integration/react.md#server-side-rendering).
+
+## Writing SSR-Friendly Components
+
+Most components render on the server without changes: Stencil's server runtime implements the DOM APIs components normally use. The points below cover what does need care, for both server-side rendering and [prerendering](../../guides/applications/prerendering/01-overview.md).
+
+### Browser-Only Code
+
+Code that needs a real browser, such as measuring layout or reading `localStorage`, should only run there. Check `Build.isBrowser`:
+
+```tsx
+import { Build } from '@stencil/core';
+
+connectedCallback() {
+  if (Build.isBrowser) {
+    this.width = this.el.getBoundingClientRect().width;
+  }
+}
+```
+
+`Build.isServer` is the inverse. Both are resolved at build time: the browser build drops server-only branches, along with anything only they import, and the server build drops browser-only ones.
+
+### Async Data
+
+The server waits for a component's `componentWillLoad()` to finish before rendering it. Return a promise to render with fetched data:
+
+```tsx
+async componentWillLoad() {
+  const response = await fetch('https://example.com/api/items');
+  this.items = await response.json();
+}
+```
+
+### Complex Props
+
+Server-rendered HTML can only pass props as attributes, which are strings. To give a component an object, array, or other complex value on the server, set it as a property in the [`beforeSsr`](#render-options) hook:
+
+```ts
+await renderToString(html, {
+  beforeSsr(doc) {
+    doc.querySelector('my-menu').items = menuItems;
+  },
+});
+```
+
+The browser doesn't receive a value set this way. For the component to keep it after hydration, serialize it to an attribute with [`@PropSerialize()`](../../components/serialization-deserialization.md#practical-uses-of-propserialize).
+
+### Style Size
+
+With Declarative Shadow DOM, each instance of a shadow DOM component carries its own copy of the component's styles. A component used many times on a page can add a lot of repeated CSS. To avoid this:
+
+- Render frequently used components as `scoped` with [`serializeShadowRoot`](#serializeshadowroot), so their styles are sent once.
+- Keep shared styles out of component stylesheets, in a [global stylesheet](../asset-outputs/global-style.md) instead.
+- Theme components with [CSS custom properties](../../components/styling/styling-api.md#css-custom-properties) and [`::part()`](../../components/styling/styling-api.md#css-parts) rather than extra internal CSS.
+
+Components with `encapsulation: { type: 'scoped' }` or `{ type: 'none' }` don't have this cost: their styles are always sent once.
 
 ## Config
 
@@ -142,7 +221,7 @@ Every rendering function accepts these options:
 | `cookie` | Sets `document.cookie`. | |
 | `referrer` | Sets `document.referrer`. | |
 | `userAgent` | Sets `navigator.userAgent`. | |
-| `resourcesUrl` | The base URL components use to resolve [assets](../../../guides/distribution/assets.md). | `'./'` |
+| `resourcesUrl` | The base URL components use to resolve [assets](../../guides/distribution/assets.md). | `'./'` |
 | `removeScripts` | Remove every `<script>` from the document. | `false` |
 | `removeUnusedStyles` | Remove CSS not used by any element in the document. | `true` |
 | `maxHydrateCount` | The most components rendered on one page. | `300` |
@@ -179,7 +258,7 @@ await renderToString(html, {
 Controls how `encapsulation: { type: 'shadow' }` components are rendered:
 
 - `'declarative-shadow-dom'` - inside a `<template shadowrootmode="open">`, including the component's styles.
-- `'scoped'` - as light DOM with [scoped](../../../components/styling.md#scoped) styles, written once to the document `<head>`. The client converts it to a real shadow root during hydration.
+- `'scoped'` - as light DOM with [scoped](../../components/styling/01-overview.md#scoped) styles, written once to the document `<head>`. The client converts it to a real shadow root during hydration.
 - An object, to choose per component:
   ```ts
   serializeShadowRoot: {

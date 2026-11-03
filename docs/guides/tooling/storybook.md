@@ -82,7 +82,9 @@ And add the scripts:
 
 ## Writing Stories
 
-Place a story file next to its component, such as `src/components/my-button/my-button.stories.tsx`. Import the component class and pass it as `component`:
+Place a story file next to its component, such as `src/components/my-button/my-button.stories.tsx`. With the plugin installed, [`stencil generate`](../../config/cli.md#stencil-generate) creates one for each new component: its "Story" file option is selected by default.
+
+A story file imports the component class and passes it as `component`:
 
 ```tsx title="src/components/my-button/my-button.stories.tsx"
 import type { Meta, StoryObj } from '@stencil/storybook-plugin';

@@ -1,13 +1,18 @@
 ---
 title: SSR WASM Output Target
-sidebar_label: Overview
+sidebar_label: ssr-wasm
+sidebar_position: 4
 description: Render Stencil components to HTML from any language with a WebAssembly runtime
 slug: /ssr-wasm
 ---
 
 # SSR WASM Output Target
 
-The `ssr-wasm` output target compiles your components' [server-side rendering](../ssr/01-overview.md) module to a WebAssembly binary. A server written in PHP, Java, Go, Ruby, Rust, .NET, or any other language with a WebAssembly runtime can then render your components to HTML, without running Node.js.
+:::caution Experimental
+`ssr-wasm` is experimental. Its options and output may change between releases.
+:::
+
+The `ssr-wasm` output target compiles your components' [server-side rendering](./ssr.md) module to a WebAssembly binary. A server written in PHP, Java, Go, Ruby, Rust, .NET, or any other language with a WebAssembly runtime can then render your components to HTML, without running Node.js.
 
 The binary is an [Extism](https://extism.org/) plugin, so it's loaded with an [Extism host SDK](https://extism.org/docs/concepts/host-sdk) for your server's language.
 
@@ -36,7 +41,7 @@ Load `index.wasm` with WASI enabled, then call its exported functions. Every fun
 
 ### renderToString
 
-Takes the HTML to render and, optionally, [render options](../ssr/01-overview.md#render-options):
+Takes the HTML to render and, optionally, [render options](./ssr.md#render-options):
 
 ```json
 {
@@ -45,13 +50,13 @@ Takes the HTML to render and, optionally, [render options](../ssr/01-overview.md
 }
 ```
 
-Returns the [render results](../ssr/01-overview.md#results) as JSON - the rendered HTML is in `html`. On failure, it returns `{ "__error": "..." }` instead.
+Returns the [render results](./ssr.md#results) as JSON - the rendered HTML is in `html`. On failure, it returns `{ "__error": "..." }` instead.
 
 Options that are functions, such as `beforeSsr`, can't be passed as JSON, so they aren't available.
 
 ### setTagTransformer
 
-Renders components under different tag names, to match [tag transformation](../../../guides/distribution/tag-transformation.md) on the client. Takes a list of mappings:
+Renders components under different tag names, to match [tag transformation](../../guides/distribution/tag-name-clashes/tag-transformation.md) on the client. Takes a list of mappings:
 
 ```json
 [{ "from": "my-greeting", "to": "acme-greeting" }]

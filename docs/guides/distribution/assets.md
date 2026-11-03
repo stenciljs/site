@@ -7,7 +7,7 @@ slug: /assets
 
 # Assets
 
-Assets are static files a component needs - images, fonts etc. (CSS is handled differently; see [Styling](../../components/styling.md).)
+Assets are static files a component needs - images, fonts etc. (CSS is handled differently; see [Styling](../../components/styling/01-overview.md).)
 
 Getting an asset from your source code onto a page a consumer actually loads takes up to four steps:
 
@@ -34,7 +34,7 @@ src/
 
 ```tsx
 // file: my-component.tsx
-import { Component, Prop, getAssetPath, h } from '@stencil/core';
+import { Component, Prop, getAssetPath } from '@stencil/core';
 
 @Component({
   tag: 'my-component',

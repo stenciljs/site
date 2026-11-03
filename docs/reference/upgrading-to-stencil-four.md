@@ -1,5 +1,6 @@
 ---
 title: Upgrading to Stencil v4.0.0
+sidebar_label: Upgrading to Stencil v4
 description: Upgrading to Stencil v4.0.0
 url: /docs/upgrading-to-stencil-4
 ---

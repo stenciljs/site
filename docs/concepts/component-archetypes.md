@@ -89,7 +89,7 @@ export class InlineAlert {
 }
 ```
 
-See [Choosing an Encapsulation Strategy](../components/styling.md#choosing-an-encapsulation-strategy) and [Slotting Without Shadow DOM](../components/styling.md#slotting-without-shadow-dom) for the styling and slot mechanics this archetype relies on.
+See [Choosing an Encapsulation Strategy](../components/styling/01-overview.md#choosing-an-encapsulation-strategy) and [Slots Without Shadow DOM](../components/slots.md#slots-without-shadow-dom) for the styling and slot mechanics this archetype relies on.
 
 ## Custom element, shadow DOM
 

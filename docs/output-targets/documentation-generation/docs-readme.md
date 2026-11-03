@@ -352,7 +352,7 @@ If a component does not use the `@Method()` decorator, this section will be omit
 
 ### @slot Details
 
-A component that uses [slots](../../components/templating-and-jsx.md#slots) may describe its slots in the component's JSDoc using the Stencil-specific `@slot` JSDoc tag.
+A component that uses [slots](../../components/slots.md) may describe its slots in the component's JSDoc using the Stencil-specific `@slot` JSDoc tag.
 The `@slot` tag follows the following format:
 ```
 @slot [slot-name] - [description]
@@ -412,11 +412,11 @@ The following table is generated:
 
 The slots section will be placed after the [@Method section](#method-details) of the README.
 
-If a component's top-level JSDoc does not use `@slot` tags, this section will be omitted from the generated README.
+Slots used in a component's `render()` function are listed even without a `@slot` tag, with an empty description (or "The default slot" for the default slot). If a component has no slots and no `@slot` tags, this section will be omitted from the generated README.
 
 ### Shadow Parts
 
-A component that uses [CSS shadow parts](../../components/styling.md#css-parts) may describe the component's shadow parts in the component's JSDoc using the Stencil-specific `@part` JSDoc tag.
+A component that uses [CSS shadow parts](../../components/styling/styling-api.md#css-parts) may describe the component's shadow parts in the component's JSDoc using the Stencil-specific `@part` JSDoc tag.
 The `@part` tag follows the following format:
 ```
 @part [part-name] - [description]
@@ -476,7 +476,7 @@ and JSDoc comments.
 For example:
 
 ```tsx title="src/components/my-element/my-element.tsx"
-import { Component, h, AttachInternals } from '@stencil/core';
+import { Component, AttachInternals } from '@stencil/core';
 /**
  * My Element component
  */
@@ -515,6 +515,7 @@ Using the `@prop` JSDoc in a component's CSS file, Stencil can generate this doc
 This information is presented in a table containing the following columns:
 - **Name**: The name of the custom property.
 - **Description**: A description of the custom property, if one was given.
+- **Syntax** and **Default**: The `syntax` and `initial-value` of a native [`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@property) rule for the same property. These two columns only appear when at least one of the component's custom properties has one.
 
 For the following usages of `@prop` in a component's css file:
 

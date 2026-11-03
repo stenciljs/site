@@ -69,6 +69,44 @@ const ValidationControllerMixin = (Base) =>
   };
 ```
 
+## Use mixins from other Stencil libraries
+
+A mixin factory can come from another Stencil library, such as a shared library of behaviors your design system's packages build on. Stencil reads the factory's decorated members (`@Prop()`, `@State()`, and so on) from that library's [`collection`](../../output-targets/supporting/collection.md) output, so the factory has to be importable from there.
+
+In the library that publishes the mixins, add a package export whose `types` point at the generated type declarations and whose JavaScript points at the collection:
+
+```ts title="src/mixins.ts"
+export { validationMixin } from './mixins/validation.js';
+export { focusMixin } from './mixins/focus.js';
+```
+
+```json title="package.json"
+{
+  "exports": {
+    "./mixins": {
+      // type declarations, for TypeScript
+      "types": "./dist/types/mixins.d.ts",
+      // transpiled source and metadata, read by other Stencil projects' compilers
+      "default": "./dist/collection/mixins.js"
+    }
+  }
+}
+```
+
+Stencil writes `dist/types` and `dist/collection` on every production build, whichever output targets you use, so there's nothing to add to your config.
+
+The library that uses them imports the factories from that path and passes them to `Mixin()` as usual:
+
+```tsx
+import { Component, Mixin } from '@stencil/core';
+import { validationMixin, focusMixin } from '@my-org/behaviors/mixins';
+
+@Component({ tag: 'my-input' })
+export class MyInput extends Mixin(validationMixin, focusMixin) {}
+```
+
+To find a factory, Stencil follows its import to the file that declares it, through at most one re-export: a named one like those in `src/mixins.ts` above, or an `export *`. It doesn't follow a re-export of a re-export, and warns at build time when it can't find a factory. The same applies to your components' own imports of their mixin factories, if another library extends one of your components.
+
 ## Compose reactive controllers
 
 A reactive controller is an object that hooks into a component's lifecycle without living inside the component class. Write the behavior once as a controller, and any component can add it.

@@ -24,7 +24,7 @@ const sidebars = {
         {
           type: 'link',
           label: 'Stencil on GitHub',
-          href: 'https://github.com/ionic-team/stencil',
+          href: 'https://github.com/stenciljs/core',
         },
       ],
     },

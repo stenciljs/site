@@ -1,107 +1,225 @@
 ---
 title: CSS-Only Components
-sidebar_label: css-only
+sidebar_label: CSS-Only Components
 description: Custom elements defined entirely in CSS, with no backing JS class
 slug: /css-only
 ---
 
 # CSS-Only Components
 
-A CSS-only component is a custom element with no JS class at all - no `@Component()`, no `render()`, never registered via `customElements.define()`. You write a stylesheet; Stencil turns its top-level rule into a documented, type-checked tag. This is the lightest-weight point on Stencil's [component archetype spectrum](../concepts/component-archetypes.md) - reach for it when a tag only ever needs styling, with no behavior of its own.
+Some components are only styles: a badge, a divider, a layout grid. You can write one as a plain stylesheet. Stencil picks it up as a component, adds its attributes to your types and generated docs, and ships its CSS with your global styles. There's no JavaScript class, so there's nothing to load or register.
 
-## Defining a Component
+See [Component Archetypes](../concepts/component-archetypes.md) for how this compares with Stencil's other kinds of component.
 
-Mark a top-level rule with a `/** @component */` comment directly above it. The rule's selector becomes the tag name:
+## A First Example
+
+Put a `/** @component */` comment above a rule. The rule's selector becomes the tag name:
 
 ```css title="src/components/my-badge/my-badge.css"
 /**
  * @component
- * A colored status badge.
+ * A small label for a status or count.
  */
 my-badge {
-  display: inline-block;
-  padding: 4px 8px;
+  /** The badge's background color. */
+  --badge-color: #e0e0e0;
+
+  display: inline-flex;
+  gap: 4px;
+  padding: 2px 8px;
+  background: var(--badge-color);
+
+  &[variant='success'] {
+    --badge-color: #c8f0d0;
+  }
+
+  &[variant='danger'] {
+    --badge-color: #f8d0d0;
+  }
+
+  &[pill] {
+    border-radius: 999px;
+  }
+
+  > [slot='icon'] {
+    width: 1em;
+  }
 }
 ```
 
-The file can live anywhere under `srcDir` - it doesn't need to sit in `src/components/` - and can be a `.css` file or any preprocessor extension your configured `plugins` already handle (`.scss`, `.sass`, `.less`, `.styl`, `.stylus`, `.pcss`), run through the same pipeline a real component's `styleUrl` uses.
+Use it like any other element:
 
-The defining rule must resolve to exactly one tag. Besides a plain selector, two other forms work:
+```html
+<my-badge variant="success" pill>
+  <svg slot="icon">...</svg>
+  Shipped
+</my-badge>
+```
+
+Stencil works out the component's API from the CSS. Your generated `components.d.ts` gets a type for the tag, so attributes are checked in JSX:
+
+```ts title="src/components.d.ts"
+interface MyBadge {
+  "pill"?: boolean;
+  "variant"?: "success" | "danger" | (string & {});
+}
+```
+
+And a [readme](../output-targets/documentation-generation/docs-readme.md) or any other [docs output](../output-targets/documentation-generation/01-overview.md) describes it:
+
+```md title="src/components/my-badge/readme.md"
+## Properties
+
+| Attribute | Description | Type                                     | Default |
+| --------- | ----------- | ---------------------------------------- | ------- |
+| `pill`    |             | `boolean`                                | --      |
+| `variant` |             | `"success" \| "danger" \| (string & {})` | --      |
+
+## Slots
+
+| Slot     | Description |
+| -------- | ----------- |
+| `"icon"` |             |
+
+## CSS Custom Properties
+
+| Name            | Description                   |
+| --------------- | ----------------------------- |
+| `--badge-color` | The badge's background color. |
+```
+
+## What Stencil Detects
+
+### Attributes
+
+An attribute selector on the component itself becomes an attribute. Values you style are combined into a union type, and an attribute with no value becomes a `boolean`:
 
 ```css
-/** @component */
-:where(my-badge, .my-badge) {
-  /* the leading :where()/:is() form - useful for a class-selector fallback */
-}
-
-/** @component */
-@scope (my-badge) to ([slot]) {
-  /* the tag comes from the scope root */
+my-badge {
+  &[variant='success'] { /* ... */ }
+  &[variant='danger'] { /* ... */ }
+  &[pill] { /* ... */ }
 }
 ```
 
-A tag that collides with a real component's tag loses - the real component wins, and Stencil raises a build error pointing at both files. Two CSS-only definitions for the same tag: the first one found wins, also with an error.
+```ts
+"variant"?: "success" | "danger" | (string & {});
+"pill"?: boolean;
+```
 
-## Documenting Properties, Attributes, and Slots
+The `(string & {})` keeps other strings valid while your editor still suggests the known values. Selectors that target a descendant, such as `my-badge [data-x]`, are about a different element and aren't picked up.
 
-Most of a CSS-only component's public API can be **auto-detected** straight from the CSS that's already there. Anything auto-detection can't infer - or a description - needs an explicit JSDoc tag. An explicit tag always wins over an auto-detected entry for the same name.
+### Slots
 
-### Auto-detection
+An `[slot="name"]` selector directly inside the component's rule becomes a named slot:
 
-- **CSS custom properties** - a `--custom-property: value;` declaration anywhere inside the component's own rule (or a nested rule under it) is picked up automatically, but only if a `/** comment */` sits directly above it. An undocumented custom property is skipped, not silently included with an empty description.
-- **Attributes** - an attribute selector on the tag's own compound (`my-badge[variant='danger']`) becomes an attribute. One with a value becomes part of a literal-union type, merged across every value seen (`'danger' | 'warning' | (string & {})` - the `(string & {})` member is deliberate, so a consumer can still pass a value you didn't enumerate without a type error); one with no value (`[dismissible]`) becomes `boolean`. A descendant-combinator selector like `my-badge [data-x]` targets a *different* element and is never picked up.
-- **Slots** - a `[slot="x"]` selector that's a direct child rule of the component's own defining rule (not nested deeper) becomes a documented slot, whether or not it has a comment above it - an undocumented slot is still included, just with an empty description.
-- **Native `@property` at-rules** - a real CSS [`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@property) rule's `syntax` and `initial-value` descriptors populate that property's type and default automatically. `@property` is file-scoped, not tag-scoped - it applies to every CSS-only component defined in the same file.
+```css
+my-badge {
+  [slot='icon'] { /* ... */ }
+}
+```
 
-### Explicit tags
+Slot selectors nested any deeper aren't picked up.
+
+### CSS Custom Properties
+
+A custom property declared in the component's rule is documented when it has a doc comment above it. Custom properties without one are treated as internal and left out:
+
+```css
+my-badge {
+  /** The badge's background color. */
+  --badge-color: #e0e0e0;
+
+  --badge-gap: 4px; /* not documented */
+}
+```
+
+A native [`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@property) rule documents a property too. Its `syntax` and `initial-value` appear in the generated docs as the property's syntax and default, whether the description is on the `@property` rule or on the declaration in the component's rule:
+
+```css
+/** The badge's height. */
+@property --badge-size {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 20px;
+}
+```
+
+`@property` rules apply to every CSS-only component in the same file.
+
+## Adding Descriptions
+
+A doc comment directly above an attribute or slot rule becomes its description:
+
+```css
+my-badge {
+  /** Shows the badge with fully rounded ends. */
+  &[pill] { /* ... */ }
+
+  /** An icon shown before the label. */
+  [slot='icon'] { /* ... */ }
+}
+```
+
+You can also describe them with JSDoc tags in the `@component` comment, which is also how to document anything the CSS doesn't show:
 
 ```css
 /**
  * @component
- * A colored status badge.
- * @attr {boolean} dismissible - Whether the badge can be dismissed.
- * @cssproperty --badge-color: The badge's text color.
+ * A small label for a status or count.
+ * @attr {'success' | 'danger'} variant - The badge's color scheme.
+ * @attr {boolean} pill - Shows the badge with fully rounded ends.
  * @slot - The badge's label.
- * @slot icon-start - Content shown before the label.
+ * @slot icon - An icon shown before the label.
+ * @cssprop --badge-color - The badge's background color.
  */
 my-badge {
-  --badge-padding: 4px;
-  color: var(--badge-color);
+  /* ... */
 }
 ```
 
-- `@attr {type} name - description` - an attribute Stencil couldn't infer a shape for, or one you want documented differently than the auto-detected version.
-- `@cssprop` / `@cssproperty` / `@prop` (interchangeable) `--name: description` - a CSS custom property. The name must start with `--`; this isn't for plain attributes.
-- `@slot name - description`, or `@slot - description` (blank name, or the literal word `default`) for the default slot.
+| Tag | Documents |
+|---|---|
+| `@attr {type} name - description` | An attribute. Its type replaces the detected one. |
+| `@slot name - description` | A slot. Leave out the name, or use `default`, for the default slot. |
+| `@cssprop --name - description` | A CSS custom property. `--name: description` also works, and so do `@cssproperty` and `@prop`. |
 
-Any other `@tagname` in the block is preserved as-is alongside the component's other docs, the same way an unrecognized JSDoc tag on a real component's class is.
+A tag always wins over a detected entry with the same name. Any other `@tag` is kept in the docs as-is, the same as on a regular component.
 
-## Getting the styles onto the page
+## Getting the Styles onto the Page
 
-With zero or one [`global-style`](../output-targets/asset-outputs/global-style.md) output target, this is automatic - Stencil collects every discovered CSS-only component's CSS and places it for you, either prepended to your one global stylesheet or written to its own generated file if you don't have one at all. Nothing to write.
+Stencil adds every CSS-only component's CSS to your [global stylesheet](../output-targets/asset-outputs/global-style.md) by placing it before your own global styles. If the project has no global stylesheet, Stencil writes one for you.
 
-Write `@import "stencil-css-components";` yourself only to control exactly where in the cascade it lands, or if your project configures more than one `global-style` output - the compiler can't guess which one should hold it, and errors naming the import that needs placing:
+To choose where the CSS goes, import `stencil-css-components` in your global stylesheet. The import takes the usual `layer()`, `supports()` and media modifiers:
 
 ```css title="src/global.css"
-@import "stencil-css-components";
+@import "stencil-css-components" layer(components);
 ```
 
-It accepts the same `layer()`/`supports()`/media modifiers a normal `@import` does.
+With more than one `global-style` output target, the import is required: Stencil can't choose which file should hold the CSS, so the build fails with an error until you add it to one.
 
-## Using the component
+## Details
 
-There's nothing to import or register. Write the tag directly - `<my-badge variant="danger">Sale</my-badge>` - and Stencil's generated `components.d.ts` gives you full JSX/TSX type-checking on its attributes, the same as a real component. The browser treats the tag as a plain, undefined element; it's the CSS from the section above that gives it any visual presence at all.
+- **File location and format.** The stylesheet can live anywhere under `srcDir`, and can use any extension your configured style `plugins` handle (`.scss`, `.sass`, `.less`, `.styl`, `.stylus`, `.pcss`).
+- **Other ways to write the defining rule.** It must name exactly one tag. Besides a plain selector, a `:where()` or `:is()` wrapper (useful for adding a class fallback) and an `@scope` rule work:
 
-## Config
+  ```css
+  /** @component */
+  :where(my-badge, .my-badge) {
+    /* ... */
+  }
 
-### enableCssOnlyComponents
+  /** @component */
+  @scope (my-badge) to ([slot]) {
+    /* ... */
+  }
+  ```
 
-*default: `true`*
+- **Tag collisions.** If a CSS-only component uses the same tag as a regular component, the regular component wins and the build reports an error naming both files. If two CSS-only components use the same tag, the first one found wins, also with an error.
+- **Turning it off.** Set `enableCssOnlyComponents: false` in `stencil.config.ts` to stop Stencil looking for CSS-only components:
 
-Set to `false` at the top level of `stencil.config.ts` to turn off CSS-only component discovery entirely.
-
-```ts
-export const config: Config = {
-  enableCssOnlyComponents: false,
-};
-```
+  ```ts title="stencil.config.ts"
+  export const config: Config = {
+    enableCssOnlyComponents: false,
+  };
+  ```

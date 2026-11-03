@@ -14,7 +14,7 @@ slug: /testing-vitest-writing-tests
 Import the source file of each component the test uses, which registers it, then use the `render` function. The examples on the rest of this page leave the imports out:
 
 ```tsx
-import { render, h, describe, it, expect } from '@stencil/vitest';
+import { render, describe, it, expect } from '@stencil/vitest';
 
 import './my-component';
 
@@ -38,7 +38,7 @@ For the complete render function API including all return values and options, se
 Test custom events emitted by your components using `spyOnEvent`:
 
 ```tsx
-import { render, h, describe, it, expect } from '@stencil/vitest';
+import { render, describe, it, expect } from '@stencil/vitest';
 
 describe('my-button', () => {
   it('emits buttonClick event', async () => {
@@ -82,7 +82,7 @@ expect(clickSpy.lastEvent?.detail).toEqual({ buttonId: 'my-button' });
 The package includes a custom snapshot serializer that properly handles shadow DOM:
 
 ```tsx
-import { render, h, describe, it, expect } from '@stencil/vitest';
+import { render, describe, it, expect } from '@stencil/vitest';
 
 describe('my-component', () => {
   it('matches snapshot', async () => {
@@ -110,7 +110,7 @@ describe('my-component', () => {
 Browser tests can include screenshot comparisons:
 
 ```tsx
-import { render, h, describe, it, expect } from '@stencil/vitest';
+import { render, describe, it, expect } from '@stencil/vitest';
 
 describe('my-button', () => {
   it('matches screenshot', async () => {
@@ -189,7 +189,7 @@ expect(root.value).toBe(1);
 Wait for an element to appear in the DOM (works in all environments):
 
 ```tsx
-import { render, waitForExist, h } from '@stencil/vitest';
+import { render, waitForExist } from '@stencil/vitest';
 
 const { root } = await render(<my-component />);
 
@@ -203,7 +203,7 @@ expect(element).not.toBeNull();
 Wait for an element to be rendered and visible (browser tests only):
 
 ```tsx
-import { render, waitForStable, h } from '@stencil/vitest';
+import { render, waitForStable } from '@stencil/vitest';
 
 const { root } = await render(<my-component />);
 await waitForStable(root);

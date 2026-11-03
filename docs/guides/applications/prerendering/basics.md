@@ -35,4 +35,4 @@ See the [prerender config](./prerender-config.md) docs to see how this can be cu
 
 ## Things to Watch For
 
-Prerendering runs your components on the server, so the same considerations apply as for server-side rendering. See [Authoring Components for SSR](../../../output-targets/main/ssr/authoring.md).
+Prerendering runs your components on the server, so the same considerations apply as for server-side rendering. See [Authoring Components for SSR](../../../output-targets/main/ssr.md#writing-ssr-friendly-components).

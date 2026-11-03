@@ -9,60 +9,26 @@ slug: /support-policy
 
 ## Community Maintenance
 
-Stencil is a 100% open source (MIT) project. Developers can ensure Stencil is the right choice for building web
-components through Ionic’s community maintenance strategy. The Stencil team regularly ships new releases, bug fixes, and
-is welcoming to community pull requests.
+Stencil is an open-source (MIT) project, backed by [OutSystems](https://www.outsystems.com/) and maintained by the community together with developers from Ionic. The team ships regular releases and bug fixes, and welcomes pull requests.
 
-## Stencil Maintenance and Support Status
+## Version Status
 
-Given the reality of time and resource constraints as well as the desire to keep innovating in the frontend development
-space, over time it becomes necessary for the Stencil team to shift focus to newer versions of the library. However, the
-Stencil team will do everything it can to make the transition to newer versions as smooth as possible. The Stencil team
-recommends updating to the newest version of the Stencil for the latest features, improvements and stability updates.
+The Stencil team recommends updating to the newest version of Stencil for the latest features, improvements, and fixes.
 
-The current status of each Stencil version is:
+| Version | Status | Released | Maintenance Ends |
+|:-------:|:------:|:--------:|:----------------:|
+| V5 | Preview | TBD | TBD |
+| V4 | **Active** | Jun 26, 2023 | 6 months after the V5 stable release |
+| V3 | End of Support | Jan 25, 2023 | Dec 26, 2023 |
+| V2 | End of Support | Aug 08, 2020 | Jul 25, 2023 |
+| V1 | End of Support | Jun 03, 2019 | Aug 08, 2020 |
 
-| Version |      Status      |   Released   | Maintenance Ends | Ext. Support Ends |
-|:-------:|:----------------:|:------------:|:----------------:|:-----------------:|
-|   V4    |    **Active**    | Jun 26, 2023 |       TBD        |        TBD        |
-|   V3    | Extended Support | Jan 25, 2023 |   Dec 26, 2023   |   Jun 26, 2024    |
-|   V2    |  End of Support  | Aug 08, 2020 |   Jul 25, 2023   |   Jan 25, 2024    |
-|   V1    |  End of Support  | Jun 03, 2019 |   Aug 08, 2020   |   Aug 08, 2020    |
-
-**Maintenance Period**: Only critical bug and security fixes. No major feature improvements.
-
-**Extended Support Period**: Available to Stencil Enterprise customers.
-
-### Stencil Support Details
-
-Starting with Stencil v2, the Stencil team is adopting a newly revised maintenance policy. When a new major version of
-Stencil is released, the previous major version release will enter maintenance mode. While a version of Stencil is in
-maintenance mode, only critical bug & security fixes will be applied to that version, and no major feature improvements
-will be added. The maintenance period shall last six months from the release of the new major version.
-
-Once the maintenance period has ended for a version of Stencil, that version enters the extended support period. During
-the extended support period, only critical bug and security fixes will be applied for teams and organizations using
-Stencil's Enterprise offerings. The extended support period lasts for twelve months from the release of the new major 
-version.
-
-The table below describes a theoretical timeline of releases:
-
-| Version |        Status         |   Released   | Maintenance Ends | Ext. Support Ends |
-|:-------:|:---------------------:|:------------:|:----------------:|:-----------------:|
-|    D    |        Active         | Jan 01, 2022 |       TBD        |        TBD        |
-|    C    |      Maintenance      | Jul 07, 2021 |   Jul 01, 2022   |   Jan 01, 2023    |
-|    B    | Extended Support Only | Jan 01, 2021 |   Jan 07, 2022   |   Jul 07, 2022    |
-|    A    |    End of Support     | Jul 07, 2020 |   Jul 01, 2021   |   Jan 01, 2021    |
-
-In the example above, when Version D is released, Version C enters maintenance mode. Version D was released on January
-1st, 2022. Version C shall be in maintenance mode until July 1st, 2022, three months after the release of Version D.
-After July 1st 2022, Version C will be in extended support until Jun 1st, 2023, twelve months after the release of
-Version D.
+When a new major version of Stencil is released, the previous major version enters **maintenance** for six months: it receives only critical bug and security fixes, and no new features. After that, it reaches **end of support**.
 
 ## Browser Support
 
 Stencil builds Web Components that run natively in all widely used desktop and mobile browsers.
-Custom Elements are natively supported in Chrome, Edge, Firefox, and Safari (including iOS)!
+Custom Elements are natively supported in Chrome, Edge, Firefox, and Safari, including on iOS.
 
 Stencil supports the following browsers. Stencil v5 supports browsers that implement ES2022:
 
@@ -121,13 +87,13 @@ compatibility tables to describe the interoperability requirements of these piec
 
 Stencil v5 requires Node.js 22 or later, including newer releases such as Node.js 24. Once a Node.js version reaches its [end of life](https://nodejs.org/en/about/previous-releases), a later Stencil release may stop supporting it without that being treated as a breaking change.
 
-| Stencil Version | Node v10 | Node v12 | Node v14 | Node v16 | Node v18 | Node v20 | Node v22 |
-|:---------------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
-|       V5        | &#10060; | &#10060; | &#10060; | &#10060; | &#10060; | &#10060; | &#9989;  |
-|       V4        | &#10060; | &#10060; | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9989;  |
-|       V3        | &#10060; | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9989;  | &#10060; |
-|       V2        | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9888;  | &#10060; | &#10060; |
-|       V1        | &#9989;  | &#9989;  | &#9989;  | &#9989;  | &#10060; | &#10060; | &#10060; |
+| Stencil Version | Node v10 | Node v12 | Node v14 | Node v16 | Node v18 | Node v20 | Node v22 | Node v24 |
+|:---------------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
+|       V5        | &#10060; | &#10060; | &#10060; | &#10060; | &#10060; | &#10060; | &#9989;  | &#9989;  |
+|       V4        | &#10060; | &#10060; | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9989;  | &#9989;  |
+|       V3        | &#10060; | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9989;  | &#10060; | &#10060; |
+|       V2        | &#10060; | &#9989;  | &#9989;  | &#9989;  | &#9888;  | &#10060; | &#10060; | &#10060; |
+|       V1        | &#9989;  | &#9989;  | &#9989;  | &#9989;  | &#10060; | &#10060; | &#10060; | &#10060; |
 
 ### Testing Libraries
 

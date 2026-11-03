@@ -9,7 +9,7 @@ slug: /framework-types
 
 React 19, Vue 3, Solid, Svelte, and Preact can all render custom elements directly, so consumers of your library don't need wrapper components to use `<my-button>` in a template. What they don't get out of the box is type-checking: the framework's TypeScript types don't know your tags or their props.
 
-`@stencil/types-output-target` generates a type definition file for each framework that adds your components to its known elements. It covers each component's props and events, and produces types only, with no runtime code. For Angular, React 18, or framework features like `v-model` and [server-side rendering](../output-targets/main/ssr/frameworks.md), use the [Angular](./angular.md), [React](./react.md), or [Vue](./vue.md) wrappers instead.
+`@stencil/types-output-target` generates a type definition file for each framework that adds your components to its known elements. It covers each component's props and events, and produces types only, with no runtime code. For Angular, React 18, or framework features like `v-model` and [server-side rendering](../output-targets/main/ssr.md#using-it-in-a-server-framework), use the [Angular](./angular.md), [React](./react.md), or [Vue](./vue.md) wrappers instead.
 
 ## Setup
 
@@ -56,10 +56,10 @@ Add an entry for each file to your `package.json` `exports`, so consumers can im
 ```json title="package.json"
 {
   "exports": {
-    "./react-types": {
+    "./react-native-types": {
       "types": "./dist/types/react-native-types.d.ts"
     },
-    "./vue-types": {
+    "./vue-native-types": {
       "types": "./dist/types/vue-native-types.d.ts"
     }
   },
@@ -79,7 +79,7 @@ Add an entry for each file to your `package.json` `exports`, so consumers can im
 A consuming app imports the types once, anywhere in its source:
 
 ```tsx
-import 'my-library/react-types';
+import 'my-library/react-native-types';
 ```
 
 Your tags are then type-checked like any built-in element:

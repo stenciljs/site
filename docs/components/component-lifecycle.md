@@ -40,9 +40,43 @@ This `lifecycle` hook follows the same semantics as the one described by the [Cu
 
 ## disconnectedCallback()
 
-Called every time the component is disconnected from the DOM, ie, it can be dispatched more than once, DO not confuse with a "onDestroy" kind of event.
+Called every time the component is disconnected from the DOM. This can happen more than once: moving an element disconnects it and connects it again.
 
 This `lifecycle` hook follows the same semantics as the one described by the [Custom Elements Spec](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements).
+
+Use it to undo what `connectedCallback()` set up. This clock starts a timer when it's added to the DOM, and stops it when it's removed:
+
+```tsx
+import { Component, State } from '@stencil/core';
+
+@Component({
+  tag: 'custom-clock'
+})
+export class CustomClock {
+
+  timer: number;
+
+  @State() time: number = Date.now();
+
+  connectedCallback() {
+    this.timer = window.setInterval(() => {
+      this.time = Date.now();
+    }, 1000);
+  }
+
+  disconnectedCallback() {
+    window.clearInterval(this.timer);
+  }
+
+  render() {
+    const time = new Date(this.time).toLocaleTimeString();
+
+    return (
+      <span>{ time }</span>
+    );
+  }
+}
+```
 
 ## componentWillLoad()
 
@@ -87,9 +121,11 @@ componentShouldUpdate(changes: ComponentShouldUpdateChanges<this>) {
 }
 ```
 
-A compiler warning is raised if `componentShouldUpdate` is declared with more than one parameter — the old `(newVal, oldVal, propName)` per-prop signature is no longer supported.
+:::note
+The per-prop `(newVal, oldVal, propName)` signature from versions before Stencil v5 is no longer supported. Declaring `componentShouldUpdate` with more than one parameter raises a compiler warning, and the extra parameters are `undefined` at runtime.
+:::
 
-Since the execution of this hook might be conditioned, it's not good to rely on it to watch for prop changes, instead use the `@Watch` decorator for that.
+`componentShouldUpdate()` only decides whether a render goes ahead. It doesn't see changes made before the first render, so to react to a prop or state change, use [`@Watch()`](./reactive-data.md).
 
 ## componentWillRender()
 
@@ -162,41 +198,5 @@ componentWillLoad() {
     .then(data => {
       this.content = data;
     });
-}
-```
-
-## Example
-
-This simple example shows a clock and updates the current time every second. The timer is started when the component is added to the DOM. Once it's removed from the DOM, the timer is stopped.
-
-```tsx
-import { Component, State, h } from '@stencil/core';
-
-@Component({
-  tag: 'custom-clock'
-})
-export class CustomClock {
-
-  timer: number;
-
-  @State() time: number = Date.now();
-
-  connectedCallback() {
-    this.timer = window.setInterval(() => {
-      this.time = Date.now();
-    }, 1000);
-  }
-
-  disconnectedCallback() {
-    window.clearInterval(this.timer);
-  }
-
-  render() {
-    const time = new Date(this.time).toLocaleTimeString();
-
-    return (
-      <span>{ time }</span>
-    );
-  }
 }
 ```

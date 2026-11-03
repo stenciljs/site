@@ -6,9 +6,21 @@ const { themes } = require('prism-react-renderer');
 
 const HOSTNAME = 'stenciljs.com';
 
+// Matches the code samples on the stenciljs.com homepage: VS Code Dark+ colours on a navy background
+const codeTheme = {
+  ...themes.vsDark,
+  plain: { ...themes.vsDark.plain, backgroundColor: '#0a1220' },
+};
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Stencil',
+  stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap',
+      type: 'text/css',
+    },
+  ],
   tagline: 'Build. Customize. Distribute. Adopt.',
   url: `https://${HOSTNAME}`,
   baseUrl: '/docs/',
@@ -40,7 +52,7 @@ const config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/ionic-team/stencil-site/tree/main',
+          editUrl: 'https://github.com/stenciljs/site/tree/main',
           remarkPlugins: [[require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }]],
           breadcrumbs: false,
           // Pin the default (un-prefixed) view to the latest *stable* release. Without this,
@@ -190,7 +202,7 @@ const config = {
             target: '_blank',
           },
           {
-            href: 'https://github.com/ionic-team/stencil',
+            href: 'https://github.com/stenciljs/core',
             position: 'right',
             className: 'icon-link icon-link-mask icon-link-github',
             'aria-label': 'GitHub repository',
@@ -223,7 +235,7 @@ const config = {
             {
               key: 'github',
               url: {
-                href: 'https://github.com/ionic-team/stencil',
+                href: 'https://github.com/stenciljs/core',
                 target: '_blank',
                 rel: 'noopener nofollow',
               },
@@ -248,8 +260,8 @@ const config = {
         },
       },
       prism: {
-        theme: themes.github,
-        darkTheme: themes.dracula,
+        theme: codeTheme,
+        darkTheme: codeTheme,
         additionalLanguages: ['jsx', 'tsx', 'bash', 'typescript', 'javascript', 'markup', 'css', 'json', 'diff'],
       },
       algolia: {

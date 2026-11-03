@@ -19,16 +19,16 @@ The cost is time: a component has no content until its JavaScript arrives and ru
 
 Components render on a server for each request, and the browser receives finished HTML. The client-side JavaScript then hydrates the markup, reusing it rather than rendering again.
 
-Ship the [`ssr`](../output-targets/main/ssr/01-overview.md) output target so consumers can do this. It runs in Node.js, Deno, Bun, and edge runtimes, and plugs into [most server frameworks](../output-targets/main/ssr/frameworks.md). For a server written in another language, such as PHP, Java, or Go, ship [`ssr-wasm`](../output-targets/main/ssr-wasm/01-overview.md) as well.
+Ship the [`ssr`](../output-targets/main/ssr.md) output target so consumers can do this. It runs in Node.js, Deno, Bun, and edge runtimes, and plugs into [most server frameworks](../output-targets/main/ssr.md#using-it-in-a-server-framework). For a server written in another language, such as PHP, Java, or Go, ship [`ssr-wasm`](../output-targets/main/ssr-wasm.md) as well.
 
 ## Prerendering (SSG)
 
-Pages render once at build time, and a static host serves the HTML. This gives the same fast first paint as SSR, with no server work per request - but only for content known at build time.
+Pages render once at build time, and a static host serves the HTML. This gives the same fast first paint as SSR, with no server work per request, but only for content known at build time.
 
 Prerendering is for applications built with Stencil's [`www`](../output-targets/main/www.md) output target. See [Prerendering](../guides/applications/prerendering/01-overview.md).
 
 ## Choosing Between SSR and Prerendering
 
-Prerender a page when its content is the same for every visitor, or changes only when you deploy. Server-render it when the content depends on the request - the signed-in user, a query, or data that changes between deploys.
+Prerender a page when its content is the same for every visitor, or changes only when you deploy. Server-render it when the content depends on the request: the signed-in user, a query, or data that changes between deploys.
 
 Fewer pages need request-time rendering than it first seems. A prerendered page can still fetch per-user data from the browser after it loads, and many per-request needs, like redirects and headers, can be handled by the server or CDN without rendering anything.

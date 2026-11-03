@@ -30,7 +30,7 @@ my-design-system/
 
 ### New Project
 
-Run the [`stencil init` wizard](../getting-started/01-getting-started.md), pick **Angular** under framework integrations, and accept the monorepo workspace prompt. It creates the structure above with both packages configured.
+Run the [`stencil init` wizard](../introduction/02-installation.md), pick **Angular** under framework integrations, and accept the monorepo workspace prompt. It creates the structure above with both packages configured.
 
 ### Existing Project
 
@@ -108,7 +108,7 @@ export class MyLibraryModule {}
 
 If your library sets [`generateExportMaps`](../config/01-overview.md#generateexportmaps), import the loader from `my-library/loader` instead.
 
-The module is your code, and Stencil never regenerates it. It's the place for any setup your library needs before its components are defined, such as [`setNonce()`](../guides/distribution/csp-nonce.md) or [`setTagTransformer()`](../guides/distribution/tag-transformation.md), which the loader also exports.
+The module is your code, and Stencil never regenerates it. It's the place for any setup your library needs before its components are defined, such as [`setNonce()`](../guides/distribution/csp-nonce.md) or [`setTagTransformer()`](../guides/distribution/tag-name-clashes/tag-transformation.md), which the loader also exports.
 
 ## Building
 
@@ -261,4 +261,4 @@ Experimental. Declares each component's inputs as typed class members, so the An
 
 **Default: `false`**
 
-Generates a script that patches the Angular components' selectors, so consumers can register them under different tag names. See [Tag Transformation](../guides/distribution/tag-transformation.md#angular).
+Generates a script that patches the Angular components' selectors, so consumers can register them under different tag names. See [Tag Transformation](../guides/distribution/tag-name-clashes/tag-transformation.md#angular).

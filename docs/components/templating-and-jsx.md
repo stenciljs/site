@@ -9,48 +9,9 @@ slug: /templating-jsx
 
 Stencil components are rendered using JSX, a popular, declarative template syntax. Each component has a `render` function that returns a tree of components that are rendered to the DOM at runtime.
 
-## Basics
+By default, Stencil sets up projects for JSX automatically. If you're setting up a project manually, add the following to your `tsconfig.json`:
 
-### The `h` and `Fragment` functions
-
-The `h` function (short for "hyperscript") is a factory function that creates virtual DOM elements. When you write JSX like `<div>Hello</div>`, it gets transformed into function calls like `h('div', null, 'Hello')`. The `Fragment` function is used to group a list of children without adding extra nodes to the DOM.
-
-#### Set up in Stencil
-
-Within your Stencil project, make sure to add or modify your `tsconfig.json` file, adding:
-
-```json
-{
-  "compilerOptions": {
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
-  }
-}
-```
-
-You will then need to import `h` (and `Fragment` if you plan to use it) from `@stencil/core` at the top of your component file:
-
-```tsx
-import { h, Fragment, Component } from '@stencil/core';
-
-@Component({
-  tag: 'my-component',
-})
-class MyComponent { ... }
-```
-
-(Read more about using the `Fragment` component in the [Complex Template Content](#complex-template-content) section below.)
-
-### `jsxImportSource` alternative
-
-`jsxImportSource` is a more modern approach that automatically imports the necessary JSX runtime functions instead of manually importing `h`; the compiler automatically imports what it needs from the specified package.
-
-#### Set up in Stencil
-
-To use `jsxImportSource`, modify your `tsconfig.json` file as follows:
-
-```json
+```json title="tsconfig.json"
 {
   "compilerOptions": {
     "jsx": "react-jsx",
@@ -59,7 +20,7 @@ To use `jsxImportSource`, modify your `tsconfig.json` file as follows:
 }
 ```
 
-Using this approach means you do not need to manually import `h` or `Fragment` in your component files.
+## Basics
 
 ### The `render` function
 
@@ -171,77 +132,7 @@ This way, if `someCondition` changes, you get a new `<my-counter>` component wit
 
 ## Slots
 
-Components often need to render dynamic children in specific locations in their component tree, allowing a developer to supply child content when using our component, with our component placing that child component in the proper location.
-
-To do this, you can use the [Slot](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot) tag inside of your `my-component`.
-
-```tsx
-// my-component.tsx
-
-render() {
-  return (
-    <div>
-      <h2>A Component</h2>
-      <div><slot /></div>
-    </div>
-  );
-}
-
-```
-
-Then, if a user passes child components when creating our component `my-component`, then `my-component` will place that
-component inside of the second `<div>` above:
-
-```tsx
-render(){
-  return(
-    <my-component>
-      <p>Child Element</p>
-    </my-component>
-  )
-}
-```
-
-Slots can also have `name`s to allow for specifying slot output location:
-
-```tsx
-// my-component.tsx
-
-render(){
-  return [
-    <slot name="item-start" />,
-    <h1>Here is my main content</h1>,
-    <slot name="item-end" />
-  ]
-}
-```
-
-```tsx
-render(){
-  return(
-    <my-component>
-      <p slot="item-start">I'll be placed before the h1</p>
-      <p slot="item-end">I'll be placed after the h1</p>
-    </my-component>
-  )
-}
-```
-
-### Slots Outside Shadow DOM
-
-:::caution
-Slots are native to the [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM), but Stencil polyfills
-the behavior to work for non-shadow components as well. However, you may encounter issues using slots outside the Shadow DOM especially with
-component trees mixing shadow and non-shadow components, or when passing a slot through many levels of components. In many cases, this behavior can
-be remedied by wrapping the `slot` in an additional element (like a `div` or `span`) so the Stencil runtime can correctly "anchor" the relocated
-content in its new location.
-:::
-
-There are known use cases that the Stencil runtime is not able to support:
-
-- Forwarding slotted content to another slot with a different name:<br/>
-  It is recommended that slot names stay consistent when slotting content through multiple levels of components. **Avoid** defining slot tags like
-  `<slot name="start" slot="main" />`.
+A `<slot>` in your JSX marks where content passed into the component goes. See [Slots](./slots.md) for named slots, fallback content, and how slots work with and without shadow DOM.
 
 ## Dealing with Children
 
@@ -406,26 +297,25 @@ render() {
 }
 ```
 
-Alternatively you can use the `Fragment` functional component, in which case you won't need to add commas:
+Alternatively, wrap them in a fragment, `<>...</>`, which groups elements without adding a wrapper node to the DOM. No commas are needed:
 
 ```tsx
-import { Fragment } from '@stencil/core';
-...
 render() {
-  return (<Fragment>
-    // first top level element
-    <div class="container">
-      <ul>
-        <li>Item 1</li>
-        <li>Item 2</li>
-        <li>Item 3</li>
-      </ul>
-    </div>
+  return (
+    <>
+      <div class="container">
+        <ul>
+          <li>Item 1</li>
+          <li>Item 2</li>
+          <li>Item 3</li>
+        </ul>
+      </div>
 
-    <div class="another-container">
-      ... more html content ...
-    </div>
-  </Fragment>);
+      <div class="another-container">
+        ... more html content ...
+      </div>
+    </>
+  );
 }
 ```
 

@@ -95,12 +95,4 @@ To set up by hand instead, follow these steps:
 
 ## Migrating to Playwright
 
-Coming from Stencil v4's integrated test runner (`stencil test --e2e`, Puppeteer-based)? That runner is removed in v5, and Playwright is now the e2e testing tool. Add a Playwright CLI call to your project's `package.json` test script:
-
-```json title="package.json"
-{
-  "scripts": {
-    "test.e2e": "playwright test"
-  }
-}
-```
+Coming from Stencil v4's integrated e2e testing (`stencil test --e2e` and `newE2EPage()`)? See [Migrating E2E Tests to Playwright](./04-migration.md).

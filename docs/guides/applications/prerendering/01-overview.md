@@ -14,7 +14,7 @@ Static Site Generation doesn't mean your pages have to be and/or _stay_ static! 
 
 Since Static Site Generation prerenders components, there are some tradeoffs and things to keep in mind, but most components can be easily prerendered without much modification.
 
-Stencil makes SSG easy, so read on to see how to incorporate it into your apps.
+Stencil makes SSG easy, so read on to see how to incorporate it into your apps. To compare it with server-side and client-side rendering, see [Rendering Strategies](../../../concepts/rendering-strategies.md).
 
 ## Benefits of Static Site Generation
 
@@ -25,7 +25,7 @@ Stencil makes SSG easy, so read on to see how to incorporate it into your apps.
 
 ## How Static Site Generation and Prerendering Works
 
-**Build the SSR Module**: The first step in prerendering is for the compiler to build the [`ssr`](../../../output-targets/main/ssr/01-overview.md) module, which prerendering uses to render each page. It's added automatically when the `--prerender` CLI flag is provided, and written to `dist/ssr` by default.
+**Build the SSR Module**: The first step in prerendering is for the compiler to build the [`ssr`](../../../output-targets/main/ssr.md) module, which prerendering uses to render each page. It's added automatically when the `--prerender` CLI flag is provided, and written to `dist/ssr` by default.
 
 **Fork Prerender Tasks to Available CPUs**: Stencil can efficiently divide out the prerendering to each of the current machine's CPUs using [Node.js' Child Process API](https://nodejs.org/api/child_process.html). By tasking each CPU on the machine, the compiler can drastically speed up prerendering times.
 

@@ -9,7 +9,7 @@ slug: /overview
 
 Stencil components are standard custom elements, so they work in any framework, or [with none](./javascript.md). What varies is how well a framework's own tooling understands them: whether templates are type-checked, whether custom events and form bindings feel native, and whether components can be rendered on the server.
 
-Stencil can generate two kinds of integration for your library. Both are produced by output targets you add to your `stencil.config.ts`, and both can be set up with the [`stencil add`](../getting-started/01-getting-started.md#adding-capabilities-later) wizard.
+Stencil can generate two kinds of integration for your library. Both are produced by output targets you add to your `stencil.config.ts`, and both can be set up with the [`stencil add`](../introduction/02-installation.md#adding-capabilities-later) wizard.
 
 ## Framework Types
 
@@ -31,10 +31,10 @@ Wrappers go further than types. Consumers import `MyButton` like any other compo
 |---|---|---|---|
 | Typed props and events | yes | yes | yes |
 | Form bindings | `ngModel`, reactive forms | | `v-model` |
-| Server-side rendering | | Next.js | Nuxt |
+| Server-side rendering | | Next.js | |
 | Works without `CUSTOM_ELEMENTS_SCHEMA` | yes | | |
 | Supports older versions | | React 18 | |
 
 ## Choosing
 
-Use wrappers for Angular, and for any framework where your consumers need form bindings or [server-side rendering](../output-targets/main/ssr/frameworks.md). Use Framework Types when typed custom elements are enough. You can ship both from the same library.
+Use wrappers for Angular, and for any framework where your consumers need form bindings or [server-side rendering](../output-targets/main/ssr.md#using-it-in-a-server-framework). Use Framework Types when typed custom elements are enough. You can ship both from the same library.
