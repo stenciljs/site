@@ -92,12 +92,6 @@ This is also the only option for a [`standalone`](../../output-targets/main/stan
 
 ## Styling Shadow DOM Components
 
-<!--
-  TODO(live-demo): a global stylesheet's `:host(my-button)` rule reaching a shadow root, with
-  `inject` on vs. off. Blocked on @stencil/playground: it applies global stylesheets to the
-  document only (not to shadow roots) and ignores `inject`. See V5_DOCS_PLAN.md "Live Examples".
--->
-
 A global stylesheet can also style the inside of shadow DOM components. The zero-config `src/global.css` stylesheet is added to every component's shadow root as a [constructable stylesheet](https://web.dev/constructable-stylesheets/). A stylesheet with an explicit `input` isn't, unless you set its [`inject`](../../output-targets/asset-outputs/global-style.md#inject) option.
 
 Inside a shadow root, `:host()` with a tag name targets every instance of that component:
@@ -119,3 +113,46 @@ Inside a shadow root, `:host()` with a tag name targets every instance of that c
 ```
 
 Use it to set default custom property values for a component, give every instance of a component the same spacing, or theme components by tag name or attribute.
+
+In this playground, `theme.css` is a global stylesheet with `inject: 'client'`, so its `:host(my-button)` rule reaches the button's shadow root and rounds its corners. Change `inject` to `'none'`, and the corners go square:
+
+:::playground{preview-height=80}
+```css title="src/theme.css"
+:host(my-button) {
+  --button-border-radius: 8px;
+}
+```
+
+```ts title="stencil.config.ts"
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  outputTargets: [{ type: 'global-style', input: './theme.css', inject: 'client' }],
+};
+```
+
+```tsx title="src/my-button.tsx"
+import { Component } from '@stencil/core';
+
+@Component({
+  tag: 'my-button',
+  styleUrl: 'my-button.css',
+  encapsulation: { type: 'shadow' },
+})
+export class MyButton {
+  render() {
+    return <button>Button</button>;
+  }
+}
+```
+
+```css title="src/my-button.css"
+button {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: var(--button-border-radius, 0);
+  background: #3880ff;
+  color: white;
+}
+```
+:::

@@ -76,6 +76,16 @@ IP address used by the dev server. The default is `0.0.0.0`, which points to all
 
 Base path to be used by the server. Defaults to the root pathname.
 
+### `historyApiFallback`
+
+**Optional**
+
+**Type: `{ index?: string; disableDotRule?: boolean } | null`**
+
+**Default: `{ index: 'index.html', disableDotRule: false }`**
+
+Serves `index` (relative to [`root`](#root)) for a page request that matches no file, so a single-page app's client-side routes load on refresh or from a bookmark. It applies to `GET` requests that accept `text/html` and whose path has no `.`; set `disableDotRule: true` to include paths with a `.` too. Set `historyApiFallback` to `null` to turn it off.
+
 ### `https`
 
 **Optional**

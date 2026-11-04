@@ -102,6 +102,15 @@ outputTargets: [
 ]
 ```
 
+`loader.js` also exports `setRegistry`, `setTagTransformer`, `setNonce` and `setPlatformOptions`. With `autoStart: false`, call them before `start()`:
+
+```js
+import { setRegistry, start } from 'my-library/dist/standalone/loader.js';
+
+setRegistry(registry);
+start();
+```
+
 ### dir
 
 _default: `'dist/standalone'`_

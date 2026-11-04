@@ -50,7 +50,7 @@ Your library's outputs export `setTagTransformer` for application developers to 
 
 #### Usage via the `standalone` output
 
-`setTagTransformer` is exported from the output's index file:
+`setTagTransformer` is exported from the output's index file, and from its `loader.js` for use before the auto-loader's `start()`:
 
 ```js
 import { setTagTransformer } from '@component/library/dist/standalone';

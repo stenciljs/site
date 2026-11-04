@@ -40,6 +40,8 @@ import { defineCustomElement } from 'my-library/dist/standalone/my-panel.js';
 defineCustomElement({ registry });
 ```
 
+With the standalone auto-loader, set [`autoStart: false`](../../../output-targets/main/standalone.md#autoloader), then import `setRegistry` and `start` from `loader.js` and call them in that order.
+
 `setRegistry` is exported from the same files as [`setTagTransformer`](./tag-transformation.md#settagtransformer-and-transformtag).
 
 ## Nested Components

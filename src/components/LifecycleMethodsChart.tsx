@@ -56,7 +56,10 @@ export default function LifecycleMethodsChart({ variant = 'component' }: { varia
                 </Link>
               </g>
               <g>
-                <Link to={isController ? hostHookAnchor.hostDidUpdate : '#componentdidupdate'} className={styles.pathUpdate}>
+                <Link
+                  to={isController ? hostHookAnchor.hostDidUpdate : '#componentdidupdate'}
+                  className={styles.pathUpdate}
+                >
                   <rect x="303" y="620" width="252" height="49" rx="24.5" ry="24.5" fill="#7b83a6" />
                   <text x="2.8501587" y="166.83597" fill="#fff" textAnchor={isController ? 'middle' : undefined}>
                     <tspan x={isController ? 429 : 339.15015} y="648.83594">
@@ -66,7 +69,10 @@ export default function LifecycleMethodsChart({ variant = 'component' }: { varia
                 </Link>
               </g>
               <g>
-                <Link href={isController ? hostHookAnchor.hostDisconnected : '#disconnectedcallback'} className={styles.pathRemoved}>
+                <Link
+                  href={isController ? hostHookAnchor.hostDisconnected : '#disconnectedcallback'}
+                  className={styles.pathRemoved}
+                >
                   <rect x="152.5" y="873" width="252" height="49" rx="24.5" ry="24.5" fill="#4b516e" />
                   <text x="-18.570755" y="148.19852" fill="#fff" textAnchor={isController ? 'middle' : undefined}>
                     <tspan x={isController ? 278.5 : 179.72925} y="902.19849">
@@ -96,7 +102,10 @@ export default function LifecycleMethodsChart({ variant = 'component' }: { varia
                 </Link>
               </g>
               <g>
-                <Link to={isController ? hostHookAnchor.hostConnected : '#connectedcallback'} className={styles.pathInit + ' ' + styles.pathAttached}>
+                <Link
+                  to={isController ? hostHookAnchor.hostConnected : '#connectedcallback'}
+                  className={styles.pathInit + ' ' + styles.pathAttached}
+                >
                   <rect x="65" y="89" width="275" height="49" rx="24.5" ry="24.5" fill="#4b516e" />
                   <text x="78.77652" y="26.198486" fill="#fff" textAnchor={isController ? 'middle' : undefined}>
                     <tspan x={isController ? 202.5 : 117.17651} y="118.19849">
@@ -119,7 +128,10 @@ export default function LifecycleMethodsChart({ variant = 'component' }: { varia
                 </Link>
               </g>
               <g>
-                <Link to={isController ? hostHookAnchor.hostWillRender : '#componentwillrender'} className={styles.pathInit + ' ' + styles.pathUpdate}>
+                <Link
+                  to={isController ? hostHookAnchor.hostWillRender : '#componentwillrender'}
+                  className={styles.pathInit + ' ' + styles.pathUpdate}
+                >
                   <rect x="77.5" y="377" width="400" height="49" rx="24.5" ry="24.5" fill="#4b516e" />
                   <text x="-148.97623" y="146.83594" fill="#fff" textAnchor={isController ? 'middle' : undefined}>
                     <tspan x={isController ? 277.5 : 183.12378} y="405.83594">
@@ -129,7 +141,10 @@ export default function LifecycleMethodsChart({ variant = 'component' }: { varia
                 </Link>
               </g>
               <g>
-                <Link to={isController ? hostHookAnchor.hostWillUpdate : '#componentwillupdate'} className={styles.pathUpdate}>
+                <Link
+                  to={isController ? hostHookAnchor.hostWillUpdate : '#componentwillupdate'}
+                  className={styles.pathUpdate}
+                >
                   <rect x="303" y="305" width="252" height="49" rx="24.5" ry="24.5" fill="#7b83a6" />
                   <text x="2.5237732" y="74.835938" fill="#fff" textAnchor={isController ? 'middle' : undefined}>
                     <tspan x={isController ? 429 : 334.62378} y="333.83594">
@@ -139,7 +154,10 @@ export default function LifecycleMethodsChart({ variant = 'component' }: { varia
                 </Link>
               </g>
               <g>
-                <Link to={isController ? hostHookAnchor.hostDidRender : '#componentdidrender'} className={styles.pathInit + ' ' + styles.pathUpdate}>
+                <Link
+                  to={isController ? hostHookAnchor.hostDidRender : '#componentdidrender'}
+                  className={styles.pathInit + ' ' + styles.pathUpdate}
+                >
                   <rect x="77.5" y="523" width="400" height="49" rx="24.5" ry="24.5" fill="#4b516e" />
                   <text x="-144.44986" y="292.83597" fill="#fff" textAnchor={isController ? 'middle' : undefined}>
                     <tspan x={isController ? 277.5 : 187.65015} y="551.83594">
@@ -149,7 +167,10 @@ export default function LifecycleMethodsChart({ variant = 'component' }: { varia
                 </Link>
               </g>
               <g>
-                <Link to={isController ? hostHookAnchor.hostWillLoad : '#componentwillload'} className={styles.pathInit}>
+                <Link
+                  to={isController ? hostHookAnchor.hostWillLoad : '#componentwillload'}
+                  className={styles.pathInit}
+                >
                   <rect y="161" width="252" height="49" rx="24.5" ry="24.5" fill="#212431" />
                   <text x="2.2765121" y="97.835938" fill="#fff" textAnchor={isController ? 'middle' : undefined}>
                     <tspan x={isController ? 126 : 40.676514} y="189.83594">
