@@ -30,3 +30,16 @@ To generate a new version:
 1. Merging the Pull Request:
     1. Only one approval is need to merge the pull request
     1. Merging the pull request should coincide with the release of Stencil Core, as the doc site automatically deploys to Vercel
+
+## Stencil v5 GA Checklist
+
+`docs/` holds the v5 docs, shown as "v5 (Preview)" at `/v5/` while the site's default stays on v4.43 (see `lastVersion` in `docusaurus.config.js`). When v5 reaches GA:
+
+1. `introduction/02-installation.md` ("Updating Stencil"): `@stencil/core@beta` → `@stencil/core@latest`, and drop the preview note.
+1. Getting started: `npm init stencil@next` → `npm init stencil`, and drop the preview note. (`@5` can't resolve until a stable `create-stencil@5.0.0` exists.)
+1. `reference/upgrading-to-stencil-five.md`: `@stencil/core@beta` → `@stencil/core@5`, drop the preview note, and point the `BREAKING_CHANGES.md` link at `main` instead of the `v5` branch.
+1. `reference/support-policy.md`: fill in V5's release date, and V4's maintenance end date (six months after it).
+1. `guides/tooling/storybook.md`: drop `@dev` and its note once `@stencil/storybook-plugin` 1.0 ships.
+1. Once v5 is merged to `main` in `stenciljs/core`: repoint `docs-json.md`'s two links to `blob/main/src/declarations/stencil-public-docs.ts` at `packages/core/src/declarations/stencil-public-docs.ts`.
+1. Cut the version (`npm run docusaurus docs:version v5.0`, see above), then set `lastVersion: 'v5.0'` and remove the `current` label/banner overrides in `docusaurus.config.js`.
+1. Outside this repo: the stenciljs.com landing page still has a "Stencil 4 is here!" banner.
