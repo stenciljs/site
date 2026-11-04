@@ -1,0 +1,20 @@
+/* Matches the site's code blocks (`.theme-code-block` in custom.scss, and `codeTheme`) */
+.playground {
+  margin-bottom: var(--ifm-leading);
+  border: 0;
+  border-radius: var(--ifm-code-border-radius);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+
+  --stencil-playground-background: #0a1220;
+  --stencil-playground-divider-color: rgb(218, 221, 225);
+  --stencil-playground-tab-divider-color: transparent;
+  --stencil-playground-tabs-background: #0a1220;
+  --stencil-playground-tab-active-background: #0a1220;
+  --stencil-playground-tab-color: rgb(156 220 254 / 0.55);
+  --stencil-playground-tab-active-color: #9cdcfe;
+  --stencil-playground-tab-font: 0.8125rem var(--ifm-font-family-base);
+  --stencil-playground-editor-font-family: var(--ifm-font-family-monospace);
+  --stencil-playground-editor-font-size: 13px;
+  --stencil-playground-editor-line-height: 1.45;
+  --stencil-playground-editor-padding: 16px;
+}

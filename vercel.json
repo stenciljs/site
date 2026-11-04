@@ -103,12 +103,12 @@
     },
     {
       "source": "/:version(next|(?:v[\\d]+(?:\\.[\\dx]+)?))?/what-is-design-system",
-      "destination": "/docs/:version/design-systems",
+      "destination": "/docs/:version/introduction",
       "statusCode": 301
     },
     {
       "source": "/:version(next|(?:v[\\d]+(?:\\.[\\dx]+)?))?/stencil-for-design-systems",
-      "destination": "/docs/:version/design-systems",
+      "destination": "/docs/:version/introduction",
       "statusCode": 301
     },
     {
@@ -154,6 +154,51 @@
     {
       "source": "/:version(next|(?:v[\\d]+(?:\\.[\\dx]+)?))?/static-site-generation-debugging",
       "destination": "/docs/:version/vs-code-debugging",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/hydrate-app",
+      "destination": "/docs/v5/ssr",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/static-site-generation-server-side-rendering-ssr",
+      "destination": "/docs/v5/rendering-strategies",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/extends",
+      "destination": "/docs/v5/mixins-and-controllers",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/distribution",
+      "destination": "/docs/v5/loader-bundle",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/custom-elements",
+      "destination": "/docs/v5/standalone",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/server-side-rendering",
+      "destination": "/docs/v5/ssr",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/ssr-authoring",
+      "destination": "/docs/v5/ssr",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/build-variables",
+      "destination": "/docs/v5/guides/build-conditionals",
+      "statusCode": 301
+    },
+    {
+      "source": "/v5/forms",
+      "destination": "/docs/v5/form-associated",
       "statusCode": 301
     }
   ],

@@ -70,7 +70,7 @@ Stencil extends the class with a few additional methods:
 
 ## `skip` Function
 
-The `skip()` function is used to skip test execution for certain browsers or [component modes](https://stenciljs.com/docs/styling#style-modes):
+The `skip()` function is used to skip test execution for certain browsers or [component modes](../../components/styling/style-modes.md):
 
 ```ts
 test('my-test', ({ page, skip }) => {

@@ -9,6 +9,34 @@ slug: /dev-server
 
 Stencil comes with an integrated dev server in order to simplify development. By integrating the build process and the dev server, Stencil is able to drastically improve the development experience without requiring complicated build scripts and configuration. As app builds and re-builds take place, the compiler is able to communicate with the dev server, and vice versa.
 
+## Component Previews
+
+In a project without a [`www` output target](../output-targets/main/www.md), such as a component library, the dev server previews your components straight from `src`. Start it, and open the folder of the component you're working on:
+
+```bash
+stencil build --dev --watch --serve
+```
+
+```
+http://localhost:3333/src/components/my-greeting/
+```
+
+The server's root address redirects to `/src/`, so you can also browse your way to it.
+
+For each component in the folder, the preview page shows its tag, the description from its JSDoc comment, and a demo. The demos come from the `usage` folder next to the component: each `html` code block in a `usage/*.md` file is rendered as one demo. A component without usage examples is rendered once with no attributes.
+
+````md title="src/components/my-greeting/usage/example.md"
+# Example
+
+```html
+<my-greeting name="World"></my-greeting>
+```
+````
+
+The same usage files appear in your [generated documentation](../output-targets/documentation-generation/01-overview.md), and [`stencil generate`](./cli.md#stencil-generate) can create one for a new component.
+
+To write your own demo page instead, add an `index.html` to the component's folder. A folder that contains any HTML file, at any depth, is served as it is, without a generated preview.
+
 ## Hot Module Replacement
 
 The compiler already provides a watch mode, but coupled with the dev server it's able to go one step farther by reloading only what has changed within the browser. Hot Module Replacement allows the app to keep its state within the browser, while switching out individual components with their updated logic after file saves.
@@ -47,6 +75,16 @@ IP address used by the dev server. The default is `0.0.0.0`, which points to all
 **Default: `/`**
 
 Base path to be used by the server. Defaults to the root pathname.
+
+### `historyApiFallback`
+
+**Optional**
+
+**Type: `{ index?: string; disableDotRule?: boolean } | null`**
+
+**Default: `{ index: 'index.html', disableDotRule: false }`**
+
+Serves `index` (relative to [`root`](#root)) for a page request that matches no file, so a single-page app's client-side routes load on refresh or from a bookmark. It applies to `GET` requests that accept `text/html` and whose path has no `.`; set `disableDotRule: true` to include paths with a `.` too. Set `historyApiFallback` to `null` to turn it off.
 
 ### `https`
 
@@ -102,9 +140,9 @@ Every request to the server will be logged within the terminal.
 
 **Type: `boolean`**
 
-**Default: `true`**
+**Default: `false`**
 
-By default, when dev server is started the local dev URL is opened in your default browser. However, to prevent this URL to be opened change this value to `false`.
+Set to `true` to open the local dev URL in your default browser when the dev server starts.
 
 ### `pingRoute`
 
@@ -160,3 +198,13 @@ To have the page do a full refresh use `pageReload`. To disable any reloading, u
 **Default: `www` output directory if exists, project root otherwise**
 
 The directory to serve files from.
+
+### `ssr`
+
+**Optional**
+
+**Type: `boolean`**
+
+**Default: `false`**
+
+Server-renders each page the dev server serves, so you can check how your components [render on a server](../output-targets/main/ssr.md). The `--ssr` CLI flag sets it for one run. It's for development only.

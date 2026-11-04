@@ -17,8 +17,8 @@ Once all the metadata has been collected, all the decorators are removed from th
 
 - [@Component()](./component.md) declares a new web component
 - [@Prop()](./properties.md#the-prop-decorator-prop) declares an exposed property/attribute
-- [@State()](./state.md#the-state-decorator-state) declares an internal state of the component
-- [@Watch()](./reactive-data.md#the-watch-decorator-watch) declares a hook that runs when a property or state changes
+- [@State()](./state.md) declares an internal state of the component
+- [@Watch()](./reactive-data.md) declares a hook that runs when a property or state changes
 - [@Element()](./host-element.md#element-decorator) declares a reference to the host element
 - [@Method()](./methods.md) declares an exposed public method
 - [@Event()](./events.md#event-decorator) declares a DOM event the component might emit
@@ -34,7 +34,7 @@ Once all the metadata has been collected, all the decorators are removed from th
 - [disconnectedCallback()](./component-lifecycle.md#disconnectedcallback)
 - [componentWillLoad()](./component-lifecycle.md#componentwillload)
 - [componentDidLoad()](./component-lifecycle.md#componentdidload)
-- [componentShouldUpdate(newValue, oldValue, propName): boolean](./component-lifecycle.md#componentshouldupdate)
+- [componentShouldUpdate(changes): boolean](./component-lifecycle.md#componentshouldupdate)
 - [componentWillRender()](./component-lifecycle.md#componentwillrender)
 - [componentDidRender()](./component-lifecycle.md#componentdidrender)
 - [componentWillUpdate()](./component-lifecycle.md#componentwillupdate)
@@ -49,8 +49,7 @@ can be used by an implementation consuming your Stencil component to detect when
 This method returns a promise which resolves after `componentDidRender()` on the _first_ render cycle.
 
 :::note
-`componentOnReady()` only resolves once per component lifetime. If you need to hook into subsequent render cycle, use
-`componentDidRender()` or `componentDidUpdate()`.
+`componentOnReady()` waits for the first render only. Calling it again later returns a promise that's already resolved.
 :::
 
 Executing code after `componentOnReady()` resolves could look something like this:
@@ -65,16 +64,11 @@ el.componentOnReady().then(() => {
 });
 ```
 
-The availability of `componentOnReady()` depends on the component's compiled output type. This method is only available for lazy-loaded
-distribution types ([`dist`](../output-targets/dist.md) and [`www`](../output-targets/www.md)) and, as such, is not available for
-[`dist-custom-elements`](../output-targets/custom-elements.md) output. If you want to simulate the behavior of `componentOnReady()` for non-lazy builds,
-you can implement a helper method to wrap the functionality similar to what the Ionic Framework does [here](https://github.com/ionic-team/ionic-framework/blob/main/core/src/utils/helpers.ts#L60-L79).
-
 ## The `appload` event
 
-In addition to component-specific lifecycle hooks, a special event called `appload` will be emitted when the app and all of its child components have finished loading. You can listen for it on the `window` object.
+In addition to component-specific lifecycle hooks, a special event called `appload` will be emitted when the app (a root level component) and all of its child components have finished loading. You can listen for it on the `window` object.
 
-If you have multiple apps on the same page, you can determine which app emitted the event by checking `event.detail.namespace`. This will be the value of the [namespace config option](../config/01-overview.md#namespace) you've set in your Stencil config.
+The event is emitted once for each root component (one that isn't inside another Stencil component). If you have multiple 'apps' on the same page, you can determine which app emitted the event by checking `event.detail.namespace`. This will be the value of the [namespace config option](../config/01-overview.md#namespace) you've set in your Stencil config.
 
 ```tsx
 window.addEventListener('appload', (event) => {
@@ -90,41 +84,13 @@ The following primitives can be imported from the `@stencil/core` package and us
 
 `<Host>`, is a functional component that can be used at the root of the render function to set attributes and event listeners to the host element itself. Refer to the [Host Element](./host-element.md) page for usage info.
 
-### **Fragment**: 
+### **h()** and **Fragment**:
 
-`<Fragment>`, often used via `<>...</>` syntax, lets you group elements without a wrapper node.
-
-  To use this feature, ensure that the following TypeScript compiler options are set:
-  - [`jsxFragmentFactory` is set](https://www.typescriptlang.org/tsconfig#jsxFragmentFactory) to "Fragment"
-  - [`jsxFactory` is set](https://www.typescriptlang.org/tsconfig#jsxFactory) to "h"
-
-  __Type:__ `FunctionalComponent`<br />
-  __Example:__
-  ```tsx
-  import { Component, Fragment, h } from '@stencil/core'
-  @Component({
-    tag: 'cmp-fragment',
-  })
-  export class CmpFragment {
-    render() {
-      return (
-        <>
-          <div>...</div>
-          <div>...</div>
-          <div>...</div>
-        </>
-      );
-    }
-  }
-  ```
-
-### [**h()**](./templating-and-jsx.md): 
-
-Turns JSX syntax into Virtual DOM elements. Read more on the [Templating and JSX](./templating-and-jsx.md#the-h-and-fragment-functions) page.
+The JSX factory functions. They're only needed with the legacy JSX setup (`"jsx": "react"` plus `jsxFactory` and `jsxFragmentFactory` in `tsconfig.json`), where every component file imports them. With Stencil's default setup (`"jsxImportSource": "@stencil/core"`), JSX and `<>...</>` fragments work without importing anything.
 
 ### **render()**: 
 
-A utility method to render a virtual DOM created by `h()` into a container.
+A utility method to render a virtual DOM created with JSX into a container.
 
   __Type:__ `(vnode: VNode, container: Element) => void`
   __Example:__
@@ -135,6 +101,10 @@ A utility method to render a virtual DOM created by `h()` into a container.
   )
   render(vdom, document.body)
   ```
+
+### [**Build**](./build-conditionals.md):
+
+Flags for the kind of build the code is running in: `Build.isDev`, `Build.isBrowser`, `Build.isServer` and `Build.isTesting`. Refer to the [Build Conditionals](./build-conditionals.md) page for usage info.
 
 ### [**readTask()**](https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing): 
 
@@ -163,12 +133,12 @@ Schedules a new render of the given instance or element even if no state changed
 
 ### **getAssetPath()**: 
  
- Gets the path to local assets. Refer to the [Assets](../guides/assets.md#getassetpath) page for usage info.
+ Gets the path to local assets. Refer to the [Assets](../guides/distribution/assets.md#getassetpath) page for usage info.
 
   __Type:__ `(path: string) => string`<br />
   __Example:__
   ```tsx
-  import { Component, Prop, getAssetPath, h } from '@stencil/core'
+  import { Component, Prop, getAssetPath } from '@stencil/core'
   @Component({
     tag: 'cmp-asset',
   })
@@ -185,7 +155,7 @@ Schedules a new render of the given instance or element even if no state changed
 
 ### **setAssetPath()**: 
 
-Sets the path for Stencil to resolve local assets. Refer to the [Assets](../guides/assets.md#setassetpath) page for usage info.
+Sets the path for Stencil to resolve local assets. Refer to the [Assets](../guides/distribution/assets.md#setassetpath) page for usage info.
 
   __Type:__ `(path: string) => string`<br />
   __Example:__
@@ -196,7 +166,7 @@ Sets the path for Stencil to resolve local assets. Refer to the [Assets](../guid
 
  ### **setMode()**: 
  
- Sets the style mode of a component. Refer to the [Styling](./styling.md#style-modes) page for usage info.
+ Sets the style mode of a component. Refer to the [Styling](./styling/style-modes.md) page for usage info.
 
   __Type:__ `((elm: HTMLElement) => string | undefined | null) => void`<br />
   __Example:__
@@ -209,7 +179,7 @@ Sets the path for Stencil to resolve local assets. Refer to the [Assets](../guid
 
 ### **getMode()**: 
 
-Get the current style mode of your application. Refer to the [Styling](./styling.md#style-modes) page for usage info.
+Get the current style mode of your application. Refer to the [Styling](./styling/style-modes.md) page for usage info.
 
   __Type:__ `(ref: any) => string | undefined`<br />
   __Example:__
@@ -275,7 +245,7 @@ Compose multiple classes into a single constructor using factory functions.
   ```
   __Example:__
   ```ts
-  import { Mixin, MixedInCtor, Component, h, Prop, State } from '@stencil/core'
+  import { Mixin, MixedInCtor, Component, Prop, State } from '@stencil/core'
 
   const aFactory = <B extends MixedInCtor>(Base: B) => {
     class A extends Base { propA = 'A' };
@@ -300,13 +270,8 @@ Compose multiple classes into a single constructor using factory functions.
   }
   ```
 
-:::caution
-If your Stencil component library uses `Mixin()` (or `extends`) and *might* be used by other Stencil component libraries, ensure that all mixed-in factories are imported directly and **not** via [barrel files](https://basarat.gitbook.io/typescript/main-1/barrel). 
-The static-analysis that Stencil uses to find mixed-in classes does not work within 3rd party (node_module) barrel files.
-:::
+For detailed guidance on using `Mixin()` to compose behavior into a component, including when to write your own mixin factories versus reactive controllers and [using mixins from other Stencil libraries](../guides/patterns/mixins-and-controllers.md#use-mixins-from-other-stencil-libraries), see the [Mixins & Reactive Controllers](../guides/patterns/mixins-and-controllers.md) guide.
 
-For detailed guidance on using `Mixin()` and `extends` for component architecture, including when to use inheritance vs composition patterns, see the [Extends & Mixins](../guides/extends.md) guide.
+### [**setTagTransformer()** and **transformTag()**](../guides/distribution/tag-name-clashes/tag-transformation.md): 
 
-### [**setTagTransformer()** and **transformTag()**](../guides/tag-transformation.md): 
-
-Manage tag name transformation at runtime. Refer to the [Tag Transformation](../guides/tag-transformation.md) page for usage info.
+Manage tag name transformation at runtime. Refer to the [Tag Transformation](../guides/distribution/tag-name-clashes/tag-transformation.md) page for usage info.

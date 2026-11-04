@@ -67,3 +67,16 @@
     }
   }
 }
+
+/*
+ * Code blocks match the samples on the stenciljs.com homepage. Kept outside `@layer local`:
+ * the Ionic docs theme's unlayered `:root:not(#\#)...` rules would win over anything layered.
+ */
+:root:not(#\#):not(#\#):not(#\#):not(#\#) {
+  --ifm-font-family-monospace: 'Roboto Mono', ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.theme-code-block {
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+}
+

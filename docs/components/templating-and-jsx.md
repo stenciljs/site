@@ -9,48 +9,9 @@ slug: /templating-jsx
 
 Stencil components are rendered using JSX, a popular, declarative template syntax. Each component has a `render` function that returns a tree of components that are rendered to the DOM at runtime.
 
-## Basics
+By default, Stencil sets up projects for JSX automatically. If you're setting up a project manually, add the following to your `tsconfig.json`:
 
-### The `h` and `Fragment` functions
-
-The `h` function (short for "hyperscript") is a factory function that creates virtual DOM elements. When you write JSX like `<div>Hello</div>`, it gets transformed into function calls like `h('div', null, 'Hello')`. The `Fragment` function is used to group a list of children without adding extra nodes to the DOM.
-
-#### Set up in Stencil
-
-Within your Stencil project, make sure to add or modify your `tsconfig.json` file, adding:
-
-```json
-{
-  "compilerOptions": {
-    "jsx": "react",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
-  }
-}
-```
-
-You will then need to import `h` (and `Fragment` if you plan to use it) from `@stencil/core` at the top of your component file:
-
-```tsx
-import { h, Fragment, Component } from '@stencil/core';
-
-@Component({
-  tag: 'my-component',
-})
-class MyComponent { ... }
-```
-
-(Read more about using the `Fragment` component in the [Complex Template Content](#complex-template-content) section below.)
-
-### `jsxImportSource` alternative
-
-`jsxImportSource` is a more modern approach that automatically imports the necessary JSX runtime functions instead of manually importing `h`; the compiler automatically imports what it needs from the specified package.
-
-#### Set up in Stencil
-
-To use `jsxImportSource`, modify your `tsconfig.json` file as follows:
-
-```json
+```json title="tsconfig.json"
 {
   "compilerOptions": {
     "jsx": "react-jsx",
@@ -59,7 +20,7 @@ To use `jsxImportSource`, modify your `tsconfig.json` file as follows:
 }
 ```
 
-Using this approach means you do not need to manually import `h` or `Fragment` in your component files.
+## Basics
 
 ### The `render` function
 
@@ -168,80 +129,70 @@ If you want to destroy and recreate a component in a conditional, you can assign
 
 This way, if `someCondition` changes, you get a new `<my-counter>` component with fresh internal state that also runs the lifecycle methods `componentWillLoad()` and `componentDidLoad()`.
 
+Click both counters a few times, then **Toggle**. The counter without a `key` keeps its count, and the one with a `key` starts again from its `initialValue`:
+
+:::playground{preview-height=150}
+```tsx title="my-counter.tsx"
+import { Component, Prop, State } from '@stencil/core';
+
+@Component({ tag: 'my-counter' })
+export class MyCounter {
+  @Prop() initialValue = 0;
+  @State() count = 0;
+
+  componentWillLoad() {
+    this.count = this.initialValue;
+  }
+
+  render() {
+    return <button onClick={() => this.count++}>Count: {this.count}</button>;
+  }
+}
+```
+
+```tsx title="my-toggle-demo.tsx"
+import { Component, State } from '@stencil/core';
+
+@Component({ tag: 'my-toggle-demo' })
+export class MyToggleDemo {
+  @State() someCondition = true;
+
+  render() {
+    return (
+      <div>
+        <button onClick={() => (this.someCondition = !this.someCondition)}>Toggle</button>
+        <p>
+          Without key:{' '}
+          {this.someCondition
+            ? <my-counter initialValue={2} />
+            : <my-counter initialValue={5} />
+          }
+        </p>
+        <p>
+          With key:{' '}
+          {this.someCondition
+            ? <my-counter key="a" initialValue={2} />
+            : <my-counter key="b" initialValue={5} />
+          }
+        </p>
+      </div>
+    );
+  }
+}
+```
+
+```html title="index.html"
+<script type="module" src="./my-counter.js"></script>
+<script type="module" src="./my-toggle-demo.js"></script>
+
+<my-toggle-demo></my-toggle-demo>
+```
+:::
+
 
 ## Slots
 
-Components often need to render dynamic children in specific locations in their component tree, allowing a developer to supply child content when using our component, with our component placing that child component in the proper location.
-
-To do this, you can use the [Slot](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/slot) tag inside of your `my-component`.
-
-```tsx
-// my-component.tsx
-
-render() {
-  return (
-    <div>
-      <h2>A Component</h2>
-      <div><slot /></div>
-    </div>
-  );
-}
-
-```
-
-Then, if a user passes child components when creating our component `my-component`, then `my-component` will place that
-component inside of the second `<div>` above:
-
-```tsx
-render(){
-  return(
-    <my-component>
-      <p>Child Element</p>
-    </my-component>
-  )
-}
-```
-
-Slots can also have `name`s to allow for specifying slot output location:
-
-```tsx
-// my-component.tsx
-
-render(){
-  return [
-    <slot name="item-start" />,
-    <h1>Here is my main content</h1>,
-    <slot name="item-end" />
-  ]
-}
-```
-
-```tsx
-render(){
-  return(
-    <my-component>
-      <p slot="item-start">I'll be placed before the h1</p>
-      <p slot="item-end">I'll be placed after the h1</p>
-    </my-component>
-  )
-}
-```
-
-### Slots Outside Shadow DOM
-
-:::caution
-Slots are native to the [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM), but Stencil polyfills
-the behavior to work for non-shadow components as well. However, you may encounter issues using slots outside the Shadow DOM especially with
-component trees mixing shadow and non-shadow components, or when passing a slot through many levels of components. In many cases, this behavior can
-be remedied by wrapping the `slot` in an additional element (like a `div` or `span`) so the Stencil runtime can correctly "anchor" the relocated
-content in its new location.
-:::
-
-There are known use cases that the Stencil runtime is not able to support:
-
-- Forwarding slotted content to another slot with a different name:<br/>
-  It is recommended that slot names stay consistent when slotting content through multiple levels of components. **Avoid** defining slot tags like
-  `<slot name="start" slot="main" />`.
+A `<slot>` in your JSX marks where content passed into the component goes. See [Slots](./slots.md) for named slots, fallback content, and how slots work with and without shadow DOM.
 
 ## Dealing with Children
 
@@ -260,11 +211,11 @@ render() {
       <div class="todo-one">
         {this.todos.map((todo) => (
           <span>{ todo.taskName }</span>
-        )}
+        ))}
       </div>
       <div class="todo-two">
-        <span>{ todos[0].taskName }</span>
-        <span>{ todos[1].taskName }</span>
+        <span>{ this.todos[0].taskName }</span>
+        <span>{ this.todos[1].taskName }</span>
       </div>
     </>
   )
@@ -406,26 +357,25 @@ render() {
 }
 ```
 
-Alternatively you can use the `Fragment` functional component, in which case you won't need to add commas:
+Alternatively, wrap them in a fragment, `<>...</>`, which groups elements without adding a wrapper node to the DOM. No commas are needed:
 
 ```tsx
-import { Fragment } from '@stencil/core';
-...
 render() {
-  return (<Fragment>
-    // first top level element
-    <div class="container">
-      <ul>
-        <li>Item 1</li>
-        <li>Item 2</li>
-        <li>Item 3</li>
-      </ul>
-    </div>
+  return (
+    <>
+      <div class="container">
+        <ul>
+          <li>Item 1</li>
+          <li>Item 2</li>
+          <li>Item 3</li>
+        </ul>
+      </div>
 
-    <div class="another-container">
-      ... more html content ...
-    </div>
-  </Fragment>);
+      <div class="another-container">
+        ... more html content ...
+      </div>
+    </>
+  );
 }
 ```
 
@@ -483,7 +433,34 @@ will set the `value` attribute on the input element, while:
 <input prop:value="Hello" />
 ```
 
-will explicitly set the `value` property on the input element.  
+will explicitly set the `value` property on the input element.
+
+For an input's `value`, the difference shows once someone has typed. Type in both inputs, then click **Toggle**. The `prop:value` input shows the new value. The `attr:value` input keeps what you typed, because the attribute is only the input's default value:
+
+:::playground{preview-height=80}
+```tsx title="my-cmp.tsx"
+import { Component, State } from '@stencil/core';
+
+@Component({ tag: 'my-cmp' })
+export class MyCmp {
+  @State() greeting = 'Hello';
+
+  private toggle = () => {
+    this.greeting = this.greeting === 'Hello' ? 'Goodbye' : 'Hello';
+  };
+
+  render() {
+    return (
+      <div>
+        <input attr:value={this.greeting} />
+        <input prop:value={this.greeting} />
+        <button onClick={this.toggle}>Toggle</button>
+      </div>
+    );
+  }
+}
+```
+:::
 
 
 ## Avoid Shared JSX Nodes

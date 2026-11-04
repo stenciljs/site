@@ -12,20 +12,25 @@ This allows you to leverage features such as [Custom States](https://developer.m
 
 ## Form Association
 
+Decorating a property with `@AttachInternals()` automatically marks the component as [form-associated](https://html.spec.whatwg.org/#custom-elements-face-example) — there's no separate `formAssociated` option on `@Component()`. To attach `ElementInternals` for something like [Custom States](#custom-states) *without* form association, use `@AttachInternals({ formAssociated: false })`.
+
 Read the dedicated guide on [Form Associated Components](./form-associated.md) and how to use `@AttachInternals` there.
+
+Note that `ElementInternals` on a [closed shadow root](./component.md#encapsulation) (`encapsulation: { type: 'shadow', mode: 'closed' }`) is still accessible via `@AttachInternals()` from inside the component — closed mode only prevents access to `shadowRoot` from *outside* the component.
 
 ## Custom States
 
 You can use the `@AttachInternals` decorator to define [Custom States](https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet) for your component.
 
 ```tsx
-import { Component, h, AttachInternals } from '@stencil/core';
+import { Component, AttachInternals } from '@stencil/core';
 /**
  * My Element component
  */
 @Component({
   tag: 'my-element',
   styleUrl: 'my-element.css',
+  encapsulation: { type: 'shadow' },
 })
 export class MyElement {
   @AttachInternals({
@@ -54,15 +59,55 @@ handleClick() {
 }
 ```
 
-You or your element users can then use custom states in CSS like so:
+You or your element users can then use custom states in CSS. Use them internally, in the component's stylesheet, or externally, from the page. Click the element below to run `handleClick()`:
 
-```css
-/* Use them internally... */
+:::playground{preview-height=90}
+```css title="my-element.css"
 :host(:state(my-custom-state)) {
   background-color: yellow;
 }
-/* ... Or use them externally */
-my-element:state(another-state) {
-  border: 2px solid red;
-} 
 ```
+
+```html title="index.html"
+<style>
+  my-element:state(another-state) {
+    border: 2px solid red;
+  }
+</style>
+
+<script type="module" src="./my-element.js"></script>
+
+<my-element></my-element>
+```
+
+```tsx title="my-element.tsx" hidden
+import { Component, AttachInternals } from '@stencil/core';
+/**
+ * My Element component
+ */
+@Component({
+  tag: 'my-element',
+  styleUrl: 'my-element.css',
+  encapsulation: { type: 'shadow' },
+})
+export class MyElement {
+  @AttachInternals({
+    states: {
+      /** A custom state for my element */
+      'my-custom-state': true,
+      /** Another custom state for my element */
+      'another-state': false
+    }
+  }) internals: ElementInternals;
+
+  handleClick() {
+    this.internals.states.add('another-state'); // to add a state
+    this.internals.states.delete('my-custom-state'); // to remove a state
+  }
+
+  render() {
+    return <div onClick={() => this.handleClick()}>My Element</div>;
+  }
+}
+```
+:::

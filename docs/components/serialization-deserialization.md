@@ -132,16 +132,77 @@ const myComponent = document.querySelector('my-component');
 console.log(myComponent.aStringArray); // ['Hello', 'World']
 ```
 
+This playground combines both decorators. Set the property and the attribute follows, or set the attribute and the property follows:
+
+:::playground{preview-height=150}
+```tsx title="my-component.tsx"
+import { AttrDeserialize, Component, Prop, PropSerialize } from '@stencil/core';
+
+@Component({
+  tag: 'my-component',
+})
+export class MyComponent {
+  @Prop() aStringArray: string[] = [];
+
+  @PropSerialize('aStringArray')
+  serializeStringArray(value: string[]) {
+    try {
+      return JSON.stringify(value);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @AttrDeserialize('aStringArray')
+  deserializeStringArray(value: string): string[] | null {
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  render() {
+    return <p>Property: {this.aStringArray.join(', ')}</p>;
+  }
+}
+```
+
+```html title="index.html"
+<script type="module" src="./my-component.js"></script>
+
+<my-component></my-component>
+<button id="prop">Set the property</button>
+<button id="attr">Set the attribute</button>
+<p>Attribute: <code id="out"></code></p>
+
+<script>
+  const myComponent = document.querySelector('my-component');
+  const show = () => {
+    document.querySelector('#out').textContent = myComponent.getAttribute('a-string-array');
+  };
+  document.querySelector('#prop').addEventListener('click', () => {
+    myComponent.aStringArray = ['Hello', 'World'];
+    setTimeout(show);
+  });
+  document.querySelector('#attr').addEventListener('click', () => {
+    myComponent.setAttribute('a-string-array', '["Goodbye","World"]');
+    show();
+  });
+</script>
+```
+:::
+
 ## Practical uses of PropSerialize
 
 Practically speaking, there is little disadvantage in using a `@AttrDeserialize()` on a complex property; it just adds another method for users to provide data to your component.
 
 The use-cases around using `@PropSerialize()` is slightly less obvious as in general, [it is not considered best practice to reflect complex data (like objects or arrays) as attributes](https://web.dev/articles/custom-elements-best-practices#aim-to-only-accept-rich-data-objects,-arrays-as-properties.) 
 
-The following example illustrates a practical use case for `@PropSerialize()` using the [hydrate script output](../guides/hydrate-app.md) on a server we can fetch and serialize complex data to an attribute. When the same component loads in a browser, the component can de-serialize the data immediately without having to do another fetch. 
+The following example illustrates a practical use case for `@PropSerialize()` using the [`ssr` output target](../output-targets/main/ssr.md) on a server we can fetch and serialize complex data to an attribute. When the same component loads in a browser, the component can de-serialize the data immediately without having to do another fetch. 
 
 ```tsx
-import { AttrDeserialize, Build, Component, h, Prop, PropSerialize } from '@stencil/core';
+import { AttrDeserialize, Build, Component, Prop, PropSerialize } from '@stencil/core';
 
 interface User {
   userName: string;

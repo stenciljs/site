@@ -1,68 +1,35 @@
 ---
 title: Stencil Output Targets
 sidebar_label: Overview
-description: Stencil Output Targets
+description: Every output target Stencil can build, and what each is for
 slug: /output-targets
 ---
 
 # Output Targets
 
-One of the more powerful features of the compiler is its ability to generate various builds depending on _"how"_ the components are going to be used. Stencil is able to take an app's source and compile it to numerous targets, such as a webapp to be deployed on an http server, as a third-party component lazy-loaded library to be distributed on [npm](https://www.npmjs.com/), or a vanilla custom elements bundle. By default, Stencil apps have an output target type of `www`, which is best suited for a webapp.
+Output targets decide what Stencil builds from your components. Configure them in the `outputTargets` array of `stencil.config.ts`. With none configured, Stencil builds [`loader-bundle`](./main/loader-bundle.md), the usual choice for a component library; add [`www`](./main/www.md) to build a complete web app.
 
+## Main
 
-## Output Target Types:
- - [`dist`: Distribution](./dist.md)
- - [`www`: Website](./www.md)
- - [`dist-custom-elements`: Custom Elements](./custom-elements.md)
+The [main output targets](./main/01-overview.md) build your components for the browser or a server:
 
-## Example:
+- [`loader-bundle`](./main/loader-bundle.md): lazy-loaded bundle for CDN and npm distribution (formerly `dist`)
+- [`standalone`](./main/standalone.md): one custom element module per component (formerly `dist-custom-elements`)
+- [`ssr`](./main/ssr.md): server-side rendering module (formerly `dist-hydrate-script`)
+- [`ssr-wasm`](./main/ssr-wasm.md): the `ssr` module as WebAssembly, for servers in other languages
+- [`www`](./main/www.md): a complete web app
 
-```tsx
-import { Config } from '@stencil/core';
+## Documentation
 
-export const config: Config = {
-  outputTargets: [
-    {
-      type: 'dist'
-    },
-    {
-      type: 'www'
-    }
-  ]
-};
-```
+[Documentation targets](./documentation-generation/01-overview.md) generate docs from your components' source and JSDoc: `docs-readme`, `docs-json`, `docs-custom-elements-manifest`, `docs-vscode`, `docs-agent-skill`, `docs-custom`, and `stats`.
 
-## Primary Package Output Target Validation
+## Assets
 
-If `validatePrimaryPackageOutputTarget: true` is set in your project's [Stencil config](../config/01-overview.md#validateprimarypackageoutputtarget) Stencil will
-attempt to validate certain fields in your `package.json` that correspond with the generated distribution code. Because Stencil can output many different formats
-from a single project, it can only validate that the `package.json` has field values that align with one of the specified output targets in your project's config.
-So, Stencil allows you to designate which output target should be used for this validation and thus which will be the default distribution when bundling your
-project. 
+- [`global-style`](./asset-outputs/global-style.md): global stylesheets
+- [`assets`](./asset-outputs/assets.md): files your components reference, such as icons and images
 
-This behavior only affects a small subset of output targets so a flag exists on the following targets that are eligible for this level of validation: `dist`, `dist-types`,
-`dist-collection`, and `dist-custom-elements`. For any of these output targets, you can configure the target to be validated as follows:
+## Supporting Outputs
 
-```ts title='stencil.config.ts'
-import { Config } from '@stencil/core';
-
-export const config: Config = {
-  ...,
-  outputTargets: [
-    {
-      type: 'dist',
-      // This flag is what tells Stencil to use this target for validation
-      isPrimaryPackageOutputTarget: true,
-      ...
-    },
-    ...
-  ],
-  // If this is not set, Stencil will not validate any targets
-  validatePrimaryPackageOutputTarget: true,
-};
-```
-
-:::note
-Stencil can only validate one of these output targets for your build. If multiple output targets are marked for validation, Stencil will use
-the first designated target in the array and ignore all others.
-:::
+- [`types`](./supporting/types.md): TypeScript type declarations, generated in production builds
+- [`collection`](./supporting/collection.md): transpiled source for other Stencil projects to re-bundle, generated in production builds
+- [Copy tasks](./supporting/copy-tasks.md): copy other files into an output target's directory

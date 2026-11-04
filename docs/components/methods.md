@@ -9,10 +9,6 @@ slug: /methods
 
 The `@Method()` decorator is used to expose methods on the public API. Functions decorated with the `@Method()` decorator can be called directly from the element, i.e. they are intended to be callable from the outside!
 
-:::note
-Developers should try to rely on publicly exposed methods as little as possible, and instead default to using properties and events as much as possible. As an app scales, we've found it's easier to manage and pass data through @Prop rather than public methods.
-:::
-
 ```tsx
 import { Method } from '@stencil/core';
 
@@ -38,6 +34,43 @@ Developers should ensure that the component is defined by using the whenDefined 
   await todoListElement.showPrompt();
 })();
 ```
+
+In this playground, the button in `index.html` calls `showPrompt()`:
+
+:::playground{preview-height=90}
+```html title="index.html"
+<script type="module" src="./todo-list.js"></script>
+
+<button>Add a todo</button>
+<todo-list></todo-list>
+
+<script>
+  document.querySelector('button').addEventListener('click', async () => {
+    await customElements.whenDefined('todo-list');
+    const todoListElement = document.querySelector('todo-list');
+    await todoListElement.showPrompt();
+  });
+</script>
+```
+
+```tsx title="todo-list.tsx"
+import { Component, Method, State } from '@stencil/core';
+
+@Component({ tag: 'todo-list' })
+export class TodoList {
+  @State() prompting = false;
+
+  @Method()
+  async showPrompt() {
+    this.prompting = true;
+  }
+
+  render() {
+    return this.prompting ? <input placeholder="What needs doing?" /> : <p>No prompt yet</p>;
+  }
+}
+```
+:::
 
 ## Public methods must be async
 

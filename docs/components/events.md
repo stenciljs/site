@@ -214,6 +214,68 @@ This property is generated automatically and is prefixed with "on". For example,
 <todo-list onTodoDeleted={ev => this.someOtherMethod(ev)} />
 ```
 
+In this playground, `todo-list` emits `todoCompleted` when you click **Done**, and `todo-app` listens with `onTodoCompleted`:
+
+:::playground{preview-height=150}
+```tsx title="todo-list.tsx"
+import { Component, Event, EventEmitter, State } from '@stencil/core';
+
+export interface Todo {
+  title: string;
+}
+
+@Component({ tag: 'todo-list' })
+export class TodoList {
+  @State() todos: Todo[] = [{ title: 'Write the docs' }, { title: 'Ship v5' }];
+
+  @Event() todoCompleted: EventEmitter<Todo>;
+
+  todoCompletedHandler(todo: Todo) {
+    this.todos = this.todos.filter((t) => t !== todo);
+    this.todoCompleted.emit(todo);
+  }
+
+  render() {
+    return (
+      <ul>
+        {this.todos.map((todo) => (
+          <li>
+            {todo.title} <button onClick={() => this.todoCompletedHandler(todo)}>Done</button>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+}
+```
+
+```tsx title="todo-app.tsx"
+import { Component, State } from '@stencil/core';
+import type { Todo } from './todo-list';
+
+@Component({ tag: 'todo-app' })
+export class TodoApp {
+  @State() completed: Todo[] = [];
+
+  render() {
+    return (
+      <div>
+        <todo-list onTodoCompleted={(ev) => (this.completed = [...this.completed, ev.detail])} />
+        <p>Completed: {this.completed.map((todo) => todo.title).join(', ') || 'nothing yet'}</p>
+      </div>
+    );
+  }
+}
+```
+
+```html title="index.html" hidden
+<script type="module" src="./todo-list.js"></script>
+<script type="module" src="./todo-app.js"></script>
+
+<todo-app></todo-app>
+```
+:::
+
 ## Listening to events from a non-JSX element
 
 ```tsx

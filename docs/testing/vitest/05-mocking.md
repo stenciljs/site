@@ -11,16 +11,38 @@ slug: /testing-vitest-mocking
 
 ## Setup Requirement
 
-The spy system patches `customElements.define`, so components must be registered after the test framework initializes. Load your components in a `beforeAll` block:
+The spy system patches `customElements.define`, so components must be registered after the test framework initializes. A test file that imports its components, as in the [standard setup](./01-overview.md#quick-start), already does this.
+
+If you load your [built output](./02-configuration.md#testing-your-built-output) from a setup file instead, do it in a `beforeAll` block:
 
 ```diff
 // vitest-setup.ts
-- await import('./dist/test-components/test-components.esm.js');
+- await import('./dist/loader-bundle/test-components/test-components.js');
 
 + import { beforeAll } from 'vitest';
 + beforeAll(async () => {
-+   await import('./dist/test-components/test-components.esm.js');
++   await import('./dist/loader-bundle/test-components/test-components.js');
 + });
+```
+
+## Mocking Modules
+
+Components are compiled from source, so Vitest's [`vi.mock()`](https://vitest.dev/api/vi.html#vi-mock) can replace a module that a component imports. Import `vi` from `vitest` itself here, as `vi.mock()` isn't recognized when it comes from another package:
+
+```tsx
+import { render } from '@stencil/vitest';
+import { vi, it, expect } from 'vitest';
+
+vi.mock('./format', () => ({
+  formatLabel: (label: string) => `mocked:${label}`,
+}));
+
+import './my-button';
+
+it('uses the mocked module', async () => {
+  const { root } = await render(<my-button label="Save" />);
+  expect(root.shadowRoot?.querySelector('button')?.textContent).toBe('mocked:Save');
+});
 ```
 
 ## Method Spying
@@ -28,7 +50,7 @@ The spy system patches `customElements.define`, so components must be registered
 Spy on methods while still calling the original implementation:
 
 ```tsx
-import { render, h, describe, it, expect } from '@stencil/vitest';
+import { render, describe, it, expect } from '@stencil/vitest';
 
 describe('my-button', () => {
   it('calls handleClick when clicked', async () => {
@@ -58,7 +80,7 @@ describe('my-button', () => {
 Replace methods with pre-configured mocks to control return values or simulate different scenarios:
 
 ```tsx
-import { render, h, vi, describe, it, expect } from '@stencil/vitest';
+import { render, vi, describe, it, expect } from '@stencil/vitest';
 
 describe('user-profile', () => {
   it('displays fetched user data', async () => {
@@ -203,7 +225,7 @@ expect(fetchMock()).toBeUndefined();
 When the root element is not a custom element, or when you have multiple custom elements, use `getComponentSpies()` to retrieve spies for specific elements:
 
 ```tsx
-import { render, getComponentSpies, h, describe, it, expect } from '@stencil/vitest';
+import { render, getComponentSpies, describe, it, expect } from '@stencil/vitest';
 
 describe('nested components', () => {
   it('spies on nested elements', async () => {
@@ -250,7 +272,7 @@ describe('nested components', () => {
 When rendering multiple component types, use the `components` property for tag-specific spy configs:
 
 ```tsx
-import { render, getComponentSpies, h, describe, it, expect } from '@stencil/vitest';
+import { render, getComponentSpies, describe, it, expect } from '@stencil/vitest';
 
 describe('my-card with my-button', () => {
   it('applies different spy configs per component', async () => {

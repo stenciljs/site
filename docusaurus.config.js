@@ -6,9 +6,21 @@ const { themes } = require('prism-react-renderer');
 
 const HOSTNAME = 'stenciljs.com';
 
+// Matches the code samples on the stenciljs.com homepage: VS Code Dark+ colours on a navy background
+const codeTheme = {
+  ...themes.vsDark,
+  plain: { ...themes.vsDark.plain, backgroundColor: '#0a1220' },
+};
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Stencil',
+  stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap',
+      type: 'text/css',
+    },
+  ],
   tagline: 'Build. Customize. Distribute. Adopt.',
   url: `https://${HOSTNAME}`,
   baseUrl: '/docs/',
@@ -40,13 +52,36 @@ const config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
-          editUrl: 'https://github.com/ionic-team/stencil-site/tree/main',
-          remarkPlugins: [[require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }]],
+          editUrl: 'https://github.com/stenciljs/site/tree/main',
+          remarkPlugins: [
+            [require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }],
+            require('./src/remark/playground'),
+          ],
           breadcrumbs: false,
+          // Pin the default (un-prefixed) view to the latest *stable* release. Without this,
+          // cutting a new version with `docusaurus docs:version` would silently make that new
+          // version the default, even while it's still v5 beta/RC content in `docs/`.
+          lastVersion: 'v4.43',
+          versions: {
+            current: {
+              // `docs/` is where v5 is actively developed, all the way through beta/RC. Labeling +
+              // pathing it explicitly (instead of leaving it as "Next" / `/next/`) makes it a real,
+              // linkable entry in the version dropdown that beta/RC testers can be pointed to
+              // directly, without making it the site's default (that stays pinned to v4.43 above).
+              label: 'v5 (Preview)',
+              path: 'v5',
+              badge: true,
+              banner: 'unreleased',
+            },
+            'v4.43': {
+              label: 'v4.43',
+              banner: 'none',
+            },
+          },
           async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...props }) {
             const defaultSidebar = await defaultSidebarItemsGenerator(props);
 
-            const EXCLUDE_TOP_LEVEL_IDS = ['build-variables', 'telemetry'];
+            const EXCLUDE_TOP_LEVEL_IDS = ['telemetry'];
 
             // remove the items in `EXCLUDE_TOP_LEVEL_IDS`, which may exist in 1+  subdirectories for versioned docs
             // note: this removes any `EXCLUDE_TOP_LEVEL_IDS` entry for _all_ versioned docs and the top level `./docs`
@@ -170,7 +205,7 @@ const config = {
             target: '_blank',
           },
           {
-            href: 'https://github.com/ionic-team/stencil',
+            href: 'https://github.com/stenciljs/core',
             position: 'right',
             className: 'icon-link icon-link-mask icon-link-github',
             'aria-label': 'GitHub repository',
@@ -203,7 +238,7 @@ const config = {
             {
               key: 'github',
               url: {
-                href: 'https://github.com/ionic-team/stencil',
+                href: 'https://github.com/stenciljs/core',
                 target: '_blank',
                 rel: 'noopener nofollow',
               },
@@ -228,8 +263,8 @@ const config = {
         },
       },
       prism: {
-        theme: themes.github,
-        darkTheme: themes.dracula,
+        theme: codeTheme,
+        darkTheme: codeTheme,
         additionalLanguages: ['jsx', 'tsx', 'bash', 'typescript', 'javascript', 'markup', 'css', 'json', 'diff'],
       },
       algolia: {

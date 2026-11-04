@@ -1,255 +1,77 @@
 ---
-title: Reactive Data, Handling arrays and objects
-sidebar_label: Reactive Data
-description: Reactive Data, Handling arrays and objects
+title: Watching Changes
+sidebar_label: Watch
+description: Run code when a prop or state value changes, with the @Watch() decorator
 slug: /reactive-data
 ---
 
-# Reactive Data
+# Watching Changes
 
-Stencil components update when props or state on a component change.
-
-## Rendering methods
-
-When props or state change on a component, the [`render()` method](./templating-and-jsx.md) is scheduled to run.
-
-## The Watch Decorator (`@Watch()`)
-
-`@Watch()` is a decorator that is applied to a method of a Stencil component.
-The decorator's first required argument is the name of a class member that is decorated with `@Prop()` or `@State()`, or
-a host attribute. A method decorated with `@Watch()` will automatically run when its associated class member or attribute changes.
+A component re-renders on its own when a [prop](./properties.md) or [state](./state.md) value changes. To run other code when a value changes, such as validating it or fetching data, decorate a method with `@Watch()` and give it the member's name:
 
 ```tsx
-// We import Prop & State to show how `@Watch()` can be used on
-// class members decorated with either `@Prop()` or `@State()`
-import { Component, Prop, State, Watch } from '@stencil/core';
+import { Component, Prop, Watch } from '@stencil/core';
 
-@Component({
-  tag: 'loading-indicator' 
-})
-export class LoadingIndicator {
-  // We decorate a class member with @Prop() so that we
-  // can apply @Watch()
-  @Prop() activated: boolean;
-  // We decorate a class member with @State() so that we
-  // can apply @Watch()
-  @State() busy: boolean;
+@Component({ tag: 'user-profile' })
+export class UserProfile {
+  @Prop() userId: string;
 
-  // Apply @Watch() for the component's `activated` member.
-  // Whenever `activated` changes, this method will fire.
-  @Watch('activated')
-  watchPropHandler(newValue: boolean, oldValue: boolean) {
-    console.log('The old value of activated is: ', oldValue);
-    console.log('The new value of activated is: ', newValue);
-  }
-
-  // Apply @Watch() for the component's `busy` member.
-  // Whenever `busy` changes, this method will fire.
-  @Watch('busy')
-  watchStateHandler(newValue: boolean, oldValue: boolean) {
-    console.log('The old value of busy is: ', oldValue);
-    console.log('The new value of busy is: ', newValue);
-  }
-  
-  @Watch('activated')
-  @Watch('busy', {immediate: true})
-  watchMultiple(newValue: boolean, oldValue: boolean, propName:string) {
-    console.log(`The new value of ${propName} is: `, newValue);
+  @Watch('userId')
+  userIdChanged(newValue: string, oldValue: string) {
+    console.log(`userId changed from ${oldValue} to ${newValue}`);
   }
 }
 ```
 
-In the example above, there are four `@Watch()` decorators:
-- The first decorates `watchPropHandler`, which will fire when the class member `activated` changes.
-- The second decorates `watchStateHandler`, which will fire when the class member `busy` changes.
-- The third and fourth decorators both decorate `watchMultiple`, which will fire when either `activated` or `busy` change. 
+The method receives the new value, then the old one.
 
-Passing `{immediate: true}` as the second argument to `@Watch()` causes the decorated 
-method to fire when the component initially loads, in addition to when the watched member changes.
+## Running on the First Value
 
-When fired, the decorated method will receive the old and new values of the prop/state.
-This is useful for validation or the handling of side effects.
+A watcher doesn't run for a member's initial value, only when it changes later. Add `immediate: true` to run it for the initial value too:
 
-:::info
-By default, the `@Watch()` decorator does not fire when a component initially loads.
-Use `@Watch('propName', {immediate: true})` to have the decorated method fire when the component first loads. 
-`immediate` watchers will be invoked before the component's first render, so be careful when trying to access DOM elements
-that may not yet be available.
-:::
+```tsx
+@Watch('userId', { immediate: true })
+userIdChanged(newValue: string) {
+  this.loadUser(newValue);
+}
+```
 
-### Watching Native HTML Attributes
+An immediate watcher runs before the component's first render, so its rendered elements don't exist yet.
 
-Stencil's `@Watch()` decorator also allows you to watch native HTML attributes on the constructed host element. Simply
-include the attribute name as the argument to the decorator (this is case-sensitive):
+## Watching Several Members
+
+Stack `@Watch()` decorators to run one method for several members. The third argument is the name of the member that changed:
+
+```tsx
+@Watch('firstName')
+@Watch('lastName')
+nameChanged(newValue: string, oldValue: string, name: string) {
+  console.log(`${name} changed to ${newValue}`);
+}
+```
+
+## Watching Native Attributes
+
+`@Watch()` also takes the name of an HTML attribute on the host element, such as `aria-label`. The name is case-sensitive:
 
 ```tsx
 @Watch('aria-label')
-onAriaLabelChange(newVal: string, oldVal: string) {
-  console.log('Label changed:', newVal, oldVal);
+ariaLabelChanged(newValue: string) {
+  console.log('Label changed:', newValue);
 }
 ```
 
-:::note
-Since native attributes are not `@Prop()` or `State()` members of the Stencil component, they will not automatically trigger a
-re-render when changed. If you wish to re-render a component in this instance, you can leverage the `forceUpdate()` method:
+A native attribute isn't a prop or state, so changing it doesn't re-render the component. Call [`forceUpdate()`](./api.md#forceupdate) in the watcher if the render depends on it:
 
 ```tsx
-import { Component, forceUpdate, h } from '@stencil/core';
+import { Component, Watch, forceUpdate } from '@stencil/core';
 
 @Watch('aria-label')
-onAriaLabelChange() {
-  forceUpdate(this); // Forces a re-render
-}
-```
-:::
-
-## Handling Arrays and Objects
-
-When Stencil checks if a class member decorated with `@Prop()` or `@State()` has changed, it checks if the reference to the class member has changed.
-When a class member is an object or array, and is marked with `@Prop()` or `@State`, in-place mutation of an existing entity will _not_ cause `@Watch()` to fire, as it does not change the _reference_ to the class member.
-
-### Updating Arrays
-
-For arrays, the standard mutable array operations such as `push()` and `unshift()` won't trigger a component update.
-These functions will change the content of the array, but won't change the reference to the array itself.
-
-In order to make changes to an array, non-mutable array operators should be used.
-Non-mutable array operators return a copy of a new array that can be detected in a performant manner.
-These include `map()` and `filter()`, and the [spread operator syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_operator).
-The value returned by `map()`, `filter()`, etc., should be assigned to the `@Prop()` or `@State()` class member being watched.
-
-For example, to push a new item to an array, create a new array with the existing values and the new value at the end:
-
-```tsx
-import { Component, State, Watch, h } from '@stencil/core';
-
-@Component({
-  tag: 'rand-numbers'
-})
-export class RandomNumbers {
-  // We decorate a class member with @State() so that we
-  // can apply @Watch(). This will hold a list of randomly
-  // generated numbers
-  @State() randNumbers: number[] = [];
-
-  private timer: NodeJS.Timer;
-
-  // Apply @Watch() for the component's `randNumbers` member.
-  // Whenever `randNumbers` changes, this method will fire.
-  @Watch('randNumbers')
-  watchStateHandler(newValue: number[], oldValue: number[]) {
-    console.log('The old value of randNumbers is: ', oldValue);
-    console.log('The new value of randNumbers is: ', newValue);
-  }
-
-  connectedCallback() {
-    this.timer = setInterval(() => {
-      // generate a random whole number
-      const newVal = Math.ceil(Math.random() * 100);
-
-      /**
-       * This does not create a new array. When stencil
-       * attempts to see if any Watched members have changed,
-       * it sees the reference to its `randNumbers` State is
-       * the same, and will not trigger `@Watch` or a re-render
-       */
-      // this.randNumbers.push(newVal)
-
-      /**
-       * Using the spread operator, on the other hand, does
-       * create a new array. `randNumbers` is reassigned
-       * using the value returned by the spread operator.
-       * The reference to `randNumbers` has changed, which
-       * will trigger `@Watch` and a re-render
-       */
-      this.randNumbers = [...this.randNumbers, newVal]
-    }, 1000)
-  }
-
-  disconnectedCallback() {
-    if (this.timer) {
-      clearInterval(this.timer)
-    }
-  }
-
-  render() {
-    return(
-      <div>
-        randNumbers contains:
-        <ol>
-          {this.randNumbers.map((num) => <li>{num}</li>)}
-        </ol>
-      </div>
-    )
-  }
+ariaLabelChanged() {
+  forceUpdate(this);
 }
 ```
 
-### Updating an object
+## Arrays and Objects
 
-The spread operator should be used to update objects.
-As with arrays, mutating an object will not trigger a view update in Stencil.
-However, using the spread operator and assigning its return value to the `@Prop()` or `@State()` class member being watched will.
-Below is an example:
-
-```tsx
-import { Component, State, Watch, h } from '@stencil/core';
-
-export type NumberContainer = {
-  val: number,
-}
-
-@Component({
-  tag: 'rand-numbers'
-})
-export class RandomNumbers {
-  // We decorate a class member with @State() so that we
-  // can apply @Watch(). This will hold a randomly generated
-  // number.
-  @State() numberContainer: NumberContainer = { val: 0 };
-
-  private timer: NodeJS.Timer;
-
-  // Apply @Watch() for the component's `numberContainer` member.
-  // Whenever `numberContainer` changes, this method will fire.
-  @Watch('numberContainer')
-  watchStateHandler(newValue: NumberContainer, oldValue: NumberContainer) {
-    console.log('The old value of numberContainer is: ', oldValue);
-    console.log('The new value of numberContainer is: ', newValue);
-  }
-
-  connectedCallback() {
-    this.timer = setInterval(() => {
-      // generate a random whole number
-      const newVal = Math.ceil(Math.random() * 100);
-
-      /**
-       * This does not create a new object. When stencil
-       * attempts to see if any Watched members have changed,
-       * it sees the reference to its `numberContainer` State is
-       * the same, and will not trigger `@Watch` or are-render
-       */
-      // this.numberContainer.val = newVal;
-
-      /**
-       * Using the spread operator, on the other hand, does
-       * create a new object. `numberContainer` is reassigned
-       * using the value returned by the spread operator.
-       * The reference to `numberContainer` has changed, which
-       * will trigger `@Watch` and a re-render
-       */
-      this.numberContainer = {...this.numberContainer, val: newVal};
-    }, 1000)
-  }
-
-  disconnectedCallback() {
-    if (this.timer) {
-      clearInterval(this.timer)
-    }
-  }
-
-  render() {
-    return <div>numberContainer contains: {this.numberContainer.val}</div>;
-  }
-}
-```
+Stencil detects a change by comparing references, so a watcher runs when you assign a new array or object, and not when you change one in place (`this.items.push(item)`). See [Arrays and Objects](./state.md#arrays-and-objects) for how to update them.

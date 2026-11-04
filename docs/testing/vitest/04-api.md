@@ -16,7 +16,7 @@ Complete reference for the `@stencil/vitest` testing utilities.
 Renders a Stencil component for testing.
 
 ```tsx
-import { render, h } from '@stencil/vitest';
+import { render } from '@stencil/vitest';
 
 const result = await render(<my-component name="World" />);
 ```
@@ -70,7 +70,7 @@ expect(spies?.methods.handleClick).toHaveBeenCalled();
 ### Example
 
 ```tsx
-import { render, h } from '@stencil/vitest';
+import { render } from '@stencil/vitest';
 
 const { root, waitForChanges, setProps, unmount, spyOnEvent } = await render(
   <my-component name="World" />
@@ -393,6 +393,5 @@ import {
   beforeAll,
   afterAll,
   vi,
-  h,  // Stencil's h function for JSX
 } from '@stencil/vitest';
 ```

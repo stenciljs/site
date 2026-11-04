@@ -24,7 +24,7 @@ const sidebars = {
         {
           type: 'link',
           label: 'Stencil on GitHub',
-          href: 'https://github.com/ionic-team/stencil',
+          href: 'https://github.com/stenciljs/core',
         },
       ],
     },
@@ -32,10 +32,6 @@ const sidebars = {
       type: 'category',
       label: 'Legal',
       items: [
-        {
-          type: 'doc',
-          id: 'telemetry',
-        },
         {
           type: 'link',
           label: 'Privacy Policy',

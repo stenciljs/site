@@ -7,7 +7,7 @@ slug: /config
 
 # Stencil Config
 
-In most cases, the `stencil.config.ts` file does not require any customization since Stencil comes with great default values out-of-the-box. In general, it's preferred to keep the config as minimal as possible. In fact, you could even delete the `stencil.config.ts` file entirely and an app would compile just fine. But at the same time, the compiler can be configured at the lowest levels using this config. Below are the many *optional* config properties.
+Most projects need little or no configuration. Stencil's defaults cover the common case: a project with no `stencil.config.ts` at all builds as a component library, with the [`loader-bundle`](../output-targets/main/loader-bundle.md) output. Keep the config as small as you can. Every property below is optional.
 
 Example `stencil.config.ts`:
 
@@ -18,31 +18,6 @@ export const config: Config = {
   namespace: 'MyApp',
   srcDir: 'src'
 };
-```
-
-## buildDist
-
-*default: true (prod), false (dev)*
-
-Sets whether or not Stencil will execute output targets and write output to
-`dist/` when `stencil build` is called. Defaults to `false` when building for
-development and `true` when building for production. If set to `true` then
-Stencil will always build all output targets, regardless of whether the build
-is in dev or prod mode or using watch mode.
-
-```tsx
-buildDist: true
-```
-
-## buildEs5
-
-Sets if the ES5 build should be generated or not.
-It defaults to `false`.
-Setting `buildEs5` to `true` will also create ES5 builds for both dev and prod modes.
-Setting `buildEs5` to `prod` will only build ES5 in prod mode.
-
-```tsx
-buildEs5: boolean | 'prod'
 ```
 
 ## bundles
@@ -62,8 +37,7 @@ bundles: [
 
 *default: '.stencil'*
 
-The directory where sub-directories will be created for caching when [`enableCache`](#enablecache) is set `true` or if using
-[Stencil's Screenshot Connector](../testing/stencil-testrunner/07-screenshot-connector.md).
+The directory where sub-directories will be created for caching when [`enableCache`](#enablecache) is set `true`.
 
 A Stencil config like the following:
 
@@ -74,9 +48,6 @@ export const config: Config = {
   ...,
   enableCache: true,
   cacheDir: '.cache',
-  testing: {
-    screenshotConnector: 'connector.js'
-  }
 }
 ```
 
@@ -85,10 +56,22 @@ Will result in the following file structure:
 ```tree
 stencil-project-root
 └── .cache
-    ├── .build <-- Where build related file caching is written
-    |
-    └── screenshot-cache.json <-- Where screenshot caching is written
+    └── .build <-- Where build related file caching is written
 ```
+
+## collections
+
+*default: `[]`*
+
+npm packages whose [`collection`](../output-targets/supporting/collection.md) output this project should compile in alongside its own components.
+
+```ts title='stencil.config.ts'
+export const config: Config = {
+  collections: ['@my-org/design-system'],
+};
+```
+
+Without this option, a collection is only picked up from a side-effect import (`import '@my-org/design-system';`) somewhere in your source.
 
 ## devServer
 
@@ -122,9 +105,9 @@ Supports glob patterns for matching multiple components:
 
 Components matching these patterns will be completely excluded from all output targets when *not* using the `--dev` flag.
 
-## extras
+## compat
 
-Please see the [Extras docs](./extras.md).
+Please see the [Compat docs](./compat.md).
 
 ## env
 
@@ -146,7 +129,7 @@ export const config: Config = {
 Now when you build your components with this environment variable set, you can import it in your component as follows:
 
 ```ts
-import { Component, h, Env, Host } from '@stencil/core';
+import { Component, Env, Host } from '@stencil/core';
 
 @Component({
   tag: 'api-component',
@@ -163,13 +146,27 @@ export class APIComponent {
 
 *default: `false`*
 
-Stencil will generate [export maps](https://nodejs.org/api/packages.html#packages_exports) that correspond with various output target outputs. This includes the root
-entry point based on the [primary output target](../output-targets/01-overview.md#primary-package-output-target-validation) (or first eligible output target if not specified),
-the entry point for the lazy-loader (if using the `dist` output target), and entry points for each component (if using `dist-custom-elements`).
+Set to `true` to have production builds write an [`exports` map](https://nodejs.org/api/packages.html#package-entry-points) into your `package.json`, with an entry for each thing your library publishes:
+
+| Entry | Points at | Generated when |
+|---|---|---|
+| `.` | The `loader-bundle` entry, or `standalone`'s if there's no `loader-bundle` | either is configured |
+| `./loader` | The lazy loader | `loader-bundle` |
+| `./standalone` | The `standalone` output's index | `standalone` |
+| `./<tag>` | One entry per component, for example `./my-button` | `standalone` |
+| `./components` | The type definitions for every component | `types` |
+| `./ssr` | The server-side rendering module | `ssr` |
+| `./assets/*` | Component assets and global stylesheets | assets or `global-style` |
+
+```tsx
+generateExportMaps: true
+```
+
+Once a package has an `exports` map, consumers can only import the paths it lists, so `my-library/dist/...` imports stop resolving. Add any extra entries you need to `package.json` yourself. Stencil keeps entries it didn't generate, and removes the entry of a component that no longer exists.
 
 ## globalScript
 
-The global script config option takes a file path as a string.
+The global script config option takes a file path as a string. If it isn't set, Stencil uses `src/global.ts` or `src/global.js` when one exists.
 
 The global script runs once before your library/app loads, so you can do things like setting up a connection to an external service or configuring a library you are using.
 
@@ -207,50 +204,17 @@ export default function() {
 
 ## globalStyle
 
-Stencil is traditionally used to compile many components into an app, and each component comes with its own compartmentalized styles. However, it's still common to have styles which should be "global" across all components and the website. A global CSS file is often useful to set [CSS Variables](../components/styling.md).
+*default: `undefined`*
 
-Additionally, the `globalStyle` config can be used to precompile styles with Sass, PostCSS, etc.
-
-Below is an example folder structure containing a webapp's global css file, named `app.css`.
-
-```bash
-src/
-  components/
-  global/
-    app.css
-```
-
-The global style config takes a file path as a string. The output from this build will go to the `buildDir`. In this example it would be saved to `www/build/app.css`. Additionally, these global styles are automatically applied to all components with shadow roots via constructable stylesheets, allowing you to style shadow DOM components directly.
+A top-level path to a global stylesheet, predating the [`global-style` output target](../output-targets/asset-outputs/global-style.md). Setting `globalStyle` auto-generates a `global-style` output target for you, so it still works, but new projects should [configure `global-style` directly](../components/styling/global-styles.md) instead - it supports more than one global stylesheet, a custom output filename, and control over shadow-root injection, none of which `globalStyle` alone gives you.
 
 ```tsx
 globalStyle: 'src/global/app.css'
 ```
 
-Check out the [styling docs](../components/styling.md#global-styles) of how to use global styles in your app.
-
-## hashedFileNameLength
-
-*default: `8`*
-
-When the `hashFileNames` config is set to `true`, and it is a production build, the `hashedFileNameLength` config is used to determine how many characters the file name's hash should be.
-
-```tsx
-hashedFileNameLength: 8
-```
-
-## hashFileNames
-
-*default: `true`*
-
-During production builds, the content of each generated file is hashed to represent the content, and the hashed value is used as the filename. If the content isn't updated between builds, then it receives the same filename. When the content is updated, then the filename is different. By doing this, deployed apps can "forever-cache" the build directory and take full advantage of content delivery networks (CDNs) and heavily caching files for faster apps.
-
-```tsx
-hashFileNames: true
-```
-
 ## hydratedFlag
 
-When using the [lazy build](https://stenciljs.com/docs/distribution) Stencil
+When using the [`loader-bundle`](../output-targets/main/loader-bundle.md) output target, Stencil
 has support for automatically applying a class or attribute to a component and
 all of its child components when they have finished hydrating. This can be used
 to prevent a [flash of unstyled content
@@ -418,6 +382,16 @@ Will generate the following comment:
  */
 ```
 
+## signalBacking
+
+*default: `false`*
+
+Stores each component's `@Prop()` and `@State()` values in [signals](../guides/patterns/signals.md#back-props-and-state-with-signals). Components need no changes. Other code can then subscribe to a component's props, and `@Effect()` methods track the component's own members.
+
+```tsx
+signalBacking: true
+```
+
 ## sourceMap
 
 *default: `'dev'`*
@@ -462,7 +436,7 @@ across the frames to efficiently render and reduce layout thrashing. By default,
 `async` is used. It's recommended to also try each setting to decide which works
 best for your use-case. In all cases, if your app has many CPU intensive tasks causing the
 main thread to periodically lock-up, it's always recommended to try
-[Web Workers](../guides/workers.md) for those tasks.
+[Web Workers](../guides/patterns/workers.md) for those tasks.
 
 * `congestionAsync`: DOM reads and writes are scheduled in the next frame to prevent layout
   thrashing. When the app is heavily tasked and the queue becomes congested it will then
@@ -474,22 +448,18 @@ main thread to periodically lock-up, it's always recommended to try
 * `async`: DOM read and writes are scheduled in the next frame to prevent layout thrashing.
   During intensive CPU tasks it will not reschedule rendering to happen in the next frame.
   `async` is ideal for most apps, and if the app has many intensive tasks causing the main
-  thread to lock-up, it's recommended to try [Web Workers](../guides/workers.md)
+  thread to lock-up, it's recommended to try [Web Workers](../guides/patterns/workers.md)
   rather than the congestion async queue.
 
 * `immediate`: Makes writeTask() and readTask() callbacks to be executed synchronously. Tasks
   are not scheduled to run in the next frame, but do note there is at least one microtask.
   The `immediate` setting is ideal for apps that do not provide long-running and smooth
   animations. Like the async setting, if the app has intensive tasks causing the main thread
-  to lock-up, it's recommended to try [Web Workers](../guides/workers.md).
+  to lock-up, it's recommended to try [Web Workers](../guides/patterns/workers.md).
 
 ```tsx
 taskQueue: 'async'
 ```
-
-## testing
-
-Please see the [testing config docs](../testing/stencil-testrunner/02-config.md).
 
 ## transformAliasedImportPaths
 
@@ -544,21 +514,16 @@ import { UtilInterface } from '../path/to/utils';
 export declare function util(arg: UtilInterface): void;
 ```
 
-## validatePrimaryPackageOutputTarget
-
-*default: `false`*
-
-When `true`, validation for common `package.json` fields will occur based on setting an output target's `isPrimaryPackageOutputTarget` flag.
-For more information on package validation, please see the [output target docs](../output-targets/01-overview.md#primary-package-output-target-validation).
-
-## rollupConfig
-
-Passes custom configuration down to rollup itself. The following options can be overwritten:
-
-- `inputOptions`: [`context`](https://rollupjs.org/configuration-options/#context), [`external`](https://rollupjs.org/configuration-options/#external), [`moduleContext`](https://rollupjs.org/configuration-options/#modulecontext) [`treeshake`](https://rollupjs.org/configuration-options/#treeshake)
-- `outputOptions`: [`globals`](https://rollupjs.org/configuration-options/#output-globals) 
+## rolldownConfig
 
 *default: `{}`*
+
+Passes custom configuration down to [Rolldown](https://rolldown.rs/) itself, which replaced Rollup as Stencil's bundler in v5 (renamed from `rollupConfig` — run `stencil migrate --dry-run` to preview updating an existing config automatically). The config shape is flatter than the old Rollup-era `rollupConfig` — there's no more `inputOptions`/`outputOptions` nesting:
+
+- `treeshake`: boolean
+- `external`: a string, `RegExp`, array of either, or a function `(source, importer, isResolved) => boolean | null | undefined`
+
+The old `inputOptions.context`, `inputOptions.moduleContext`, and `outputOptions.globals` options have no `rolldownConfig` equivalent.
 
 ## watchIgnoredRegex
 

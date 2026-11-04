@@ -1,91 +1,76 @@
 ---
 title: Components without a Framework
 sidebar_label: JavaScript
-description: Components without a Framework
+description: Using Stencil components in plain HTML and JavaScript
 slug: /javascript
 ---
 
 # Components without a Framework
 
-Integrating a component built with Stencil to a project without a JavaScript framework is straight forward. If you're using a simple HTML page, you can add your component via a script tag. For example, if we published a component to npm, we could load the component through a CDN like this:
+Stencil components are standard custom elements, so a page with no framework can use them like any built-in HTML element.
 
-```markup
+## Loading the Components
+
+For a plain HTML page, load the library's [`loader-bundle`](../output-targets/main/loader-bundle.md) with a script tag, for example from a CDN. It registers every component and fetches each one's code when it first appears on the page:
+
+```html
 <html>
   <head>
-    <script src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic.js"></script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/my-library@1.0.0/dist/loader-bundle/my-library/my-library.js"
+    ></script>
   </head>
   <body>
-    <ion-toggle></ion-toggle>
+    <my-button variant="primary">Save</my-button>
   </body>
 </html>
 ```
 
-Alternatively, if you wanted to take advantage of ES Modules, you could include the components using an import statement.
+In a project with a bundler, import the components instead. See [Consuming Your Library](../guides/distribution/publishing.md#consuming-your-library) for both approaches.
 
-```markup
-<html>
-  <head>
-    <script type="module">
-      import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@ionic/core/loader/index.es2017.mjs';
-      defineCustomElements();
-    </script>
-  </head>
-  <body>
-    <ion-toggle></ion-toggle>
-  </body>
-</html>
+## Setting Props
+
+Attributes can only carry strings. Use them for strings, numbers, and booleans:
+
+```html
+<my-button variant="primary" disabled></my-button>
 ```
 
-## Passing object props from a non-JSX element
+Set objects, arrays, and functions as properties in JavaScript:
 
-### Setting the prop manually
-
-```tsx
-import { Prop } from '@stencil/core';
-
-export class TodoList {
-  @Prop() myObject: object;
-  @Prop() myArray: Array<string>;
-}
-```
-
-```markup
+```html
 <todo-list></todo-list>
+
 <script>
-  const todoListElement = document.querySelector('todo-list');
-  todoListElement.myObject = {};
-  todoListElement.myArray = [];
+  const todoList = document.querySelector('todo-list');
+  todoList.items = [{ text: 'Write docs', done: true }];
 </script>
 ```
 
-### Watching props changes
+This works even if the script runs before the component has loaded. Stencil picks up the value once the component is ready.
 
-```tsx
-import { Prop, State, Watch } from '@stencil/core';
+A component can also accept this kind of data from an attribute, by parsing it with [`@AttrDeserialize()`](../components/serialization-deserialization.md#the-attrdeserialize-decorator-attrdeserialize).
 
-export class TodoList {
-  @Prop() myObject: string;
-  @Prop() myArray: string;
-  @State() myInnerObject: object;
-  @State() myInnerArray: Array<string>;
+## Listening to Events
 
-  componentWillLoad() {
-    this.parseMyObjectProp(this.myObject);
-    this.parseMyArrayProp(this.myArray);
-  }
+A component's [custom events](../components/events.md) are ordinary DOM events. Listen with `addEventListener()`, and read the data from `event.detail`:
 
-  @Watch('myObject')
-  parseMyObjectProp(newValue: string) {
-    if (newValue) this.myInnerObject = JSON.parse(newValue);
-  }
+```js
+const todoList = document.querySelector('todo-list');
 
-  @Watch('myArray')
-  parseMyArrayProp(newValue: string) {
-    if (newValue) this.myInnerArray = JSON.parse(newValue);
-  }
-}
+todoList.addEventListener('todoCompleted', (event) => {
+  console.log(event.detail);
+});
 ```
 
-```tsx
-<todo-list my-object="{}" my-array="[]"></todo-list>
+## Calling Methods
+
+A component's [public methods](../components/methods.md) exist once the component is defined, and always return a promise:
+
+```js
+await customElements.whenDefined('todo-list');
+
+const todoList = document.querySelector('todo-list');
+await todoList.showPrompt();
 ```

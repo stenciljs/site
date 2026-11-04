@@ -1,108 +1,118 @@
 ---
 title: Functional Components
 sidebar_label: Functional Components
-description: Functional Components
+description: Reusable pieces of JSX, written as plain functions
 slug: /functional-components
 ---
 
-# Working with Functional Components
+# Functional Components
 
-Functional components are quite different to normal Stencil web components because they are a part of Stencil's JSX compiler. A functional component is basically a function that takes an object of props and turns it into JSX.
+A functional component is a plain function that takes props and returns JSX. Use one to reuse a piece of markup across your components' `render()` functions, the way you'd pull repeated code out into a helper function:
 
 ```tsx
-const Hello = props => <h1>Hello, {props.name}!</h1>;
+const Hello = (props) => <h1>Hello, {props.name}!</h1>;
 ```
 
-When the JSX transpiler encounters such a component, it will take its attributes, pass them into the function as the `props` object, and replace the component with the JSX that is returned by the function.
+Render it like any other JSX element, with a capitalized name. Its attributes are passed to the function as `props`:
 
 ```tsx
-<Hello name="World" />
+render() {
+  return <Hello name="World" />;
+}
 ```
 
-Functional components also accept a second argument `children`.
+The `<h1>` it returns goes straight into the component's output. There's no `<hello>` element: unlike a class component, a functional component isn't a custom element, so it has no tag, styles, state, or lifecycle methods of its own. Its markup is styled by the component that renders it.
 
-```tsx
-const Hello = (props, children) => [
-  <h1>Hello, {props.name}</h1>,
-  children
-];
-```
+## Typing Props
 
-The JSX transpiler passes all child elements of the component as an array into the function's `children` argument.
+Use the `FunctionalComponent` type to declare the props a functional component accepts:
 
-```tsx
-<Hello name="World">
-  <p>I'm a child element.</p>
-</Hello>
-```
-
-Stencil provides a `FunctionalComponent` generic type that allows to specify an interface for the component's properties.
-
-```tsx
-// Hello.tsx
-
-import { FunctionalComponent, h } from '@stencil/core';
+```tsx title="src/components/hello.tsx"
+import { FunctionalComponent } from '@stencil/core';
 
 interface HelloProps {
   name: string;
 }
 
-export const Hello: FunctionalComponent<HelloProps> = ({ name }) => (
-  <h1>Hello, {name}!</h1>
+export const Hello: FunctionalComponent<HelloProps> = ({ name }) => <h1>Hello, {name}!</h1>;
+```
+
+JSX that uses `<Hello>` is then type-checked against `HelloProps`.
+
+A functional component returns a single element, or `null`. To return several, wrap them in a fragment (`<>...</>`).
+
+## Children
+
+Children passed to a functional component arrive as its second argument. Render them wherever they should go:
+
+```tsx
+const Card: FunctionalComponent<{ heading: string }> = ({ heading }, children) => (
+  <>
+    <h2>{heading}</h2>
+    {children}
+  </>
 );
 ```
 
-## Working with children
-
-The second argument of a functional component receives the passed children, but in order to work with them, `FunctionalComponent` provides a utils object that exposes a `map()` method to transform the children, and a `forEach()` method to read them. Reading the `children` array is not recommended since the stencil compiler can rename the vNode properties in prod mode.
-
 ```tsx
-export interface FunctionalUtilities {
-  forEach: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => void) => void;
-  map: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => ChildNode) => VNode[];
-}
-export interface ChildNode {
-  vtag?: string | number | Function;
+<Card heading="Welcome">
+  <p>I'm a child element.</p>
+</Card>
+```
+
+### Inspecting and Changing Children
+
+The children are Stencil's internal virtual DOM nodes. Their property names are shortened in production builds, so code that reads them directly breaks there. To read or change children, use the `utils` object passed as the third argument instead:
+
+- `utils.forEach(children, cb)` calls `cb` with each child.
+- `utils.map(children, cb)` calls `cb` with each child and returns the children it returns.
+
+Each child is given to `cb` in this form:
+
+```ts
+interface ChildNode {
+  vtag?: string | number | Function | null; // the tag name or functional component; null for text
+  vattrs?: any;                      // attributes and props
+  vchildren?: VNode[];               // the child's own children
+  vtext?: string;                    // the text of a text node
   vkey?: string | number;
-  vtext?: string;
-  vchildren?: VNode[];
-  vattrs?: any;
   vname?: string;
 }
 ```
 
-**Example:**
+This functional component adds a class to each child element, and returns text children unchanged:
 
 ```tsx
-export const AddClass: FunctionalComponent = (_, children, utils) => (
-  utils.map(children, child => ({
-    ...child,
-    vattrs: {
-      ...child.vattrs,
-      class: `${child.vattrs.class} add-class`
-    }
-  }
-  ))
+const AddClass: FunctionalComponent = (_, children, utils) => (
+  <>
+    {utils.map(children, (child) =>
+      child.vtag
+        ? {
+            ...child,
+            vattrs: {
+              ...child.vattrs,
+              class: [child.vattrs?.class, 'add-class'].filter(Boolean).join(' '),
+            },
+          }
+        : child,
+    )}
+  </>
 );
 ```
 
-:::note
-When using a functional component in JSX, its name must start with a capital letter. Therefore it makes sense to export it as such.
-:::
+```tsx
+<AddClass>
+  <p class="intro">First</p>
+  <p>Second</p>
+  Some text
+</AddClass>
+// renders <p class="intro add-class">First</p><p class="add-class">Second</p>Some text
+```
 
+## Class or Functional Component?
 
-## Disclaimer
+Functional components suit markup you want to reuse inside your own components. Make it a class component instead when it needs any of these:
 
-There are a few major differences between functional components and class components. Since functional components are just syntactic sugar within JSX, they...
-
-* aren't compiled into web components,
-* don't create a DOM node,
-* don't have a Shadow DOM or scoped styles,
-* don't have lifecycle hooks,
-* are stateless.
-
-When deciding whether to use functional components, one concept to keep in mind is that often the UI of your application can be a function of its state, i. e., given the same state, it always renders the same UI. If a component has to hold state, deal with events, etc, it should probably be a class component. If a component's purpose is to simply encapsulate some markup so it can be reused across your app, it can probably be a functional component (especially if you're using a component library and thus don't need to style it).
-
-:::caution
-Stencil does not support re-exporting a functional component from a "barrel file" and dynamically rendering it in another component. This is a [known limitation](https://github.com/ionic-team/stencil/issues/5246) within Stencil. Instead, either use class components and remove the import or import the functional component directly.
-:::
+- its own tag, so it can be used in HTML or by other frameworks
+- state, or lifecycle methods
+- its own styles, or shadow DOM

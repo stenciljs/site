@@ -40,9 +40,43 @@ This `lifecycle` hook follows the same semantics as the one described by the [Cu
 
 ## disconnectedCallback()
 
-Called every time the component is disconnected from the DOM, ie, it can be dispatched more than once, DO not confuse with a "onDestroy" kind of event.
+Called every time the component is disconnected from the DOM. This can happen more than once: moving an element disconnects it and connects it again.
 
 This `lifecycle` hook follows the same semantics as the one described by the [Custom Elements Spec](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements).
+
+Use it to undo what `connectedCallback()` set up. This clock starts a timer when it's added to the DOM, and stops it when it's removed:
+
+```tsx
+import { Component, State } from '@stencil/core';
+
+@Component({
+  tag: 'custom-clock'
+})
+export class CustomClock {
+
+  timer: number;
+
+  @State() time: number = Date.now();
+
+  connectedCallback() {
+    this.timer = window.setInterval(() => {
+      this.time = Date.now();
+    }, 1000);
+  }
+
+  disconnectedCallback() {
+    window.clearInterval(this.timer);
+  }
+
+  render() {
+    const time = new Date(this.time).toLocaleTimeString();
+
+    return (
+      <span>{ time }</span>
+    );
+  }
+}
+```
 
 ## componentWillLoad()
 
@@ -56,20 +90,42 @@ Called once just after the component is fully loaded and the first `render()` oc
 
 ## componentShouldUpdate()
 
-This hook is called when a component's [`Prop`](./properties.md) or [`State`](./state.md) property changes and a rerender is about to be requested. This hook receives three arguments: the new value, the old value and the name of the changed state. It should return a boolean to indicate if the component should rerender (`true`) or not (`false`).
+This hook is called when one or more of a component's [`Prop`](./properties.md) or [`State`](./state.md) properties change and a rerender is about to be requested. It receives a single `changes` argument — a map of every prop/state name that changed since the last render to its `{ newVal, oldVal }` — and should return a boolean to indicate if the component should rerender (`true`) or not (`false`).
 
-A couple of things to notice is that this method will not be executed before the initial render, that is, when the component is first attached to the dom, nor when a rerender is already scheduled in the next frame.
-
-Let’s say the following two props of a component change synchronously:
+This method is not executed before the initial render (when the component is first attached to the DOM). It fires once per render cycle, even if multiple props change synchronously:
 
 ```tsx
 component.somePropA = 42;
 component.somePropB = 88;
 ```
 
-The `componentShouldUpdate` will be first called with arguments: `42`, `undefined` and `somePropA`. If it does return `true`, the hook will not be called again since the rerender is already scheduled to happen. Instead, if the first hook returned `false`, then `componentShouldUpdate` will be called again with `88`, `undefined` and `somePropB` as arguments, triggered by the `component.somePropB = 88` mutation.
+Both changes are batched into a single call:
 
-Since the execution of this hook might be conditioned, it's not good to rely on it to watch for prop changes, instead use the `@Watch` decorator for that.
+```tsx
+componentShouldUpdate(changes) {
+  if (changes['somePropA'] && changes['somePropA'].newVal === changes['somePropA'].oldVal) {
+    return false;
+  }
+}
+```
+
+For stricter per-prop typing, use the `ComponentShouldUpdateChanges<this>` type:
+
+```tsx
+import { ComponentShouldUpdateChanges } from '@stencil/core';
+
+componentShouldUpdate(changes: ComponentShouldUpdateChanges<this>) {
+  if (changes['somePropA']?.newVal === changes['somePropA']?.oldVal) {
+    return false;
+  }
+}
+```
+
+:::note
+The per-prop `(newVal, oldVal, propName)` signature from versions before Stencil v5 is no longer supported. Declaring `componentShouldUpdate` with more than one parameter raises a compiler warning, and the extra parameters are `undefined` at runtime.
+:::
+
+`componentShouldUpdate()` only decides whether a render goes ahead. It doesn't see changes made before the first render, so to react to a prop or state change, use [`@Watch()`](./reactive-data.md).
 
 ## componentWillRender()
 
@@ -128,6 +184,97 @@ In the example below we have a simple hierarchy of components. The numbered list
 
 Even if some components may or may not be already loaded, the entire component hierarchy waits on its child components to finish loading and rendering.
 
+In this playground, each component adds a line to the list as its methods run:
+
+:::playground{preview-height=190}
+```tsx title="cmp-a.tsx"
+import { Component } from '@stencil/core';
+import { log } from './log';
+
+@Component({ tag: 'cmp-a' })
+export class CmpA {
+  componentWillLoad() {
+    log('cmp-a - componentWillLoad()');
+  }
+
+  componentDidLoad() {
+    log('cmp-a - componentDidLoad()');
+  }
+
+  render() {
+    return <slot />;
+  }
+}
+```
+
+```ts title="log.ts"
+export const log = (message: string) => {
+  const item = document.createElement('li');
+  item.textContent = message;
+  document.querySelector('#log').append(item);
+};
+```
+
+```ts title="main.ts"
+// Define all three together, as a build's output does
+import './cmp-a';
+import './cmp-b';
+import './cmp-c';
+```
+
+```html title="index.html"
+<script type="module" src="./main.js"></script>
+
+<cmp-a>
+  <cmp-b>
+    <cmp-c></cmp-c>
+  </cmp-b>
+</cmp-a>
+
+<ol id="log"></ol>
+```
+
+```tsx title="cmp-b.tsx" hidden
+import { Component } from '@stencil/core';
+import { log } from './log';
+
+@Component({ tag: 'cmp-b' })
+export class CmpB {
+  componentWillLoad() {
+    log('cmp-b - componentWillLoad()');
+  }
+
+  componentDidLoad() {
+    log('cmp-b - componentDidLoad()');
+  }
+
+  render() {
+    return <slot />;
+  }
+}
+```
+
+```tsx title="cmp-c.tsx" hidden
+import { Component } from '@stencil/core';
+import { log } from './log';
+
+@Component({ tag: 'cmp-c' })
+export class CmpC {
+  componentWillLoad() {
+    log('cmp-c - componentWillLoad()');
+  }
+
+  componentDidLoad() {
+    log('cmp-c - componentDidLoad()');
+  }
+
+  render() {
+    return <slot />;
+  }
+}
+```
+:::
+
 
 ## Async Lifecycle Methods
 
@@ -142,41 +289,5 @@ componentWillLoad() {
     .then(data => {
       this.content = data;
     });
-}
-```
-
-## Example
-
-This simple example shows a clock and updates the current time every second. The timer is started when the component is added to the DOM. Once it's removed from the DOM, the timer is stopped.
-
-```tsx
-import { Component, State, h } from '@stencil/core';
-
-@Component({
-  tag: 'custom-clock'
-})
-export class CustomClock {
-
-  timer: number;
-
-  @State() time: number = Date.now();
-
-  connectedCallback() {
-    this.timer = window.setInterval(() => {
-      this.time = Date.now();
-    }, 1000);
-  }
-
-  disconnectedCallback() {
-    window.clearInterval(this.timer);
-  }
-
-  render() {
-    const time = new Date(this.time).toLocaleTimeString();
-
-    return (
-      <span>{ time }</span>
-    );
-  }
 }
 ```

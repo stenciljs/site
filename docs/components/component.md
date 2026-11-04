@@ -84,10 +84,10 @@ src/
     └── todo-list.tsx
 ```
 
-Below, the `todo-list` component will correctly load the `sunset.jpg` image from the `assets/` directory, using Stencil's [`getAssetPath()`](../guides/assets.md#getassetpath).
+Below, the `todo-list` component will correctly load the `sunset.jpg` image from the `assets/` directory, using Stencil's [`getAssetPath()`](../guides/distribution/assets.md#getassetpath).
 
 ```tsx
-import { Component, Prop, getAssetPath, h } from '@stencil/core';
+import { Component, Prop, getAssetPath } from '@stencil/core';
 
 @Component({
   tag: 'todo-list',
@@ -110,132 +110,89 @@ export class TodoList {
 In the example above, the following allows `todo-list` to display the provided asset:
 1. The `TodoList`'s `@Component()` decorator has the `assetsDirs` property, and lists the file's sibling directory, `assets/`.
    This will copy the `assets` directory over to the distribution directory.
-2. Stencil's [`getAssetPath()`](../guides/assets.md#getassetpath) is used to retrieve the path to the image to be used in the `<img>` tag
+2. Stencil's [`getAssetPath()`](../guides/distribution/assets.md#getassetpath) is used to retrieve the path to the image to be used in the `<img>` tag
 
-For more information on configuring assets, please see Stencil's [Assets Guide](../guides/assets.md)
+For more information on configuring assets, please see Stencil's [Assets Guide](../guides/distribution/assets.md)
 
 
-### formAssociated
+### encapsulation
 
 **Optional**
 
-**Type: `boolean`**
-
-**Default: `false`**
-
-If `true` the component will be
-[form-associated](https://html.spec.whatwg.org/dev/custom-elements.html#form-associated-custom-element),
-allowing you to take advantage of the
-[`ElementInternals`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals)
-API to enable your Stencil component to participate in forms.
-
-A minimal form-associated Stencil component could look like this:
-
+**Type:**
 ```tsx
-import { Component } from '@stencil/core';
-
-@Component({
-  tag: 'form-associated',
-  formAssociated: true
-})
-export class FormAssociated {
-  render() {
-    return <span>form associated!</span>
-  }
-}
+type Encapsulation =
+  | {
+      type: 'shadow';
+      mode?: 'open' | 'closed';
+      delegatesFocus?: boolean;
+      slotAssignment?: 'manual' | 'named';
+      clonable?: boolean;
+      serializable?: boolean;
+    }
+  | { type: 'scoped'; patches?: ('all' | 'children' | 'clone' | 'insert')[] }
+  | { type: 'none'; patches?: ('all' | 'children' | 'clone' | 'insert')[] };
 ```
 
-See the documentation for [form-associated components](./form-associated.md)
-for more info and examples.
-
-### scoped
-
-**Optional**
-
-**Type: `boolean`**
-
-**Default: `false`**
+**Default: `{ type: 'none' }`**
 
 **Details:**<br/>
-If `true`, the component will use [scoped stylesheets](./styling.md#scoped-css).
+`encapsulation` controls how a component's styles and DOM are isolated from the rest of the page. Stencil supports three encapsulation types:
 
-Scoped CSS is an alternative to using the native [shadow DOM](./styling.md#shadow-dom) style encapsulation.
-It appends a data attribute to your styles to make them unique and thereby scope them to your component.
-It does not, however, prevent styles from the light DOM from seeping into your component.
+- `shadow`: uses the browser's native [Shadow DOM](./styling/01-overview.md#shadow). Styles and internal markup are fully isolated from the rest of the page.
+- `scoped`: uses [scoped CSS](./styling/01-overview.md#scoped). Stencil generates a unique class for your styles so they don't leak out, but the component's DOM stays in the light DOM and light-DOM styles can still leak in.
+- `none` (default): no style encapsulation. The component's markup and styles behave like any other element on the page.
 
-To use the native [shadow DOM](./styling.md#shadow-dom), see the configuration for [`shadow`](#shadow).
+See [Component Archetypes](../concepts/component-archetypes.md) for when to use each.
 
-This option cannot be set to `true` if `shadow` is enabled.
+**Shadow DOM options** (`type: 'shadow'`):
 
-**Example**:<br/>
+- `mode`: `'open'` (default) or `'closed'`. A closed shadow root can't be reached from `element.shadowRoot` outside the component.
+- `delegatesFocus`: [provides focus](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/delegatesFocus) to the first focusable element inside the component when a non-focusable part is clicked.
+- `slotAssignment`: `'manual'` enables [manual slot assignment](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/slotAssignment) (otherwise known as [imperative slot assignment](https://github.com/WICG/webcomponents/blob/gh-pages/proposals/Imperative-Shadow-DOM-Distribution-API.md)); `'named'` is the default DOM slotting behavior.
+- `clonable`: preserves the shadow root when the host is deep-cloned via [`Node.cloneNode(true)`](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode). Without it, cloning a shadow host produces an empty shell.
+- `serializable`: marks the shadow root serializable, so it's included when the host is serialized via [`Element.getHTML({ serializableShadowRoots: true })`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getHTML).
+
+**Scoped/none options** (`type: 'scoped'` or `type: 'none'`):
+
+- `patches`: which light-DOM slot patches Stencil applies to this component (`'all'`, `'children'`, `'clone'`, `'insert'`). Overrides the project-wide `compat.lightDomPatches` config setting for this component specifically.
+
+**Examples**:<br/>
 ```tsx
 import { Component } from '@stencil/core';
 
 @Component({
   tag: 'todo-list',
-  scoped: true
+  encapsulation: { type: 'shadow' },
 })
 export class TodoList {
   // implementation omitted
 }
 ```
 
-### shadow
-
-**Optional**
-
-**Type: `boolean | { delegatesFocus?: boolean, slotAssignment?: 'manual' | 'named' }`**
-
-**Default: `false`**
-
-**Details:**<br/>
-If `true`, the component will use [native Shadow DOM encapsulation](./styling.md#shadow-dom).
-It will fall back to `scoped` if the browser does not support shadow-dom natively.
-
-`delegatesFocus` is a property that [provides focus](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/delegatesFocus) to the first focusable entry in a component using Shadow DOM.
-If an object literal containing `delegatesFocus` is provided, the component will use [native Shadow DOM encapsulation](./styling.md#shadow-dom), regardless of the value assigned to `delegatesFocus`.
-
-When `delegatesFocus` is set to `true`, the component will have `delegatesFocus: true` added to its shadow DOM.
-
-When `delegatesFocus` is `true` and a non-focusable part of the component is clicked:
-- the first focusable part of the component is given focus
-- the component receives any available `focus` styling
-
-When `slotAssignment` is set to `'manual'` or `'named'`, the component will have `slotAssignment` added to its shadow DOM.
-
-`slotAssignment: 'manual'` enables [manual slot assignment](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/slotAssignment) (otherwise known as [imperative slot assignment](https://github.com/WICG/webcomponents/blob/gh-pages/proposals/Imperative-Shadow-DOM-Distribution-API.md)) for the component.
-
-If `shadow` is set to `false`, the component will not use native shadow DOM encapsulation.
-
-This option cannot be set to enabled if `scoped` is enabled.
-
-**Example 1**:<br/>
-```tsx
-import { Component } from '@stencil/core';
-
+```tsx title="Closed shadow root with delegated focus"
 @Component({
   tag: 'todo-list',
-  shadow: true
+  encapsulation: { type: 'shadow', mode: 'closed', delegatesFocus: true },
 })
 export class TodoList {
   // implementation omitted
 }
 ```
 
-**Example 2**:<br/>
-```tsx
-import { Component } from '@stencil/core';
-
+```tsx title="Scoped CSS"
 @Component({
   tag: 'todo-list',
-  shadow: { 
-    delegatesFocus: true,
-  }
+  encapsulation: { type: 'scoped' },
 })
 export class TodoList {
   // implementation omitted
 }
 ```
+
+:::note
+Migrating from Stencil v4? `shadow: true` becomes `encapsulation: { type: 'shadow' }`, `scoped: true` becomes `encapsulation: { type: 'scoped' }`, and no encapsulation option becomes `encapsulation: { type: 'none' }` (or omit the property — `'none'` is the default). `formAssociated: true` is gone too — see the [`@AttachInternals()` decorator](./attach-internals.md), which sets it automatically. Run `stencil migrate --dry-run` to preview the automatic migration.
+:::
 
 ### styleUrl
 
@@ -324,7 +281,7 @@ export class TodoList {
 }
 ```
 
-Read more on styling modes in the Components [Styling](./styling.md#style-modes) section.
+Read more on styling modes in the Components [Styling](./styling/style-modes.md) section.
 
 ### styles
 
@@ -359,7 +316,7 @@ Components can be composed easily by adding the HTML tag to the JSX code. Since 
 Here's an example of using a component within another component:
 
 ```tsx
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop } from '@stencil/core';
 
 @Component({
   tag: 'my-embedded-component'
@@ -376,7 +333,7 @@ export class MyEmbeddedComponent {
 ```
 
 ```tsx
-import { Component, h } from '@stencil/core';
+import { Component } from '@stencil/core';
 
 @Component({
   tag: 'my-parent-component'
@@ -397,4 +354,4 @@ The `my-parent-component` includes a reference to the `my-embedded-component` in
 
 ## Component Architecture Patterns
 
-Stencil supports advanced component architecture patterns including class inheritance and composition. Learn more about organizing component logic with controllers in the [Extends & Mixins](../guides/extends.md) guide.
+Stencil supports advanced component architecture patterns including class inheritance and composition. Learn more about organizing component logic with controllers in the [Mixins & Reactive Controllers](../guides/patterns/mixins-and-controllers.md) guide.

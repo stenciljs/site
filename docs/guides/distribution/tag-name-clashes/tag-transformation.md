@@ -1,0 +1,371 @@
+---
+title: Tag Transformation
+sidebar_label: Tag Transformation
+sidebar_position: 2
+description: Register components under different tag names to avoid clashes
+slug: /tag-transformation
+---
+
+# Tag Transformation
+
+Tag transformation registers your components under different tag names, so a second copy of a library can't clash with the first. See [Avoiding Tag Name Clashes](./01-overview.md) for how it compares with scoped registries.
+
+## `setTagTransformer` and `transformTag`
+
+Stencil has two utilities to manage dynamic tag names:
+
+1) `setTagTransformer` allows application developers (your component library consumers) to assign a tag transformer function.
+2) `transformTag` is mainly used *within* your component libraries - transforming any static string tag names using the tag transformer function assigned via `setTagTransformer` (Alternatively, you can auto apply `transformTag` to all tag names via the [`compat.additionalTagTransformers` config option](#compatadditionaltagtransformers).)
+
+
+### Using `setTagTransformer`
+
+Your library's outputs export `setTagTransformer` for application developers to use. They must call it *before* the components are defined.
+
+#### Usage via the `loader-bundle` output
+
+`setTagTransformer` is exported from the loader:
+
+```html
+<script type="module">
+  import { defineCustomElements, setTagTransformer } from 'https://cdn.jsdelivr.net/npm/@component/library/dist/loader-bundle/loader/index.js';
+
+  // Setup a tag transformer
+  setTagTransformer((tag) => {
+    if (tag.startsWith('my-')) {
+      return tag.replace('my-', 'your-');
+    }
+    return tag;
+  });
+
+  // Define components as normal
+  defineCustomElements();
+</script>
+
+<body>
+  <your-button></your-button> 
+  <!-- ^^^ note the transformed tag name -->
+</body>
+```
+
+#### Usage via the `standalone` output
+
+`setTagTransformer` is exported from the output's index file, and from its `loader.js` for use before the auto-loader's `start()`:
+
+```js
+import { setTagTransformer } from '@component/library/dist/standalone';
+import { defineCustomElement } from '@component/library/dist/standalone/my-button.js';
+
+// setup a tag transformer
+
+setTagTransformer((tag) => {
+  if (tag.startsWith('my-')) {
+    return tag.replace('my-', 'your-');
+  }
+  return tag;
+})
+
+// define components as normal
+
+defineCustomElement();
+```
+
+#### Usage via `ssr` output (on a Node.js server)
+
+The [`ssr` module](../../../output-targets/main/ssr.md) exports its own `setTagTransformer`. Once it's set, `renderToString` renders the transformed tags it finds in the HTML:
+
+```js
+import { renderToString, setTagTransformer } from '@component/library/dist/ssr';
+
+// setup a tag transformer
+
+setTagTransformer((tag) => {
+  if (tag.startsWith('my-')) {
+    return tag.replace('my-', 'your-');
+  }
+  return tag;
+})
+
+const { html } = await renderToString(`
+  <html>
+    <body>
+      <your-button></your-button>
+    </body>
+  </html>
+`);
+```
+
+### Using `transformTag`
+
+Stencil also exports `transformTag` which you can use within your component code; 
+transforming static tag names via any assigned tag transformer function.
+
+```tsx
+import { Component, Element, transformTag } from '@stencil/core';
+
+@Component({
+  tag: 'my-component',
+  encapsulation: { type: 'shadow' },
+})
+export class MyComponent {
+  @Element() host: HTMLElement;
+
+  connectedCallback() {
+    const ele = this.host.querySelector(transformTag('my-other-element'));
+    const anotherEle = document.createElement(transformTag('my-another-element'));
+    ...
+  }
+
+  render() {
+    return (
+      <div>
+        <my-button>Click here</my-button>  
+        {/* ^^ jsx tags are automatically transformed */}
+      </div>
+    );
+  }
+}
+```
+
+#### Notes on CSS
+
+Unless using `compat.additionalTagTransformers`, 
+you need to be thoughtful when writing CSS selectors within your component library. 
+
+For example, if `my-button` is transformed to `your-button` this won't work:
+
+```css
+:host {
+  display: block;
+
+  my-button {
+    color: red;
+  }
+}
+```
+
+Instead, structure your components to use other selectors:
+
+```tsx
+import { Component, Host } from '@stencil/core';
+
+@Component({
+  tag: 'my-button',
+  encapsulation: { type: 'shadow' },
+})
+export class MyComponent {
+  @Element() host: HTMLElement;
+
+  render() {
+    return (
+      <Host class="my-button">...</Host>
+    );
+  }
+}
+```
+
+```css
+:host {
+  display: block;
+
+  .my-button {
+    color: red;
+  }
+}
+```
+
+## `compat.additionalTagTransformers`
+
+Setting the experimental `compat.additionalTagTransformers` configuration option to `true` (or `prod` to only apply to production builds) 
+will auto-wrap `transformTag(...)` to most static tag names within your component library (including CSS selectors!).
+
+Examples of auto-transformations include:
+
+```js
+document.createElement('my-element');
+// becomes
+document.createElement(transformTag('my-element'));
+
+document.querySelectorAll('my-element');
+// becomes
+document.querySelectorAll(transformTag('my-element'));
+```
+
+Incoming CSS like:
+
+```css
+:host my-element {}
+
+my-element::before {}
+
+my-element.active:hover {}
+```
+
+Is transformed for use at runtime to:
+
+```ts
+`:host ${transformTag('my-element')} {}
+
+${transformTag('my-element')}::before {}
+
+${transformTag('my-element')}.active:hover {}
+```
+
+## Framework integrations
+
+The tag transformation also works for the Stencil framework integrations but requires a bit of extra setup that is framework specific.
+
+### React
+
+Adding `transformTag: true` to the output:
+
+```ts
+reactOutputTarget({
+    ...
+    transformTag: true,
+}),
+```
+
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your React lib. It generates a new file called `tag-transformer.ts`. To export the tag-transformer to your consumers you need to add an export in the package.json of your React package.
+
+```json
+ "exports": {
+    ...
+    "./tag-transformer": {
+      "types": "./dist/tag-transformer.d.ts",
+      "import": "./dist/tag-transformer.js"
+    }
+  },
+```
+
+Application users can then import the tag transformer and set their own custom tag.
+
+It's important to bear in mind, that if any of the React application's initializing modules import any components from your React wrapper library (`import { MyButton } from 'component-library-react'`), they will immediately define before the transformer is registered and so not be applied. So it is very important that `setTagTransformer` is called before any components are imported.
+
+One approach to solve this is that the React app creates a file that includes a side effect call to `setTagTransformer` that is then imported before the root `App.tsx`. An example setup:
+
+```jsx
+//initTagTransformer.ts
+
+import { setTagTransformer } from "component-library-react/tag-transformer";
+
+setTagTransformer((tag) => {
+  if (tag.startsWith("my-component-lib-")) {
+    return tag.replace("my-component-lib-", "my-component-lib-v2-");
+  }
+
+  return tag;
+});
+```
+
+```tsx
+//main.tsx
+
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import "./initTagTransformer.ts"; // This has to come before the import of App.tsx
+import App from "./App.tsx";
+
+const rootElement = document.getElementById("root");
+
+const queryClient = new QueryClient();
+
+createRoot(rootElement).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+```
+
+```jsx
+// App.tsx
+import { MyComponentLibButton } from "component-library-react";
+
+function App() {
+  const [count, setCount] = useState(0);
+
+  const handleIncreaseCount = () => setCount(count + 1);
+
+  return (
+    <div>
+      <h1>My React app</h1>
+      {/* Should render my-component-lib-v2-button in the DOM */}
+      <MyComponentLibButton onClick={handleIncreaseCount}>Increase count</MyComponentLibButton>
+    </div>
+  );
+}
+
+export default App;
+```
+
+**Note** some linters re-organize imports as they see fit which might cause `import "./initTagTransformer.ts";` to be placed after `import App from "./App.tsx";`. Though most linters do not move side effect imports, so hopefully this shouldn't be an issue. But something to keep in mind if you notice that the tag transformation doesn't work like it should.
+
+### Vue
+
+Adding `transformTag: true` to the output:
+
+```ts
+vueOutputTarget({
+    ...
+    transformTag: true,
+}),
+```
+
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Vue lib. It generates a new file called `tag-transformer.ts`. To export the tag-transformer to your consumers you need to add an export in the package.json of your Vue package.
+
+```json
+ "exports": {
+    ...
+    "./tag-transformer": {
+      "types": "./dist/tag-transformer.d.ts",
+      "import": "./dist/tag-transformer.js"
+    }
+  },
+```
+
+Application users can then import add a transformer. e.g.
+
+```ts
+// main.ts
+import { setTagTransformer } from 'component-library-vue/tag-transformer'
+
+setTagTransformer((tag: string) => tag.startsWith('my-transform-') ? `v1-${tag}` : tag)
+
+const app = createApp(App)
+```
+
+It's important to bear in mind, that if any of the Vue application's initializing modules import any components from your vue wrapper library (`import { MyButton } from 'component-library-vue'`), they will immediately define before the transformer is registered and so not be applied.
+
+
+### Angular
+
+Adding `transformTag: true` to the output:
+
+```ts
+angularOutputTarget({
+    ...
+    transformTag: true,
+}),
+```
+
+Will cause `setTagTransformer` and `tagTransformer` to be automatically exported from your Angular lib. It generates a new file called `tag-transformer.ts`.
+
+Because Angular has no hooks for template compilation (e.g. in an Angular template, `<my-button>`, cannot be intercepted and re-written at runtime to be `<my-button-v1>`) the output to produces a build-time script which consumers can use as a postinstall script for example. Make sure to make it available via:
+
+```json
+"bin": {
+    "patch-transform-selectors": "./scripts/patch-transform-selectors.mjs"
+  },
+```
+
+in your Angular wrapper package.json.
+
+Applications consumers set a tag-transformer by adding a `tag-transformer.config.mjs` to the root of their project:
+```ts
+export default (tag) => {
+  return tag.replace('my-button', 'my-button-v1');
+}
+```
+
+The transformer will then be applied at buildtime to Angular selectors and at runtime.
