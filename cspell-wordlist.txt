@@ -49,6 +49,8 @@ hostdidrender
 hostconnected
 hostdidload
 hostwillrender
+hostdisconnected
+hostwillload
 oxlint
 oxlintrc
 pcss
@@ -73,3 +75,5 @@ precaches
 unregisters
 repoint
 webcomponents
+stenciljs
+frontmatter
