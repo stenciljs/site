@@ -195,6 +195,11 @@
       "source": "/v5/build-variables",
       "destination": "/docs/v5/guides/build-conditionals",
       "statusCode": 301
+    },
+    {
+      "source": "/v5/forms",
+      "destination": "/docs/v5/form-associated",
+      "statusCode": 301
     }
   ],
   "rewrites": [

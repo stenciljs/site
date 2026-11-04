@@ -129,6 +129,66 @@ If you want to destroy and recreate a component in a conditional, you can assign
 
 This way, if `someCondition` changes, you get a new `<my-counter>` component with fresh internal state that also runs the lifecycle methods `componentWillLoad()` and `componentDidLoad()`.
 
+Click both counters a few times, then **Toggle**. The counter without a `key` keeps its count, and the one with a `key` starts again from its `initialValue`:
+
+:::playground{preview-height=150}
+```tsx title="my-counter.tsx"
+import { Component, Prop, State } from '@stencil/core';
+
+@Component({ tag: 'my-counter' })
+export class MyCounter {
+  @Prop() initialValue = 0;
+  @State() count = 0;
+
+  componentWillLoad() {
+    this.count = this.initialValue;
+  }
+
+  render() {
+    return <button onClick={() => this.count++}>Count: {this.count}</button>;
+  }
+}
+```
+
+```tsx title="my-toggle-demo.tsx"
+import { Component, State } from '@stencil/core';
+
+@Component({ tag: 'my-toggle-demo' })
+export class MyToggleDemo {
+  @State() someCondition = true;
+
+  render() {
+    return (
+      <div>
+        <button onClick={() => (this.someCondition = !this.someCondition)}>Toggle</button>
+        <p>
+          Without key:{' '}
+          {this.someCondition
+            ? <my-counter initialValue={2} />
+            : <my-counter initialValue={5} />
+          }
+        </p>
+        <p>
+          With key:{' '}
+          {this.someCondition
+            ? <my-counter key="a" initialValue={2} />
+            : <my-counter key="b" initialValue={5} />
+          }
+        </p>
+      </div>
+    );
+  }
+}
+```
+
+```html title="index.html"
+<script type="module" src="./my-counter.js"></script>
+<script type="module" src="./my-toggle-demo.js"></script>
+
+<my-toggle-demo></my-toggle-demo>
+```
+:::
+
 
 ## Slots
 
@@ -151,11 +211,11 @@ render() {
       <div class="todo-one">
         {this.todos.map((todo) => (
           <span>{ todo.taskName }</span>
-        )}
+        ))}
       </div>
       <div class="todo-two">
-        <span>{ todos[0].taskName }</span>
-        <span>{ todos[1].taskName }</span>
+        <span>{ this.todos[0].taskName }</span>
+        <span>{ this.todos[1].taskName }</span>
       </div>
     </>
   )
@@ -373,7 +433,34 @@ will set the `value` attribute on the input element, while:
 <input prop:value="Hello" />
 ```
 
-will explicitly set the `value` property on the input element.  
+will explicitly set the `value` property on the input element.
+
+For an input's `value`, the difference shows once someone has typed. Type in both inputs, then click **Toggle**. The `prop:value` input shows the new value. The `attr:value` input keeps what you typed, because the attribute is only the input's default value:
+
+:::playground{preview-height=80}
+```tsx title="my-cmp.tsx"
+import { Component, State } from '@stencil/core';
+
+@Component({ tag: 'my-cmp' })
+export class MyCmp {
+  @State() greeting = 'Hello';
+
+  private toggle = () => {
+    this.greeting = this.greeting === 'Hello' ? 'Goodbye' : 'Hello';
+  };
+
+  render() {
+    return (
+      <div>
+        <input attr:value={this.greeting} />
+        <input prop:value={this.greeting} />
+        <button onClick={this.toggle}>Toggle</button>
+      </div>
+    );
+  }
+}
+```
+:::
 
 
 ## Avoid Shared JSX Nodes

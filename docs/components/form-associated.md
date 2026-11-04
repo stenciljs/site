@@ -17,8 +17,9 @@ You usually need this only for components with [shadow DOM](./styling/01-overvie
 
 ## Example
 
-This text input submits its value, and reports itself as invalid when it's `required` and empty:
+This text input submits its value, and reports itself as invalid when it's `required` and empty. Use it in a form like any other input. Submit with the field empty to see the browser's message, then type a value and submit again:
 
+:::playground{preview-height=110}
 ```tsx title="src/components/my-input/my-input.tsx"
 import { AttachInternals, Component, Prop, State } from '@stencil/core';
 
@@ -63,14 +64,22 @@ export class MyInput {
 }
 ```
 
-Use it in a form like any other input:
-
-```html
+```html title="index.html"
 <form>
   <my-input name="email" required></my-input>
   <button>Submit</button>
 </form>
+
+<script type="module" src="./components/my-input/my-input.js"></script>
+<script>
+  // Show what the form submits, instead of sending it
+  document.querySelector('form').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    document.body.append(JSON.stringify(Object.fromEntries(new FormData(ev.target))));
+  });
+</script>
 ```
+:::
 
 - [`setFormValue()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setFormValue) sets the value the form submits, under the element's `name` (`email` here).
 - [`setValidity()`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals/setValidity) marks the element valid or invalid. While it's invalid, the element matches `:invalid` in CSS and the form won't submit. On a submit attempt, the browser shows the message at the inner `<input>`, which is passed as the last argument.
@@ -114,6 +123,83 @@ render() {
 ```
 
 A disabled element's value isn't submitted, and the element matches `:disabled` in CSS.
+
+Type a value, then disable the fieldset or reset the form:
+
+:::playground{preview-height=110}
+```html title="index.html"
+<label><input type="checkbox" id="disable" /> Disable the fieldset</label>
+
+<form>
+  <fieldset>
+    <my-input name="email"></my-input>
+  </fieldset>
+  <button type="reset">Reset</button>
+</form>
+
+<script type="module" src="./components/my-input/my-input.js"></script>
+<script>
+  document.querySelector('#disable').addEventListener('change', (ev) => {
+    document.querySelector('fieldset').disabled = ev.target.checked;
+  });
+</script>
+```
+
+```tsx title="src/components/my-input/my-input.tsx" hidden
+import { AttachInternals, Component, Prop, State } from '@stencil/core';
+
+@Component({
+  tag: 'my-input',
+  encapsulation: { type: 'shadow' },
+})
+export class MyInput {
+  @AttachInternals() internals: ElementInternals;
+
+  /** Whether the field must have a value. */
+  @Prop() required = false;
+
+  @State() value = '';
+
+  @State() disabled = false;
+
+  private input?: HTMLInputElement;
+
+  componentDidLoad() {
+    this.setValue('');
+  }
+
+  private setValue(value: string) {
+    this.value = value;
+    this.internals.setFormValue(value);
+
+    if (this.required && !value) {
+      this.internals.setValidity({ valueMissing: true }, 'Please fill in this field.', this.input);
+    } else {
+      this.internals.setValidity({});
+    }
+  }
+
+  formDisabledCallback(disabled: boolean) {
+    this.disabled = disabled;
+  }
+
+  formResetCallback() {
+    this.setValue('');
+  }
+
+  render() {
+    return (
+      <input
+        ref={(el) => (this.input = el)}
+        value={this.value}
+        disabled={this.disabled}
+        onInput={(ev) => this.setValue((ev.target as HTMLInputElement).value)}
+      />
+    );
+  }
+}
+```
+:::
 
 ### Restoring State
 

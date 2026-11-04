@@ -64,19 +64,6 @@ Then open [http://localhost:3333/src/components/my-greeting/](http://localhost:3
 
 Add a `name` prop, and render a greeting with it:
 
-<!--
-  TODO(live-demo): replace/supplement this static walkthrough (source, usage snippet, and
-  described output below) with a single live, editable demo - the reader edits `name`
-  (or the component source itself) and sees the real compiled/rendered
-  result update, rather than reading a description of what the browser will display. This
-  is the strongest candidate on the whole site for the "real compiler, not a sandboxed
-  runtime" direction (V5_DOCS_PLAN.md "Live Examples"): it's the reader's first-ever contact with Stencil's compile step
-  (decorators, JSX, `styleUrl`), so showing the actual transformation matters most here.
-  See V5_DOCS_PLAN.md "Live Examples" - tool not yet decided (playground-elements was proposed and
-  retracted; needs a POC comparing @stencil/unplugin-in-a-real-browser-Node-runtime vs. a
-  custom Sandpack/Nodebox-backed playground before implementing).
--->
-
 ```tsx title="src/components/my-greeting/my-greeting.tsx"
 import { Component, Host, Prop } from '@stencil/core';
 
@@ -125,6 +112,45 @@ The [`@Component()` decorator](../components/component.md) tells Stencil about t
 [`@Prop()`](../components/properties.md) makes `name` part of the component's public API. Stencil sets it from the `name` attribute in HTML, or from the `name` property in JavaScript, and renders the component again whenever it changes. The `= 'Stencil'` is its default value.
 
 [`render()`](../components/templating-and-jsx.md) returns what the component displays, written in JSX. `<Host>` is the component's own element, and `<slot>` is where any content placed inside the element appears.
+
+Here's the finished component. Change `name` in `index.html`, or edit the component itself:
+
+:::playground{preview-height=70}
+```html title="index.html"
+<script type="module" src="./components/my-greeting/my-greeting.js"></script>
+
+<my-greeting name="World"></my-greeting>
+```
+
+```tsx title="src/components/my-greeting/my-greeting.tsx" hidden
+import { Component, Host, Prop } from '@stencil/core';
+
+@Component({
+  tag: 'my-greeting',
+  styleUrl: 'my-greeting.css',
+  encapsulation: { type: 'shadow' },
+})
+export class MyGreeting {
+  /** Who to greet */
+  @Prop() name = 'Stencil';
+
+  render() {
+    return (
+      <Host>
+        <p>Hello, {this.name}!</p>
+        <slot></slot>
+      </Host>
+    );
+  }
+}
+```
+
+```css title="src/components/my-greeting/my-greeting.css"
+:host {
+  display: block;
+}
+```
+:::
 
 The project also includes a starter component, `my-component`, created by `stencil init`. It's another example to look at, and you can delete it.
 

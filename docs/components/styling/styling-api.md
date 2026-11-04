@@ -41,7 +41,10 @@ shadow-card {
 
 Custom properties only let consumers change the values you've chosen to expose. For more freedom, mark an element with a `part` attribute, and consumers can style it however they like with the [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) pseudo-element:
 
-```tsx
+:::playground{preview-height=150}
+```tsx title="shadow-card.tsx"
+import { Component, Host, Prop } from '@stencil/core';
+
 @Component({
   tag: 'shadow-card',
   styleUrl: 'shadow-card.css',
@@ -53,7 +56,7 @@ export class ShadowCard {
   render() {
     return (
       <Host>
-        <h1 part="heading">{this.heading}</h1>
+        <h1 class="heading" part="heading">{this.heading}</h1>
         <slot></slot>
       </Host>
     );
@@ -61,11 +64,50 @@ export class ShadowCard {
 }
 ```
 
+```css title="shadow-card.css" hidden
+:host {
+  /**
+   * @prop --heading-color: Color of the card heading
+   */
+  --heading-color: black;
+}
+
+.heading {
+  color: var(--heading-color);
+}
+```
+
+```html title="index.html" hidden
+<style>
+  shadow-card {
+    --heading-color: blue;
+  }
+
+  shadow-card::part(heading) {
+    text-transform: uppercase;
+  }
+
+  /* No effect: the h1 is inside the shadow root */
+  shadow-card h1 {
+    font-style: italic;
+  }
+</style>
+
+<script type="module" src="./shadow-card.js"></script>
+
+<shadow-card heading="Card heading">
+  <p>Card content</p>
+</shadow-card>
+```
+:::
+
 ```css
 shadow-card::part(heading) {
   text-transform: uppercase;
 }
 ```
+
+In the playground above, `index.html` sets both `--heading-color` and this rule. It also has a plain `shadow-card h1` rule, which has no effect, because the heading is inside the shadow root.
 
 `::part()` is for reaching into a shadow root. In a `scoped` or `none` component, the element is already in the light DOM, so consumers can use an ordinary selector such as `shadow-card [part="heading"]`.
 
@@ -73,10 +115,12 @@ shadow-card::part(heading) {
 
 Parts of a nested component aren't exposed through the component that renders it. To pass them on, list them in the nested component's `exportparts` attribute:
 
-```tsx
+:::playground{preview-height=150}
+```tsx title="outer-component.tsx"
+import { Component, Host } from '@stencil/core';
+
 @Component({
   tag: 'outer-component',
-  styleUrl: 'outer-component.css',
   encapsulation: { type: 'shadow' },
 })
 export class OuterComponent {
@@ -89,10 +133,13 @@ export class OuterComponent {
     );
   }
 }
+```
+
+```tsx title="inner-component.tsx"
+import { Component, Host } from '@stencil/core';
 
 @Component({
   tag: 'inner-component',
-  styleUrl: 'inner-component.css',
   encapsulation: { type: 'shadow' },
 })
 export class InnerComponent {
@@ -106,6 +153,20 @@ export class InnerComponent {
 }
 ```
 
+```html title="index.html" hidden
+<style>
+  outer-component::part(inner-text) {
+    color: blue;
+  }
+</style>
+
+<script type="module" src="./outer-component.js"></script>
+<script type="module" src="./inner-component.js"></script>
+
+<outer-component></outer-component>
+```
+:::
+
 Consumers can then style `inner-component`'s `inner-text` part through `outer-component`:
 
 ```css
@@ -113,3 +174,5 @@ outer-component::part(inner-text) {
   color: blue;
 }
 ```
+
+The playground's `index.html` has this rule. Remove `exportparts` from `outer-component.tsx`, and the inner heading is no longer blue.

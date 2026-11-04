@@ -232,6 +232,48 @@ By default, setting a property doesn't change the element's attributes. Set `ref
 
 A boolean prop is reflected as an attribute with no value when it's `true`, and the attribute is removed when it's `false`.
 
+In this playground, the page's CSS styles `my-button[active]`, and the button below it sets `el.active`:
+
+:::playground{preview-height=90}
+```html title="index.html"
+<style>
+  my-button[active] {
+    outline: 3px solid orange;
+  }
+</style>
+
+<script type="module" src="./my-button.js"></script>
+
+<my-button>Reflected</my-button>
+<button id="toggle">Toggle active</button>
+
+<script>
+  const el = document.querySelector('my-button');
+  document.querySelector('#toggle').addEventListener('click', () => {
+    el.active = !el.active;
+  });
+</script>
+```
+
+```tsx title="my-button.tsx"
+import { Component, Prop } from '@stencil/core';
+
+@Component({ tag: 'my-button', encapsulation: { type: 'shadow' } })
+export class MyButton {
+  @Prop({ reflect: true }) variant = 'primary';
+  @Prop({ reflect: true }) active = false;
+
+  render() {
+    return (
+      <button>
+        <slot />
+      </button>
+    );
+  }
+}
+```
+:::
+
 ### Prop Getters and Setters
 
 A `@Prop()` can be a getter, with or without a setter. Use one to validate or transform incoming values, or to expose a read-only property:

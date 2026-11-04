@@ -36,31 +36,40 @@ Any children passed to `my-card` are placed inside `.body`:
 
 ### Named Slots
 
-Give a slot a `name` to place content in a specific location. Content picks a slot with the `slot` attribute, and anything without one goes to the default (unnamed) slot:
+Give a slot a `name` to place content in a specific location. Content picks a slot with the `slot` attribute, and anything without one goes to the default (unnamed) slot. The order of the children doesn't matter:
 
+:::playground{preview-height=160}
 ```tsx title="my-card.tsx"
-render() {
-  return (
-    <div class="card">
-      <header>
-        <slot name="header" />
-      </header>
-      <slot />
-      <footer>
-        <slot name="footer" />
-      </footer>
-    </div>
-  );
+import { Component } from '@stencil/core';
+
+@Component({ tag: 'my-card' })
+export class MyCard {
+  render() {
+    return (
+      <div class="card">
+        <header>
+          <slot name="header" />
+        </header>
+        <slot />
+        <footer>
+          <slot name="footer" />
+        </footer>
+      </div>
+    );
+  }
 }
 ```
 
-```html
+```html title="index.html"
+<script type="module" src="./my-card.js"></script>
+
 <my-card>
-  <h2 slot="header">Title</h2>
-  <p>Card content</p>
   <button slot="footer">Close</button>
+  <p>Card content</p>
+  <h2 slot="header">Title</h2>
 </my-card>
 ```
+:::
 
 ### Fallback Content
 
@@ -71,6 +80,8 @@ Children of a `<slot>` are shown when nothing is passed to that slot:
   <h2>Untitled</h2>
 </slot>
 ```
+
+To try it, add this fallback to the header slot in the playground above, then delete the `<h2 slot="header">` line from `index.html`.
 
 ## Forwarding Slots
 
@@ -109,6 +120,48 @@ render() {
   );
 }
 ```
+
+In this playground, the component shows a note while its footer slot is empty. Delete the button from `index.html`, and the note appears:
+
+:::playground{preview-height=110}
+```tsx title="my-card.tsx"
+import { Component, State } from '@stencil/core';
+
+@Component({
+  tag: 'my-card',
+  encapsulation: { type: 'shadow' },
+})
+export class MyCard {
+  @State() hasFooter = false;
+
+  private handleSlotchange = (ev: Event) => {
+    const slot = ev.target as HTMLSlotElement;
+    this.hasFooter = slot.assignedElements().length > 0;
+  };
+
+  render() {
+    return (
+      <div>
+        <slot />
+        <footer>
+          <slot name="footer" onSlotchange={this.handleSlotchange} />
+        </footer>
+        {!this.hasFooter && <p>(No footer)</p>}
+      </div>
+    );
+  }
+}
+```
+
+```html title="index.html"
+<script type="module" src="./my-card.js"></script>
+
+<my-card>
+  <p>Card content</p>
+  <button slot="footer">Close</button>
+</my-card>
+```
+:::
 
 This works the same way in components [without shadow DOM](#slots-without-shadow-dom), except that the `flatten` option of `assignedElements()` and `assignedNodes()` isn't supported there.
 

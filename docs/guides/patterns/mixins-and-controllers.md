@@ -11,31 +11,70 @@ Stencil composes component logic through `Mixin()`, a function that folds one or
 
 ## Combine your own mixin factories
 
-Write each behavior as its own mixin factory, then pass as many as you need to `Mixin()`:
+Write each behavior as its own mixin factory, then pass as many as you need to `Mixin()`. In this playground, type a name, clear it, and click outside the field:
 
-<!--
-  TODO(live-demo): replace/supplement this static example with a live,
-  editable demo 
--->
-
-```typescript
-import { Component, Mixin } from '@stencil/core';
+:::playground{preview-height=110}
+```tsx title="my-component.tsx"
+import { Component, Mixin, State } from '@stencil/core';
 import { ValidationControllerMixin } from './validation-controller-mixin';
 import { FocusControllerMixin } from './focus-controller-mixin';
 
 @Component({ tag: 'my-component' })
 export class MyComponent extends Mixin(ValidationControllerMixin, FocusControllerMixin) {
-  componentDidLoad() {
-    super.componentDidLoad?.();
-    // Your logic here
-  }
+  @State() values = { name: '' };
 
   private onBlur = () => {
     this.handleBlur();
     this.validate(this.values);
   };
+
+  private onInput = (ev: Event) => {
+    this.values = { name: (ev.target as HTMLInputElement).value };
+  };
+
+  render() {
+    return (
+      <div>
+        <input placeholder="Name" onInput={this.onInput} onBlur={this.onBlur} />
+        {this.touched && this.errors.map((error) => <p>{error}</p>)}
+      </div>
+    );
+  }
 }
 ```
+
+```ts title="validation-controller-mixin.ts"
+import { State } from '@stencil/core';
+
+export function ValidationControllerMixin(Base) {
+  class ValidationControllerMixinClass extends Base {
+    @State() errors: string[] = [];
+
+    validate(values: Record<string, string>) {
+      this.errors = Object.entries(values)
+        .filter(([, value]) => !value.trim())
+        .map(([field]) => `${field} is required`);
+    }
+  }
+  return ValidationControllerMixinClass;
+}
+```
+
+```ts title="focus-controller-mixin.ts"
+import { State } from '@stencil/core';
+
+export function FocusControllerMixin(Base) {
+  class FocusControllerMixinClass extends Base {
+    @State() touched = false;
+
+    handleBlur() {
+      this.touched = true;
+    }
+  }
+  return FocusControllerMixinClass;
+}
+```
+:::
 
 `Mixin(A, B, C)` applies the factories right to left, so `A` ends up closest to `MyComponent` in the prototype chain. Call `super.<method>?.()` in any lifecycle method you override, since an earlier factory in the chain might not define it.
 
@@ -111,20 +150,16 @@ To find a factory, Stencil follows its import to the file that declares it, thro
 
 A reactive controller is an object that hooks into a component's lifecycle without living inside the component class. Write the behavior once as a controller, and any component can add it.
 
-Mix in Stencil's built-in `ReactiveControllerHost`, then construct controller instances and pass them `this`:
+Mix in Stencil's built-in `ReactiveControllerHost`, then construct controller instances and pass them `this`. A controller takes the host in its constructor and registers itself. Move the pointer over the preview to see the controller update the component:
 
-```typescript
+:::playground{preview-height=80}
+```tsx title="src/my-component.tsx"
 import { Component, Mixin, ReactiveControllerHost } from '@stencil/core';
 import { MouseController } from './mouse-controller';
 
 @Component({ tag: 'my-component' })
 export class MyComponent extends Mixin(ReactiveControllerHost) {
   private mouse = new MouseController(this);
-
-  componentDidLoad() {
-    super.componentDidLoad?.();
-    // Your logic here
-  }
 
   render() {
     return (
@@ -136,13 +171,7 @@ export class MyComponent extends Mixin(ReactiveControllerHost) {
 }
 ```
 
-:::note
-`ReactiveControllerHost` is itself a mixin factory, so it always goes through `Mixin()`
-:::
-
-A controller takes the host in its constructor and registers itself:
-
-```typescript
+```ts title="src/mouse-controller.ts"
 import type { ReactiveController, ReactiveControllerHostInterface } from '@stencil/core';
 
 export class MouseController implements ReactiveController {
@@ -168,6 +197,11 @@ export class MouseController implements ReactiveController {
   };
 }
 ```
+:::
+
+:::note
+`ReactiveControllerHost` is itself a mixin factory, so it always goes through `Mixin()`. It implements the component lifecycle methods, from `connectedCallback()` to `componentDidUpdate()`, to pass them on to its controllers. If your component overrides one, call `super.<method>?.()` in it, as the `connectedCallback()` example below does, or its controllers stop receiving that hook.
+:::
 
 If using the [`loader-bundle`](../../output-targets/main/loader-bundle.md) output target, a controller that also needs the real host element (e.g. `@lit/context`'s `ContextProvider` which dispatches DOM events), cannot use a field initializer (like the `MouseController` above), but must instead use `connectedCallback()`.
 In the loader-bundle, `this` and the host element are different objects until `connectedCallback` runs: `this` has `addController` / `requestUpdate` / `updateComplete`, the element does not yet. 

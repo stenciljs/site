@@ -11,16 +11,6 @@ slug: /styling
 
 Styling your components depends partly on their [`encapsulation`](../component.md#encapsulation) choice - `shadow`, `scoped`, or `none`.
 
-<!--
-  TODO(live-demo): replace/supplement this static example with an interactive live demo -
-  three near-identical components, one per encapsulation type, the same CSS selector
-  applied to all three, live side by side, so the isolation difference is something the reader
-  sees rather than reads three descriptions of. See V5_DOCS_PLAN.md "Live Examples" - the tool for this is
-  not yet decided (playground-elements was proposed and retracted; needs a POC comparing
-  @stencil/unplugin-in-a-real-browser-Node-runtime vs. a custom Sandpack/Nodebox-backed
-  playground before implementing).
--->
-
 ```tsx title="my-component.tsx"
 @Component({
   tag: 'my-component',
@@ -29,6 +19,78 @@ Styling your components depends partly on their [`encapsulation`](../component.m
 })
 export class MyComponent {}
 ```
+
+Here, three components share one stylesheet and differ only in `encapsulation`. The page's `h2` rule turns the `scoped` and `none` headings red, but not the `shadow` one. The `none` component's `h2` rule leaks out and underlines the page's own heading:
+
+:::playground{preview-height=230}
+```css title="demo.css"
+h2 {
+  text-decoration: underline;
+}
+```
+
+```tsx title="shadow-demo.tsx"
+import { Component } from '@stencil/core';
+
+@Component({
+  tag: 'shadow-demo',
+  styleUrl: 'demo.css',
+  encapsulation: { type: 'shadow' },
+})
+export class ShadowDemo {
+  render() {
+    return <h2>shadow</h2>;
+  }
+}
+```
+
+```tsx title="scoped-demo.tsx" hidden
+import { Component } from '@stencil/core';
+
+@Component({
+  tag: 'scoped-demo',
+  styleUrl: 'demo.css',
+  encapsulation: { type: 'scoped' },
+})
+export class ScopedDemo {
+  render() {
+    return <h2>scoped</h2>;
+  }
+}
+```
+
+```tsx title="none-demo.tsx" hidden
+import { Component } from '@stencil/core';
+
+@Component({
+  tag: 'none-demo',
+  styleUrl: 'demo.css',
+  encapsulation: { type: 'none' },
+})
+export class NoneDemo {
+  render() {
+    return <h2>none</h2>;
+  }
+}
+```
+
+```html title="index.html"
+<style>
+  h2 {
+    color: red;
+  }
+</style>
+
+<script type="module" src="./shadow-demo.js"></script>
+<script type="module" src="./scoped-demo.js"></script>
+<script type="module" src="./none-demo.js"></script>
+
+<h2>Page heading</h2>
+<shadow-demo></shadow-demo>
+<scoped-demo></scoped-demo>
+<none-demo></none-demo>
+```
+:::
 
 | | `shadow` | `scoped` | `none` |
 |---|---|---|---|

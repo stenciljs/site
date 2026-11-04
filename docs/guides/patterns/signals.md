@@ -13,15 +13,14 @@ Stencil's signals are [Preact Signals](https://github.com/preactjs/signals). The
 
 ## Share State with a Signal
 
-Create a signal in a module of its own, and export it:
+Create a signal in a module of its own, and export it. Any component can import it. Read and write the current value through `.value`, and place the signal itself in JSX to display it:
 
+:::playground{preview-height=80}
 ```ts title="src/count.ts"
 import { signal } from '@stencil/core/signals';
 
 export const count = signal(0);
 ```
-
-Any component can import it. Read and write the current value through `.value`, and place the signal itself in JSX to display it:
 
 ```tsx title="src/components/my-counter/my-counter.tsx"
 import { Component } from '@stencil/core';
@@ -41,6 +40,14 @@ export class MyCounter {
   }
 }
 ```
+
+```html title="index.html"
+<script type="module" src="./components/my-counter/my-counter.js"></script>
+
+<my-counter></my-counter>
+<my-counter></my-counter>
+```
+:::
 
 Every `<my-counter>` on the page now shows the same number, and a click on any of them updates all of them.
 
@@ -70,6 +77,7 @@ The same goes for anything computed from `.value` inside `render()`, such as `co
 
 When a signal should change what a component renders, and not only a value in it, copy what you need into `@State()` from a method marked with `@Effect()`:
 
+:::playground{preview-height=110}
 ```tsx title="src/components/my-parity/my-parity.tsx"
 import { Component, State } from '@stencil/core';
 import { Effect } from '@stencil/core/signals';
@@ -92,6 +100,40 @@ export class MyParity {
   }
 }
 ```
+
+```ts title="src/count.ts" hidden
+import { signal } from '@stencil/core/signals';
+
+export const count = signal(0);
+```
+
+```tsx title="src/components/my-counter/my-counter.tsx" hidden
+import { Component } from '@stencil/core';
+import { count } from '../../count';
+
+@Component({
+  tag: 'my-counter',
+  encapsulation: { type: 'shadow' },
+})
+export class MyCounter {
+  private increment = () => {
+    count.value = count.value + 1;
+  };
+
+  render() {
+    return <button onClick={this.increment}>{count}</button>;
+  }
+}
+```
+
+```html title="index.html" hidden
+<script type="module" src="./components/my-counter/my-counter.js"></script>
+<script type="module" src="./components/my-parity/my-parity.js"></script>
+
+<my-counter></my-counter>
+<my-parity></my-parity>
+```
+:::
 
 Stencil runs the method once when the component loads, and again whenever a signal that it read changes. Setting `@State()` then renders the component in the usual way. The effect stops when the component is removed from the page.
 
@@ -138,6 +180,58 @@ effect(() => {
 ```
 
 `@State()` members aren't available this way. They're internal to the component.
+
+In this playground, the script in `index.html` follows the slider's `value` prop through `getSignal()`:
+
+:::playground{preview-height=90}
+```html title="index.html"
+<script type="module" src="./my-slider.js"></script>
+
+<my-slider></my-slider>
+<p>Outside the component: <span id="percent"></span></p>
+
+<script type="module">
+  import { computed, effect, getSignal } from '@stencil/core/signals';
+
+  const slider = document.querySelector('my-slider');
+  await slider.componentOnReady();
+
+  const value = getSignal(slider, 'value');
+  const percent = computed(() => `${value.value}%`);
+
+  effect(() => {
+    document.querySelector('#percent').textContent = percent.value;
+  });
+</script>
+```
+
+```tsx title="src/my-slider.tsx"
+import { Component, Prop } from '@stencil/core';
+
+@Component({ tag: 'my-slider' })
+export class MySlider {
+  @Prop({ mutable: true }) value = 50;
+
+  render() {
+    return (
+      <input
+        type="range"
+        value={this.value}
+        onInput={(ev) => (this.value = Number((ev.target as HTMLInputElement).value))}
+      />
+    );
+  }
+}
+```
+
+```ts title="stencil.config.ts" hidden
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  signalBacking: true,
+};
+```
+:::
 
 ### Reading Signals Without Importing Stencil
 

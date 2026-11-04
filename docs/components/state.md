@@ -75,4 +75,39 @@ this.items = [...this.items, 'Stencil'];
 this.user = { ...this.user, age: 37 };
 ```
 
+In this list, **Push** changes the array in place, and nothing appears. **Add** assigns a new array, and the render then shows every item, including the ones pushed before:
+
+:::playground{preview-height=180}
+```tsx title="my-list.tsx"
+import { Component, State } from '@stencil/core';
+
+@Component({ tag: 'my-list' })
+export class MyList {
+  @State() items: string[] = [];
+
+  private push = () => {
+    this.items.push(`Item ${this.items.length + 1}`);
+  };
+
+  private add = () => {
+    this.items = [...this.items, `Item ${this.items.length + 1}`];
+  };
+
+  render() {
+    return (
+      <div>
+        <button onClick={this.push}>Push</button>
+        <button onClick={this.add}>Add</button>
+        <ul>
+          {this.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}
+```
+:::
+
 The same applies to [`@Watch()`](./reactive-data.md): a watcher only runs when the member is assigned a new value.

@@ -30,6 +30,7 @@ import { Component, AttachInternals } from '@stencil/core';
 @Component({
   tag: 'my-element',
   styleUrl: 'my-element.css',
+  encapsulation: { type: 'shadow' },
 })
 export class MyElement {
   @AttachInternals({
@@ -58,15 +59,55 @@ handleClick() {
 }
 ```
 
-You or your element users can then use custom states in CSS like so:
+You or your element users can then use custom states in CSS. Use them internally, in the component's stylesheet, or externally, from the page. Click the element below to run `handleClick()`:
 
-```css
-/* Use them internally... */
+:::playground{preview-height=90}
+```css title="my-element.css"
 :host(:state(my-custom-state)) {
   background-color: yellow;
 }
-/* ... Or use them externally */
-my-element:state(another-state) {
-  border: 2px solid red;
-} 
 ```
+
+```html title="index.html"
+<style>
+  my-element:state(another-state) {
+    border: 2px solid red;
+  }
+</style>
+
+<script type="module" src="./my-element.js"></script>
+
+<my-element></my-element>
+```
+
+```tsx title="my-element.tsx" hidden
+import { Component, AttachInternals } from '@stencil/core';
+/**
+ * My Element component
+ */
+@Component({
+  tag: 'my-element',
+  styleUrl: 'my-element.css',
+  encapsulation: { type: 'shadow' },
+})
+export class MyElement {
+  @AttachInternals({
+    states: {
+      /** A custom state for my element */
+      'my-custom-state': true,
+      /** Another custom state for my element */
+      'another-state': false
+    }
+  }) internals: ElementInternals;
+
+  handleClick() {
+    this.internals.states.add('another-state'); // to add a state
+    this.internals.states.delete('my-custom-state'); // to remove a state
+  }
+
+  render() {
+    return <div onClick={() => this.handleClick()}>My Element</div>;
+  }
+}
+```
+:::

@@ -53,7 +53,10 @@ const config = {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/stenciljs/site/tree/main',
-          remarkPlugins: [[require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }]],
+          remarkPlugins: [
+            [require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }],
+            require('./src/remark/playground'),
+          ],
           breadcrumbs: false,
           // Pin the default (un-prefixed) view to the latest *stable* release. Without this,
           // cutting a new version with `docusaurus docs:version` would silently make that new

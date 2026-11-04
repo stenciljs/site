@@ -35,6 +35,43 @@ Developers should ensure that the component is defined by using the whenDefined 
 })();
 ```
 
+In this playground, the button in `index.html` calls `showPrompt()`:
+
+:::playground{preview-height=90}
+```html title="index.html"
+<script type="module" src="./todo-list.js"></script>
+
+<button>Add a todo</button>
+<todo-list></todo-list>
+
+<script>
+  document.querySelector('button').addEventListener('click', async () => {
+    await customElements.whenDefined('todo-list');
+    const todoListElement = document.querySelector('todo-list');
+    await todoListElement.showPrompt();
+  });
+</script>
+```
+
+```tsx title="todo-list.tsx"
+import { Component, Method, State } from '@stencil/core';
+
+@Component({ tag: 'todo-list' })
+export class TodoList {
+  @State() prompting = false;
+
+  @Method()
+  async showPrompt() {
+    this.prompting = true;
+  }
+
+  render() {
+    return this.prompting ? <input placeholder="What needs doing?" /> : <p>No prompt yet</p>;
+  }
+}
+```
+:::
+
 ## Public methods must be async
 
 Stencil's architecture is async at all levels which allows for many performance benefits and ease of use. By ensuring publicly exposed methods using the `@Method` decorator return a promise:

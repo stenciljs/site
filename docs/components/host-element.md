@@ -16,7 +16,7 @@ The `Host` functional component can be used at the root of the render function t
 
 ```tsx
 // Host is imported from '@stencil/core'
-import { Component, Host } from '@stencil/core';
+import { Component, Host, Prop } from '@stencil/core';
 
 @Component({tag: 'todo-list'})
 export class TodoList {

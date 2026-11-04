@@ -93,13 +93,9 @@ This is also the only option for a [`standalone`](../../output-targets/main/stan
 ## Styling Shadow DOM Components
 
 <!--
-  TODO(live-demo, speculative - lower priority than the encapsulation demo above): once
-  a playground direction is chosen (see
-  V5_DOCS_PLAN.md "Live Examples"), consider a live demo here specifically - a global stylesheet with a
-  :host(my-button) rule, inject: 'client' toggled on vs. off, showing it actually reach a live
-  shadow root only when enabled. Unlike the multi-sheet/co-location story (build-time, not a
-  good live-demo fit), this one piece is genuine runtime behavior. Not scoped or committed to;
-  revisit after the encapsulation POC lands.
+  TODO(live-demo): a global stylesheet's `:host(my-button)` rule reaching a shadow root, with
+  `inject` on vs. off. Blocked on @stencil/playground: it applies global stylesheets to the
+  document only (not to shadow roots) and ignores `inject`. See V5_DOCS_PLAN.md "Live Examples".
 -->
 
 A global stylesheet can also style the inside of shadow DOM components. The zero-config `src/global.css` stylesheet is added to every component's shadow root as a [constructable stylesheet](https://web.dev/constructable-stylesheets/). A stylesheet with an explicit `input` isn't, unless you set its [`inject`](../../output-targets/asset-outputs/global-style.md#inject) option.

@@ -184,6 +184,97 @@ In the example below we have a simple hierarchy of components. The numbered list
 
 Even if some components may or may not be already loaded, the entire component hierarchy waits on its child components to finish loading and rendering.
 
+In this playground, each component adds a line to the list as its methods run:
+
+:::playground{preview-height=190}
+```tsx title="cmp-a.tsx"
+import { Component } from '@stencil/core';
+import { log } from './log';
+
+@Component({ tag: 'cmp-a' })
+export class CmpA {
+  componentWillLoad() {
+    log('cmp-a - componentWillLoad()');
+  }
+
+  componentDidLoad() {
+    log('cmp-a - componentDidLoad()');
+  }
+
+  render() {
+    return <slot />;
+  }
+}
+```
+
+```ts title="log.ts"
+export const log = (message: string) => {
+  const item = document.createElement('li');
+  item.textContent = message;
+  document.querySelector('#log').append(item);
+};
+```
+
+```ts title="main.ts"
+// Define all three together, as a build's output does
+import './cmp-a';
+import './cmp-b';
+import './cmp-c';
+```
+
+```html title="index.html"
+<script type="module" src="./main.js"></script>
+
+<cmp-a>
+  <cmp-b>
+    <cmp-c></cmp-c>
+  </cmp-b>
+</cmp-a>
+
+<ol id="log"></ol>
+```
+
+```tsx title="cmp-b.tsx" hidden
+import { Component } from '@stencil/core';
+import { log } from './log';
+
+@Component({ tag: 'cmp-b' })
+export class CmpB {
+  componentWillLoad() {
+    log('cmp-b - componentWillLoad()');
+  }
+
+  componentDidLoad() {
+    log('cmp-b - componentDidLoad()');
+  }
+
+  render() {
+    return <slot />;
+  }
+}
+```
+
+```tsx title="cmp-c.tsx" hidden
+import { Component } from '@stencil/core';
+import { log } from './log';
+
+@Component({ tag: 'cmp-c' })
+export class CmpC {
+  componentWillLoad() {
+    log('cmp-c - componentWillLoad()');
+  }
+
+  componentDidLoad() {
+    log('cmp-c - componentDidLoad()');
+  }
+
+  render() {
+    return <slot />;
+  }
+}
+```
+:::
+
 
 ## Async Lifecycle Methods
 
