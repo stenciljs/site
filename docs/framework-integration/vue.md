@@ -9,7 +9,7 @@ slug: /vue
 
 **Supports: Vue 3 • Stencil v5**
 
-`@stencil/vue-output-target` generates a Vue component for each of your Stencil components. Consumers of your library get real Vue components: typed props, typed events, and `v-model` on your form controls.
+`@stencil/vue-output-target` generates a Vue component for each of your Stencil components. Consumers of your library get Vue components: typed props, typed events, and `v-model` on your form controls.
 
 Vue 3 can also render custom elements without wrappers. If typed props and events are all your consumers need, [Framework Types](./framework-types.md) is a lighter option.
 
