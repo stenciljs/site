@@ -194,6 +194,53 @@ export class TodoList {
 Migrating from Stencil v4? `shadow: true` becomes `encapsulation: { type: 'shadow' }`, `scoped: true` becomes `encapsulation: { type: 'scoped' }`, and no encapsulation option becomes `encapsulation: { type: 'none' }` (or omit the property — `'none'` is the default). `formAssociated: true` is gone too — see the [`@AttachInternals()` decorator](./attach-internals.md), which sets it automatically. Run `stencil migrate --dry-run` to preview the automatic migration.
 :::
 
+### globalStyle
+
+**Optional**
+
+**Type: `string`**
+
+**Details:**<br/>
+Inline CSS for the document, collected from the component at build time. It's the inline form of [`globalStyleUrl`](#globalstyleurl).
+
+**Example**:<br/>
+```tsx
+import { Component } from '@stencil/core';
+
+@Component({
+  tag: 'my-card',
+  globalStyle: 'my-card { display: block; min-height: 200px; }',
+})
+export class MyCard {
+  // implementation omitted
+}
+```
+
+### globalStyleUrl
+
+**Optional**
+
+**Type: `string`**
+
+**Details:**<br/>
+A relative path to a stylesheet of document-level styles for this component. Unlike [`styleUrl`](#styleurl), these styles aren't scoped to the component: Stencil collects them at build time from every component that declares one, and adds them to your global stylesheet. Use them for styles that must apply before the component's JavaScript loads, such as its size, or for its host element and slotted content. They work with every `encapsulation` type.
+
+See [Co-locating styles with a component](./styling/global-styles.md#co-locating-styles-with-a-component) for where the collected CSS ends up and how to place it yourself.
+
+**Example**:<br/>
+```tsx
+import { Component } from '@stencil/core';
+
+@Component({
+  tag: 'my-card',
+  styleUrl: 'my-card.css',
+  globalStyleUrl: 'my-card.global.css',
+})
+export class MyCard {
+  // implementation omitted
+}
+```
+
 ### styleUrl
 
 **Optional**
