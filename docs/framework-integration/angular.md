@@ -9,7 +9,7 @@ slug: /angular
 
 **Supports: Angular 19 and later • Stencil v5**
 
-`@stencil/angular-output-target` generates an Angular component for each of your Stencil components. Consumers of your library get real Angular components:
+`@stencil/angular-output-target` generates an Angular component for each of your Stencil components. Consumers of your library get Angular components with:
 
 - typed inputs, and outputs for your custom events
 - no `CUSTOM_ELEMENTS_SCHEMA` in the modules or components that use them

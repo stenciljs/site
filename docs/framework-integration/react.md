@@ -9,7 +9,7 @@ slug: /react
 
 **Supports: React 18 and 19 • Stencil v5**
 
-`@stencil/react-output-target` generates a React component for each of your Stencil components. Consumers of your library get real React components: typed props, `onMyEvent` handlers for your custom events, refs, and optional server-side rendering in Next.js. They never touch the custom elements directly.
+`@stencil/react-output-target` generates a React component for each of your Stencil components. Consumers of your library get React components: typed props, `onMyEvent` handlers for your custom events, refs, and optional server-side rendering in Next.js. They never touch the custom elements directly.
 
 React 19 can also render custom elements without wrappers. If typed props are all your consumers need, [Framework Types](./framework-types.md) is a lighter option.
 

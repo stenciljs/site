@@ -19,21 +19,11 @@ It supports React 19, Vue 3, Solid, Svelte, and Preact, all of which render cust
 
 ## Framework Wrappers
 
-A wrapper output target generates a real component for each of your Stencil components, in a package you publish alongside your library:
+A wrapper output target generates a component for each of your Stencil components, in a package you publish alongside your library. Consumers import `MyButton` like any other component in their framework, with typed props and events. Each wrapper also adds what custom elements alone don't get in that framework:
 
-- [Angular](./angular.md)
-- [React](./react.md)
-- [Vue](./vue.md)
-
-Wrappers go further than types. Consumers import `MyButton` like any other component in their framework, and get the features custom elements alone don't give them there:
-
-| | Angular | React | Vue |
-|---|---|---|---|
-| Typed props and events | yes | yes | yes |
-| Form bindings | `ngModel`, reactive forms | | `v-model` |
-| Server-side rendering | | Next.js | |
-| Works without `CUSTOM_ELEMENTS_SCHEMA` | yes | | |
-| Supports older versions | | React 18 | |
+- [Angular](./angular.md): no `CUSTOM_ELEMENTS_SCHEMA` in the modules or components that use them, and optional form controls that work with `ngModel` and reactive forms.
+- [React](./react.md): support for React 18, which can't pass objects to a custom element or listen for its custom events in JSX, and optional server-side rendering in Next.js.
+- [Vue](./vue.md): `v-model` on your form controls.
 
 ## Choosing
 

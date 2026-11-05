@@ -100,7 +100,7 @@ export class NoneDemo {
 | Styling parts from outside | `::part()`, piercing the shadow boundary | A plain attribute selector (e.g. `[part="heading"]`) - there's no boundary for `::part()` to pierce | Same as `scoped` |
 | Global stylesheets reach in? | Only via `:host()` in a stylesheet registered as a [constructable stylesheet](./global-styles.md#styling-shadow-dom-components) | Yes, like any other element | Yes, like any other element |
 
-Reach for `shadow` when you want the browser to guarantee isolation for you - publishing a design system used across teams you don't control, or embedding a component into a page whose CSS you don't trust. Reach for `scoped` or `none` when you want your component's DOM to behave like an ordinary part of the page.
+Reach for `shadow` when you want the browser to guarantee isolation for you - publishing a design system used across teams you don't control, or embedding a component into a page whose CSS you don't trust. Reach for `scoped` or `none` when you want your component's DOM to behave like an ordinary part of the page. Page CSS applies to it, and so do the things a shadow root blocks: a `<label for>` or `aria-labelledby` elsewhere on the page can point at an element inside it, and a native `<input>` it renders takes part in the surrounding `<form>` with no extra code (see [Form-Associated Components](../form-associated.md)).
 
 ### `shadow`
 
@@ -108,11 +108,11 @@ Full isolation, guaranteed by the browser - not just Stencil. The one addition t
 
 ### `scoped`
 
-Stencil generates a unique class for your component (e.g. `sc-my-component`), rewrites your stylesheet's selectors to include it, and adds that same class to the component's elements at render time - you write ordinary CSS, Stencil does the scoping. One-directional: page styles can still reach in, even though yours can't leak out.
+Stencil generates a unique class for your component (e.g. `sc-my-component`), rewrites your stylesheet's selectors to include it, and adds that same class to the component's elements at render time - you write ordinary CSS, Stencil does the scoping. One-directional: page styles can still reach in, even though yours can't leak out. To stop them, see [Keeping Page Styles Out](#keeping-page-styles-out).
 
 ### `none`
 
-No scoping at all, and the default. Reach for it when a component should inherit and participate in page styles on purpose (a typography or layout primitive), or when you want to add your own scoping - see [Real Scoping With `@scope`](#real-scoping-with-scope) below.
+No scoping at all, and the default. Your styles and the page's mix freely, which suits a component that should share page styles on purpose, such as a typography or layout primitive. To scope its styles yourself, see [Real Scoping With `@scope`](#real-scoping-with-scope) below.
 
 ## Styling the Host Element
 
@@ -153,6 +153,44 @@ Everything inside the `@scope` block only matches within a `<plain-component>` e
 :::note
 `@scope` reached Baseline "Newly available" as of Firefox 146 (December 2025) - it's also supported in Chrome 118+, Safari 17.4+, and Edge 118+. Choose `type: 'scoped'` instead if you need to support browsers from before this landed.
 :::
+
+## Keeping Page Styles Out
+
+Page styles reach the elements of `scoped` and `none` components. To keep them out, reset the component's elements with `all: revert`, then write your own styles after the reset.
+
+In a `scoped` component, the reset is a normal rule:
+
+```css title="scoped-component.css"
+*:where(:not(img, svg):not(svg *)) {
+  all: revert;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+```
+
+Stencil adds its generated class to the reset, which makes it more specific than the page's element selectors, such as `h2`, and less specific than your own rules. It only matches the elements the component renders, so content slotted in from the page keeps the page's styles.
+
+In a `none` component, nest the reset and your own styles under the component's tag:
+
+```css title="plain-component.css"
+plain-component {
+  all: revert;
+
+  :not(x):where(:not(img, svg):not(svg *)) {
+    all: revert;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+}
+```
+
+The tag keeps the reset inside the component. `:not(x)` matches any element that isn't an `<x>`, and adds an element selector's specificity, so the reset outranks the page's `h2`. Your own rules are nested the same way and come after the reset, so they win over it. The reset also applies to content slotted in from the page. Where [`@scope`](#real-scoping-with-scope) is available, `@scope (plain-component) { :scope, :not(x):where(...) { all: revert; } }` works the same.
+
+Both resets skip images and SVG, because `all: revert` also undoes SVG presentation attributes such as `fill`. A more specific page selector, such as `.content h2`, or an `!important` one, still gets through. `all` doesn't reset CSS custom properties, so consumers can still theme the component through them.
 
 ## More on Styling
 
