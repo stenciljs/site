@@ -155,6 +155,8 @@ await renderToString(html, {
 
 The browser doesn't receive a value set this way. For the component to keep it after hydration, serialize it to an attribute with [`@PropSerialize()`](../../components/serialization-deserialization.md#practical-uses-of-propserialize).
 
+Alternatively, write the value into the HTML as a JSON attribute, and have the component convert it with [`@AttrDeserialize()`](../../components/serialization-deserialization.md#the-attrdeserialize-decorator-attrdeserialize). The server and the browser then both read it from the attribute. The [`ssr-wasm`](./ssr-wasm.md#complex-props) output target supports only this approach.
+
 ### Style Size
 
 With Declarative Shadow DOM, each instance of a shadow DOM component carries its own copy of the component's styles. A component used many times on a page can add a lot of repeated CSS. To avoid this:
@@ -233,7 +235,7 @@ Every rendering function accepts these options:
 
 | Option | Description | Default |
 |---|---|---|
-| `fullDocument` | Serialize a complete document. Set to `false` to return only the rendered components. | `true` |
+| `fullDocument` | Serialize a complete document. Set to `false` to return only the rendered components, preceded by the `<style>` elements their scoped styles need. | `true` |
 | `beforeSsr(document)` | Runs before rendering. Use it to set properties that can't be expressed as attributes. | |
 | `afterSsr(document)` | Runs after rendering, before serialization. | |
 | `prettyHtml` | Indent the output. | `false` |
