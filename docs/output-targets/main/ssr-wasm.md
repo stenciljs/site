@@ -68,7 +68,7 @@ Renders components under different tag names, to match [tag transformation](../.
 [{ "from": "my-greeting", "to": "acme-greeting" }]
 ```
 
-Call it once, before rendering.
+Call it once, before rendering. Calling it again later works too, but sets up the runtime from scratch on the next render.
 
 ### resetSsrDocData
 
@@ -83,6 +83,8 @@ A plugin instance runs one call at a time and isn't thread-safe. Never share an 
 - Compile the module once per process. Most host SDKs have a compiled-plugin type for this, such as `CompiledPlugin` in Go and Python.
 - Create instances from the compiled module. Give each worker or thread its own instance, or keep a pool and check one out for the whole request.
 - The first call to a new instance starts the JavaScript runtime and loads your components, so it's slower than later calls. To keep that cost off a request, call `resetSsrDocData` once when you create the instance.
+
+An instance only runs one call at a time, so its renders share one window: the plugin turns on [`reuseWindow`](./ssr.md#reusewindow) by default. That way it sets up Stencil's runtime and your components once, rather than on every call. To turn it off, pass `"reuseWindow": false` in the render options.
 
 Host SDKs built on `libextism`, such as those for Python, Ruby, and PHP, cache compiled code in `~/.cache/wasmtime`. If the server's user can't write to its home directory, compiling the plugin fails. Compiling the plugin once while you build your server image fills that cache, so workers start faster.
 
