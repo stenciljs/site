@@ -230,6 +230,7 @@ Every rendering function accepts these options:
 | `timeout` | Milliseconds to wait for rendering to finish before failing. | `15000` |
 | `buildId` | Added as `<html data-stencil-build="...">`. | random |
 | `runtimeLogging` | Print component console output to the server's console. | `false` |
+| `reuseWindow` | Render into one long-lived window instead of creating one for every call. Faster - see [below](#reusewindow). | `false` |
 
 `renderToString()` and `streamToString()` also accept options for the serialized HTML:
 
@@ -271,6 +272,24 @@ Controls how `encapsulation: { type: 'shadow' }` components are rendered:
 - `false` - don't render shadow DOM components on the server.
 
 Declarative Shadow DOM repeats a component's styles in every instance. For a component used many times on a page, `'scoped'` sends its styles once.
+
+### reuseWindow
+
+Every render normally gets a new mock window, and sets up Stencil's server runtime and all your components in it. That setup is most of the cost of rendering a small fragment, and a good part of a whole page. With `reuseWindow: true`, renders share one long-lived window instead. It's reset between renders and keeps the runtime it already set up.
+
+```ts
+const { html } = await renderToString('<my-card heading="Hi"></my-card>', {
+  fullDocument: false,
+  reuseWindow: true,
+});
+```
+
+- It applies when the input is an HTML string. A `Document` passed to `ssrDocument()` is rendered as it is.
+- Each distinct [`serializeShadowRoot`](#serializeshadowroot) value gets its own window.
+- Renders that share a window run one at a time. Calls you make concurrently wait for each other, so for parallel rendering, use several worker threads or processes.
+- [`setTagTransformer()`](#rendering) discards the reused windows, so later renders pick up the new tag names.
+
+Output is the same as without `reuseWindow`. It's worth turning on whenever you render many fragments or pages in one process, such as one call per component from a template helper.
 
 ## Results
 
