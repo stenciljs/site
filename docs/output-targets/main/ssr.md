@@ -133,6 +133,25 @@ Some frameworks read the DOM in ways the patches can't reach. Svelte 5, for exam
 
 React Server Components render each component separately, so there's no single page of HTML to pass through a hook. The React output target generates server versions of your wrappers instead: see [React: Server-Side Rendering](../../framework-integration/react.md#server-side-rendering).
 
+## Working Examples
+
+The [ssr-examples](https://github.com/stenciljs/ssr-examples) repository renders the same page with the same component library in several frameworks. Each example shows where `renderToString()` hooks in, how to define the components before the framework hydrates, and how to pass objects and arrays with `ssrProp()`:
+
+| Framework | Where Stencil hooks in | Example |
+|---|---|---|
+| Next.js (App Router) | the React output target's server wrappers | [`next`](https://github.com/stenciljs/ssr-examples/tree/main/examples/next) |
+| Nuxt | a Nitro `render:response` hook | [`nuxt`](https://github.com/stenciljs/ssr-examples/tree/main/examples/nuxt) |
+| Astro | middleware | [`astro`](https://github.com/stenciljs/ssr-examples/tree/main/examples/astro) |
+| SvelteKit | the `handle` hook | [`sveltekit`](https://github.com/stenciljs/ssr-examples/tree/main/examples/sveltekit) |
+| SolidStart | middleware | [`solid-start`](https://github.com/stenciljs/ssr-examples/tree/main/examples/solid-start) |
+| React Router | `entry.server.tsx` | [`react-router`](https://github.com/stenciljs/ssr-examples/tree/main/examples/react-router) |
+| TanStack Start | a custom server entry | [`tanstack-start`](https://github.com/stenciljs/ssr-examples/tree/main/examples/tanstack-start) |
+| Angular | `server.ts` | [`angular`](https://github.com/stenciljs/ssr-examples/tree/main/examples/angular) |
+| Eleventy | a transform, at build time | [`eleventy`](https://github.com/stenciljs/ssr-examples/tree/main/examples/eleventy) |
+| None (Node.js) | a plain `node:http` server | [`node`](https://github.com/stenciljs/ssr-examples/tree/main/examples/node) |
+
+For servers in other languages, see [ssr-wasm](./ssr-wasm.md#working-examples).
+
 ## Writing SSR-Friendly Components
 
 Most components render on the server without changes: Stencil's server runtime implements the DOM APIs components normally use. The points below cover what does need care, for both server-side rendering and [prerendering](../../guides/applications/prerendering/01-overview.md).
@@ -166,7 +185,7 @@ async componentWillLoad() {
 
 ### Complex Props
 
-HTML can only carry strings, so an object or array has two gaps to cross: into the server render, and from the server to the browser.
+HTML attributes only carry strings, so a prop whose value isn't a string, number or boolean (an array, an object, a `Map`, a `Date`, a class instance) has two gaps to cross: into the server render, and from the server to the browser.
 
 **Into the server render.** From a framework template, wrap the value in `ssrProp()`. Frameworks drop objects when they write HTML, or write `"[object Object]"`:
 
