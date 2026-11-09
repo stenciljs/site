@@ -31,10 +31,14 @@ To render every page of a site built with the [`www` output target](./www.md) to
 ```tree
 dist/ssr
 ├── index.js
-└── index.d.ts
+├── index.d.ts
+├── ssr-prop.js
+└── ssr-prop.d.ts
 ```
 
-Expose the module to consumers through your package's `exports`:
+`index.js` is the server-side rendering module. `ssr-prop.js` exports [`ssrProp()`](#complex-props), for framework templates; it runs in the browser too, so it's separate.
+
+Expose both to consumers through your package's `exports` ([`generateExportMaps`](../../config/01-overview.md) adds them for you):
 
 ```json title="package.json"
 {
@@ -42,6 +46,10 @@ Expose the module to consumers through your package's `exports`:
     "./ssr": {
       "types": "./dist/ssr/index.d.ts",
       "import": "./dist/ssr/index.js"
+    },
+    "./ssr-prop": {
+      "types": "./dist/ssr/ssr-prop.d.ts",
+      "import": "./dist/ssr/ssr-prop.js"
     }
   }
 }
@@ -106,6 +114,21 @@ async function onResponse(response: Response): Promise<Response> {
 
 `renderToString()` needs the whole document, so run it on the complete response, not on streamed chunks.
 
+### Define the Components Before the Framework Hydrates
+
+The framework hydrates its own markup in the browser, and the Stencil components hydrate theirs. Load your components first, and wait for them: `defineCustomElements()` is async.
+
+```ts
+import { defineCustomElements } from 'my-library/loader';
+
+await defineCustomElements();
+// then let the framework hydrate
+```
+
+A `scoped` or unencapsulated component's server-rendered light DOM holds its own nodes next to the framework's slotted content. Once the component is defined, Stencil's [light DOM patches](../../config/compat.md#lightdompatches) make `firstChild`, `childNodes`, `textContent` and the like report only the slotted content, so the framework finds the DOM it rendered. If the framework hydrates first, it finds Stencil's nodes instead, reports a hydration mismatch, and usually replaces the elements.
+
+Some frameworks read the DOM in ways the patches can't reach. Svelte 5, for example, walks a node's children with the browser's own `firstChild` and `nextSibling`, so text it updates inside a `scoped` or unencapsulated component's slot doesn't hydrate. Use `shadow` encapsulation for components that take framework-reactive slot content.
+
 ### Next.js
 
 React Server Components render each component separately, so there's no single page of HTML to pass through a hook. The React output target generates server versions of your wrappers instead: see [React: Server-Side Rendering](../../framework-integration/react.md#server-side-rendering).
@@ -143,7 +166,21 @@ async componentWillLoad() {
 
 ### Complex Props
 
-Server-rendered HTML can only pass props as attributes, which are strings. To give a component an object, array, or other complex value on the server, set it as a property in the [`beforeSsr`](#render-options) hook:
+HTML can only carry strings, so an object or array has two gaps to cross: into the server render, and from the server to the browser.
+
+**Into the server render.** From a framework template, wrap the value in `ssrProp()`. Frameworks drop objects when they write HTML, or write `"[object Object]"`:
+
+```vue
+<script setup>
+import { ssrProp } from 'my-library/ssr-prop';
+</script>
+
+<my-menu :items="ssrProp(items)" />
+```
+
+In the browser, `ssrProp()` returns the value. On the server, it keeps the value and returns a reference that the template renders as an attribute. The `ssr` module swaps the reference for the value while it sets the component up, so nothing is serialized: a `Map`, a `Date` or a class instance arrives as it is. Bind it under the prop's name or its dash-case (`chartData` or `chart-data`). It only works when the page is rendered in the same process, shortly after the template ran, which is the case with a [server framework hook](#using-it-in-a-server-framework).
+
+Outside a framework template, set the property in the [`beforeSsr`](#render-options) hook:
 
 ```ts
 await renderToString(html, {
@@ -153,9 +190,21 @@ await renderToString(html, {
 });
 ```
 
-The browser doesn't receive a value set this way. For the component to keep it after hydration, serialize it to an attribute with [`@PropSerialize()`](../../components/serialization-deserialization.md#practical-uses-of-propserialize).
+**To the browser.** The browser has only the HTML, so the component has to carry the value in its attribute. For JSON, use [`@Prop({ serialize: 'json' })`](../../components/properties.md#serialize-as-json-serialize):
 
-Alternatively, write the value into the HTML as a JSON attribute, and have the component convert it with [`@AttrDeserialize()`](../../components/serialization-deserialization.md#the-attrdeserialize-decorator-attrdeserialize). The server and the browser then both read it from the attribute. The [`ssr-wasm`](./ssr-wasm.md#complex-props) output target supports only this approach.
+```tsx
+@Prop({ serialize: 'json' }) items: MenuItem[] = [];
+```
+
+For any other format, write a [`@PropSerialize()` / `@AttrDeserialize()`](../../components/serialization-deserialization.md#practical-uses-of-propserialize) pair. Either way, the server writes the value to the attribute and the browser reads it back before the component first renders, whether the value came from `ssrProp()`, `beforeSsr`, a framework wrapper, or the component itself.
+
+If an object prop is set from outside on the server and the component has no serializer for it, `renderToString()` adds a warning to its `diagnostics`: the browser won't get the value, so the component first renders there without it.
+
+The [`ssr-wasm`](./ssr-wasm.md#complex-props) output target receives only HTML, so there the value must be in the attribute from the start.
+
+### Reserved Attribute Names
+
+Server rendering writes `s-id`, `c-id`, `s-sn` and `s-mode` attributes. A prop whose attribute has one of those names (`@Prop() sId` is `s-id`) is a build error when there's an `ssr` or `ssr-wasm` output target. Rename the prop, or give it another attribute with `@Prop({ attribute: '...' })`.
 
 ### Style Size
 
@@ -238,7 +287,7 @@ Every rendering function accepts these options:
 |---|---|---|
 | `fullDocument` | Serialize a complete document. Set to `false` to return only the rendered components, preceded by the `<style>` elements their scoped styles need. | `true` |
 | `beforeSsr(document)` | Runs before rendering. Use it to set properties that can't be expressed as attributes. | |
-| `afterSsr(document)` | Runs after rendering, before serialization. | |
+| `afterSsr(document)` | Runs after rendering, before serialization. Setting component props here doesn't change the output: the components have rendered already. | |
 | `prettyHtml` | Indent the output. | `false` |
 | `approximateLineWidth` | Wrap lines at about this width, where the HTML allows it. | no wrapping |
 | `removeHtmlComments` | Remove comments. Stencil's own hydration comments are kept. | `false` |
@@ -246,7 +295,7 @@ Every rendering function accepts these options:
 | `removeBooleanAttributeQuotes` | Write boolean attributes as `hidden` instead of `hidden=""`. | `false` |
 | `removeEmptyAttributes` | Remove empty `class`, `dir`, `id`, `lang`, `name`, and `title` attributes. | `true` |
 
-`beforeSsr` is the way to pass complex data to a component on the server:
+`beforeSsr` is one way to pass complex data to a component on the server; see [Complex Props](#complex-props):
 
 ```ts
 await renderToString(html, {

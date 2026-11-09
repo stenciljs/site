@@ -130,20 +130,13 @@ The plugin runs your components in [QuickJS](https://github.com/quickjs-ng/quick
 
 ### Complex Props
 
-The plugin receives only HTML, and `beforeSsr` isn't available. To give a component an object or array on the server, write it into an attribute as JSON, and have the component convert it with [`@AttrDeserialize()`](../../components/serialization-deserialization.md#the-attrdeserialize-decorator-attrdeserialize):
+The plugin receives only HTML, and neither `beforeSsr` nor [`ssrProp()`](./ssr.md#complex-props) is available. To give a component an object or array on the server, write it into an attribute as JSON, and declare the prop with [`serialize: 'json'`](../../components/properties.md#serialize-as-json-serialize):
 
 ```tsx
-@Prop() items: Item[] = [];
-
-@AttrDeserialize('items')
-deserializeItems(value: string): Item[] {
-	try {
-		return JSON.parse(value);
-	} catch {
-		return [];
-	}
-}
+@Prop({ serialize: 'json' }) items: Item[] = [];
 ```
+
+For another format, convert the attribute with your own [`@AttrDeserialize()`](../../components/serialization-deserialization.md#the-attrdeserialize-decorator-attrdeserialize) instead.
 
 The server writes the JSON with its template engine's normal escaping. The browser receives the same attribute, so the component has the data after hydration too:
 

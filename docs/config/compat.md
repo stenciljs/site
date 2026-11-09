@@ -43,7 +43,7 @@ compat: {
     childNodes: true,    // patch childNodes/children to return only slotted content
     cloneNode: true,     // patch cloneNode() to correctly deep-clone slotted content
     domMutations: true,  // patch appendChild()/insertBefore()/removeChild() to route to the correct slot
-    textContent: true,   // patch textContent to act like shadow DOM (reads/writes slotted text only)
+    textContent: true,   // patch textContent to act like shadow DOM (reads/writes slotted text only, as text)
   },
 }
 ```
