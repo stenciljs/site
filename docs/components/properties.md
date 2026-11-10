@@ -93,7 +93,13 @@ Pass it an array by setting the property, from TSX or from JavaScript:
 document.querySelector('todo-list').items = ['Learn about props', 'Write a component'];
 ```
 
-An `items` attribute in HTML would give the component a string, and `this.items.map` would fail. To accept the attribute as well, add an [`@AttrDeserialize()`](./serialization-deserialization.md) method that turns the string into the value:
+An `items` attribute in HTML would give the component a string, and `this.items.map` would fail. To accept a JSON attribute as well, declare the prop with [`serialize: 'json'`](#serialize-as-json-serialize):
+
+```tsx
+@Prop({ serialize: 'json' }) items: string[] = [];
+```
+
+For any other format, add an [`@AttrDeserialize()`](./serialization-deserialization.md) method that turns the string into the value:
 
 ```tsx
 @AttrDeserialize('items')
@@ -167,9 +173,10 @@ A [setter](#prop-getters-and-setters) can validate a value too, and can also rej
 
 ```tsx
 export interface PropOptions {
-  attribute?: string;
+  attribute?: string | null;
   mutable?: boolean;
   reflect?: boolean;
+  serialize?: 'json';
 }
 ```
 
@@ -184,6 +191,8 @@ Set `attribute` to use an attribute name other than the dash-case form of the pr
 ```html
 <todo-list-item complete></todo-list-item>
 ```
+
+Set `attribute: null` for a prop that has no attribute at all: it can only be set as a property.
 
 ### Prop Mutability
 
@@ -273,6 +282,20 @@ export class MyButton {
 }
 ```
 :::
+
+### Serialize as JSON (`serialize`)
+
+`serialize: 'json'` keeps an object or array prop in its attribute as JSON:
+
+```tsx
+@Prop({ serialize: 'json' }) items: string[] = [];
+```
+
+- An `items` attribute is parsed with `JSON.parse()`, whenever it's set: `<todo-list items='["Learn about props"]'>` works.
+- During [server-side rendering](../output-targets/main/ssr.md#complex-props), the value is written to the attribute with `JSON.stringify()`, so the component has it when it first renders in the browser. It isn't written in the browser, where the attribute has done its job.
+- An attribute that isn't valid JSON leaves the prop as it is, with a warning in development builds.
+
+It's shorthand for a [`@PropSerialize()` / `@AttrDeserialize()`](./serialization-deserialization.md) pair. Write the pair yourself for any other format, such as a `Map` or a `Date`. A prop can't have both, and it needs an attribute, so `attribute: null` isn't allowed with it.
 
 ### Prop Getters and Setters
 

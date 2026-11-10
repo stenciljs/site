@@ -79,3 +79,4 @@ stenciljs
 frontmatter
 wasmtime
 Laravel
+astro

@@ -156,6 +156,7 @@ Set to `true` to have production builds write an [`exports` map](https://nodejs.
 | `./<tag>` | One entry per component, for example `./my-button` | `standalone` |
 | `./components` | The type definitions for every component | `types` |
 | `./ssr` | The server-side rendering module | `ssr` |
+| `./ssr-prop` | [`ssrProp()`](../output-targets/main/ssr.md#complex-props), for framework templates | `ssr` |
 | `./assets/*` | Component assets and global stylesheets | assets or `global-style` |
 
 ```tsx

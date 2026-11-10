@@ -55,6 +55,8 @@ console.log(myComponent.myNumber); // 43
 
 Most of the time Stencil's automatic serialization and deserialization is enough - especially with primitive data types, however there are cases where you might want to customize this behavior, especially when dealing with complex data.
 
+For JSON, [`@Prop({ serialize: 'json' })`](./properties.md#serialize-as-json-serialize) does it for you. The decorators below are for everything else.
+
 
 ## The PropSerialize Decorator (`@PropSerialize()`)
 
@@ -200,6 +202,8 @@ Practically speaking, there is little disadvantage in using a `@AttrDeserialize(
 The use-cases around using `@PropSerialize()` is slightly less obvious as in general, [it is not considered best practice to reflect complex data (like objects or arrays) as attributes](https://web.dev/articles/custom-elements-best-practices#aim-to-only-accept-rich-data-objects,-arrays-as-properties.) 
 
 The following example illustrates a practical use case for `@PropSerialize()` using the [`ssr` output target](../output-targets/main/ssr.md) on a server we can fetch and serialize complex data to an attribute. When the same component loads in a browser, the component can de-serialize the data immediately without having to do another fetch. 
+
+The same applies to a value given to the component from outside during server rendering, with [`ssrProp()`](../output-targets/main/ssr.md#complex-props), `beforeSsr` or a framework wrapper: the serializer writes it to the attribute, and the browser reads it back before the component first renders. For JSON data, [`@Prop({ serialize: 'json' })`](./properties.md#serialize-as-json-serialize) is the short form of the pair below.
 
 ```tsx
 import { AttrDeserialize, Build, Component, Prop, PropSerialize } from '@stencil/core';
