@@ -565,6 +565,30 @@ The following footer will replace the default one at the bottom of your componen
 *Built with love!*
 ```
 
+### Custom Columns
+
+To add columns to the Properties and Events tables, set `customColumns` on the output target. Each column has a `header`, and a `content` function that returns the cell for one row. It receives the prop or event's docs data, and the component's. Custom columns come after the built-in ones. This adds a column for a custom `@since` JSDoc tag:
+
+```tsx title="stencil.config.ts"
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  outputTargets: [
+    {
+      type: 'docs-readme',
+      customColumns: {
+        props: [
+          {
+            header: 'Since',
+            content: (prop) => prop.docsTags.find((tag) => tag.name === 'since')?.text ?? '',
+          },
+        ],
+      },
+    }
+  ]
+};
+```
+
 ## Configuration
 ### Specifying the Output Directory
 

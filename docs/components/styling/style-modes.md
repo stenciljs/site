@@ -25,6 +25,8 @@ export class SimpleButton {
 }
 ```
 
+To catch a misspelled mode name at build time, list your modes in the [`modes`](../../config/01-overview.md#modes) config option.
+
 ## Choosing a Mode
 
 Call `setMode()` with a function that returns the mode for an element. Stencil calls it once for each component instance, before its first render. This example reads the element's `mode` attribute and falls back to `md`:

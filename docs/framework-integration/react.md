@@ -184,6 +184,8 @@ export default function Home() {
 
 See the React output target's [`hydrateModule`](#hydratemodule) and [`excludeServerSideRenderingFor`](#excludeserversiderenderingfor) options for more control.
 
+The [Next.js example](https://github.com/stenciljs/ssr-examples/tree/main/examples/next) shows a complete setup. Other React frameworks don't need the wrappers to server-render: the [React Router](https://github.com/stenciljs/ssr-examples/tree/main/examples/react-router) and [TanStack Start](https://github.com/stenciljs/ssr-examples/tree/main/examples/tanstack-start) examples use plain custom elements.
+
 ## API
 
 ### outDir

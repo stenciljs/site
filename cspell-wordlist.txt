@@ -80,3 +80,7 @@ frontmatter
 wasmtime
 Laravel
 astro
+Rspack
+inlines
+autoprefix
+customelement

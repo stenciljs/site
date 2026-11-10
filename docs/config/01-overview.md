@@ -20,6 +20,22 @@ export const config: Config = {
 };
 ```
 
+## allowInlineScripts
+
+*default: `true`*
+
+In a production build of the [`www`](../output-targets/main/www.md) output, Stencil inlines the entry script into `index.html` when it's under 1 KB, which saves a request. Set it to `false` to always load the entry script as a separate file.
+
+## autoprefixCss
+
+*default: `false`*
+
+When `true`, Stencil adds vendor prefixes to your components' CSS, such as `-webkit-backdrop-filter` alongside `backdrop-filter`, for a modern set of browsers. To choose the browsers, pass an object with a [browserslist](https://browsersl.ist/) `targets` array instead:
+
+```tsx
+autoprefixCss: { targets: ['last 2 versions', 'safari >= 15'] }
+```
+
 ## bundles
 
 By default, Stencil will statically analyze the application and generate a component graph of how all the components are interconnected. From the component graph it is able to best decide how components should be grouped depending on their usage with one another within the app. By doing so it's able to bundle components together in order to reduce network requests. However, bundles can be manually generated using the `bundles` config.
@@ -104,6 +120,12 @@ Supports glob patterns for matching multiple components:
 - `['my-component']` - Excludes a specific component
 
 Components matching these patterns will be completely excluded from all output targets when *not* using the `--dev` flag.
+
+## excludeUnusedDependencies
+
+*default: `false`*
+
+When `true`, a component from one of your [`collections`](#collections) is only built if one of your own components uses it. By default, every component in each collection is built.
 
 ## compat
 
@@ -333,6 +355,16 @@ Setting `invisiblePrehydration` to `false` will cause everything to be visible w
 invisiblePrehydration: true
 ```
 
+## jsMinifier
+
+*default: `'oxc'`*
+
+The minifier for JS output, when [`minifyJs`](#minifyjs) is on. `'oxc'` is built into Rolldown and is much faster. `'terser'` is slower, but usually produces slightly smaller output.
+
+```tsx
+jsMinifier: 'terser'
+```
+
 ## minifyCss
 
 _default: `true` in production_
@@ -343,7 +375,17 @@ When `true`, the browser CSS file will be minified.
 
 _default: `true` in production_
 
-When `true`, the browser JS files will be minified. Stencil uses [Terser](https://terser.org/) under-the-hood for file minification.
+When `true`, the browser JS files will be minified, with the minifier set by [`jsMinifier`](#jsminifier).
+
+## modes
+
+*default: `[]`*
+
+The [style modes](../components/styling/style-modes.md) your components may use. Once set, every mode key in a component's `styleUrls` or `styles` must be in this list, so a typo such as `iso` fails the build. Mark a mode `required` to make every component with mode styles include it:
+
+```tsx
+modes: ['ios', { mode: 'md', required: true }]
+```
 
 ## namespace
 
@@ -525,6 +567,16 @@ Passes custom configuration down to [Rolldown](https://rolldown.rs/) itself, whi
 - `external`: a string, `RegExp`, array of either, or a function `(source, importer, isResolved) => boolean | null | undefined`
 
 The old `inputOptions.context`, `inputOptions.moduleContext`, and `outputOptions.globals` options have no `rolldownConfig` equivalent.
+
+## watchExternalDirs
+
+*default: `[]`*
+
+Directories to watch in watch mode, in addition to the project root and [`srcDir`](#srcdir). A change in one of them starts a rebuild:
+
+```tsx
+watchExternalDirs: ['../design-tokens']
+```
 
 ## watchIgnoredRegex
 
