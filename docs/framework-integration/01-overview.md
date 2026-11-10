@@ -27,4 +27,6 @@ A wrapper output target generates a component for each of your Stencil component
 
 ## Choosing
 
-Use wrappers for Angular, and for any framework where your consumers need form bindings or [server-side rendering](../output-targets/main/ssr.md#using-it-in-a-server-framework). Use Framework Types when typed custom elements are enough. You can ship both from the same library.
+Use wrappers for Angular, for any framework where your consumers need form bindings, and for [server-side rendering](./react.md#server-side-rendering) in Next.js. Use Framework Types when typed custom elements are enough: they [server-render](../output-targets/main/ssr.md#using-it-in-a-server-framework) in other frameworks too. You can ship both from the same library.
+
+To write Stencil components directly in an app, without publishing a library, compile them in the app's own build with the [bundler plugin](../guides/tooling/bundler-plugin.md).

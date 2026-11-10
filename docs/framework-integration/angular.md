@@ -179,6 +179,24 @@ import { TextValueAccessor } from './text-value-accessor';
 export class MyLibraryFormsModule {}
 ```
 
+## Server-Side Rendering
+
+If apps server-render your Angular components and pass each page through the [`ssr`](../output-targets/main/ssr.md) output target's `renderToString()`, set `ssrPropModule` to your library's `ssr-prop` module:
+
+```ts title="stencil.config.ts"
+angularOutputTarget({
+  componentCorePackage: 'my-library',
+  directivesProxyFile: '../angular/src/lib/directives.ts',
+  ssrPropModule: 'my-library/ssr-prop',
+}),
+```
+
+The Angular components set their inputs as properties on the element, and Angular's server renderer never writes properties to the HTML, so without this no input reaches the server render. With `ssrPropModule` set, every input does.
+
+For an object or array to still be there when the component hydrates, the component has to carry it. See [Complex Props](../output-targets/main/ssr.md#complex-props).
+
+The [Angular example](https://github.com/stenciljs/ssr-examples/tree/main/examples/angular) shows a complete setup.
+
 ## API
 
 ### componentCorePackage
@@ -254,6 +272,12 @@ Lets consumers set a boolean input by attribute presence (`<my-input disabled>`)
 **Default: `false`**
 
 Experimental. Declares each component's inputs as typed class members, so the Angular Language Service can type-check them and show their documentation in templates.
+
+### ssrPropModule
+
+**Type: `string`**
+
+Your library's `ssr-prop` module, for example `'my-library/ssr-prop'`. Set it when apps server-render the Angular components and pass the page through your library's `renderToString()`. See [Server-Side Rendering](#server-side-rendering).
 
 ### transformTag
 

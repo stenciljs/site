@@ -9,7 +9,7 @@ slug: /testing-vitest
 
 `@stencil/vitest` provides testing utilities for Stencil components, powered by [Vitest](https://vitest.dev/): a `render()` function, matchers for custom elements, and spies for events, methods, props, and lifecycle hooks.
 
-Paired with `@stencil/unplugin`, which compiles your components as each test imports them, there's no Stencil build to run before your tests. The same test code runs in:
+Paired with [`@stencil/unplugin`](../../guides/tooling/bundler-plugin.md), which compiles your components as each test imports them, there's no Stencil build to run before your tests. The same test code runs in:
 
 - **A real browser**, through Vitest's browser mode. Components get real layout, styling, and events, so this is the recommended setup.
 - **Node**, with a simulated DOM (Stencil's mock-doc, jsdom, or happy-dom). Tests start faster and need no browser installed.

@@ -218,6 +218,25 @@ vueOutputTarget({
 
 When the event fires, the new value is read from the element's `value` property (the `targetAttr`). To read it from the event instead, set `eventAttr` to its path on the event, for example `eventAttr: 'detail.value'`.
 
+## Server-Side Rendering
+
+If apps server-render your Vue components (with Nuxt, for example) and pass each page through the [`ssr`](../output-targets/main/ssr.md) output target's `renderToString()`, set `ssrPropModule` to your library's `ssr-prop` module:
+
+```ts title="stencil.config.ts"
+vueOutputTarget({
+  componentCorePackage: 'my-library',
+  proxiesFile: '../vue/src/components.ts',
+  includeImportCustomElements: true,
+  ssrPropModule: 'my-library/ssr-prop',
+}),
+```
+
+Vue's server renderer leaves objects and arrays out of a custom element's HTML, and writes props under the names they're bound with, so `firstName` reaches the HTML as `firstname`. With `ssrPropModule` set, every prop reaches the server render.
+
+For an object or array to still be there when the component hydrates, the component has to carry it. See [Complex Props](../output-targets/main/ssr.md#complex-props).
+
+The [Nuxt example](https://github.com/stenciljs/ssr-examples/tree/main/examples/nuxt) shows a complete setup. The wrappers are optional for server rendering: the example's README also shows Nuxt with plain custom elements.
+
 ## API
 
 ### proxiesFile
@@ -285,6 +304,18 @@ Write each component to its own file, with `proxiesFile` re-exporting them all. 
 **Type: `string[]`**
 
 Tag names to leave out of the Vue library.
+
+### ssrPropModule
+
+**Type: `string`**
+
+Your library's `ssr-prop` module, for example `'my-library/ssr-prop'`. Set it when apps server-render the Vue components and pass the page through your library's `renderToString()`. See [Server-Side Rendering](#server-side-rendering).
+
+### hydrateModule
+
+**Type: `string`**
+
+Deprecated, and not recommended: it will be removed. Use [`ssrPropModule`](#ssrpropmodule) with the [`ssr`](../output-targets/main/ssr.md) output target instead. Can't be combined with `ssrPropModule`.
 
 ### transformTag
 

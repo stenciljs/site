@@ -7,9 +7,11 @@ slug: /framework-types
 
 # Framework Types
 
-React 19, Vue 3, Solid, Svelte, and Preact can all render custom elements directly, so consumers of your library don't need wrapper components to use `<my-button>` in a template. What they don't get out of the box is type-checking: the framework's TypeScript types don't know your tags or their props.
+React 19, Vue 3, Solid, Svelte, Preact, and Astro can all render custom elements directly, so consumers of your library don't need wrapper components to use `<my-button>` in a template. What they don't get out of the box is type-checking: the framework's TypeScript types don't know your tags or their props.
 
-`@stencil/types-output-target` generates a type definition file for each framework that adds your components to its known elements. It covers each component's props and events, and produces types only, with no runtime code. For Angular, React 18, or framework features like `v-model` and [server-side rendering](../output-targets/main/ssr.md#using-it-in-a-server-framework), use the [Angular](./angular.md), [React](./react.md), or [Vue](./vue.md) wrappers instead.
+`@stencil/types-output-target` generates a type definition file for each framework that adds your components to its known elements. It covers each component's props and events, and produces types only, with no runtime code. For Angular, React 18, framework features like `v-model`, or server-side rendering in Next.js, use the [Angular](./angular.md), [React](./react.md), or [Vue](./vue.md) wrappers instead. Plain custom elements server-render in other frameworks: see the [`ssr`](../output-targets/main/ssr.md#using-it-in-a-server-framework) output target.
+
+The [SvelteKit](https://github.com/stenciljs/ssr-examples/tree/main/examples/sveltekit), [SolidStart](https://github.com/stenciljs/ssr-examples/tree/main/examples/solid-start), [Astro](https://github.com/stenciljs/ssr-examples/tree/main/examples/astro) and [React Router](https://github.com/stenciljs/ssr-examples/tree/main/examples/react-router) examples use these types with server-rendered components.
 
 ## Setup
 
@@ -111,6 +113,12 @@ Where to write the Svelte types. Default file name: `svelte-native-types.d.ts`.
 ### preactTypesPath
 
 Where to write the Preact types. Default file name: `preact-native-types.d.ts`.
+
+### astroTypesPath
+
+Where to write the Astro types. Default file name: `astro-native-types.d.ts`.
+
+Astro templates only run on the server, so each prop is typed under its attribute name, and there are no event types: listen for events in a client-side script. The file adds your tags to Astro's global JSX types, so it needs no peer dependency. Consumers import it from a `.d.ts` file in their project, such as `src/env.d.ts`.
 
 ### excludeComponents
 
