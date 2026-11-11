@@ -129,6 +129,7 @@ type Encapsulation =
       slotAssignment?: 'manual' | 'named';
       clonable?: boolean;
       serializable?: boolean;
+      referenceTarget?: string;
     }
   | { type: 'scoped'; patches?: ('all' | 'children' | 'clone' | 'insert')[] }
   | { type: 'none'; patches?: ('all' | 'children' | 'clone' | 'insert')[] };
@@ -152,6 +153,7 @@ See [Component Archetypes](../concepts/component-archetypes.md) for when to use 
 - `slotAssignment`: `'manual'` enables [manual slot assignment](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/slotAssignment) (otherwise known as [imperative slot assignment](https://github.com/WICG/webcomponents/blob/gh-pages/proposals/Imperative-Shadow-DOM-Distribution-API.md)); `'named'` is the default DOM slotting behavior.
 - `clonable`: preserves the shadow root when the host is deep-cloned via [`Node.cloneNode(true)`](https://developer.mozilla.org/en-US/docs/Web/API/Node/cloneNode). Without it, cloning a shadow host produces an empty shell.
 - `serializable`: marks the shadow root serializable, so it's included when the host is serialized via [`Element.getHTML({ serializableShadowRoots: true })`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getHTML).
+- `referenceTarget`: the `id` of an element inside the shadow root that ID references to the host are forwarded to. A `<label for>`, `aria-labelledby`, or `aria-describedby` that points at the host then applies to that element instead, so it gets the label, and clicking the label focuses it. Browser support is still limited: so far only Chromium-based browsers support it (see [`referenceTarget`](https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot/referenceTarget)). Other browsers ignore the option, so there the label and ARIA references don't reach the inner element. The `id` is set at build time, and server-rendered output includes it. To change it later, set `shadowRoot.referenceTarget`.
 
 **Scoped/none options** (`type: 'scoped'` or `type: 'none'`):
 
@@ -178,6 +180,24 @@ export class TodoList {
 export class TodoList {
   // implementation omitted
 }
+```
+
+```tsx title="Forwarding a label to an inner input"
+@Component({
+  tag: 'my-input',
+  encapsulation: { type: 'shadow', referenceTarget: 'field' },
+})
+export class MyInput {
+  render() {
+    return <input id="field" />;
+  }
+}
+```
+
+```html
+<!-- the label applies to the <input> inside my-input's shadow root -->
+<label for="name">Name</label>
+<my-input id="name"></my-input>
 ```
 
 ```tsx title="Scoped CSS"
