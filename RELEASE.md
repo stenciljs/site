@@ -35,9 +35,9 @@ To generate a new version:
 
 `docs/` holds the v5 docs, shown as "v5 (Preview)" at `/v5/` while the site's default stays on v4.43 (see `lastVersion` in `docusaurus.config.js`). When v5 reaches GA:
 
-1. `introduction/02-installation.md` ("Updating Stencil"): `@stencil/core@beta` → `@stencil/core@latest`, and drop the preview note.
+1. `introduction/02-installation.md` ("Updating Stencil"): `@stencil/core@rc` → `@stencil/core@latest`, and drop the preview note.
 1. Getting started: `npm init stencil@next` → `npm init stencil`, and drop the preview note. (`@5` can't resolve until a stable `create-stencil@5.0.0` exists.)
-1. `reference/upgrading-to-stencil-five.md`: `@stencil/core@beta` → `@stencil/core@5`, drop the preview note, and point the `BREAKING_CHANGES.md` link at `main` instead of the `v5` branch.
+1. `reference/upgrading-to-stencil-five.md`: `@stencil/core@rc` → `@stencil/core@5`, drop the preview note, and point the `BREAKING_CHANGES.md` link at `main` instead of the `v5` branch.
 1. `reference/support-policy.md`: fill in V5's release date, and V4's maintenance end date (six months after it).
 1. `guides/tooling/storybook.md`: drop `@dev` and its note once `@stencil/storybook-plugin` 1.0 ships.
 1. Once v5 is merged to `main` in `stenciljs/core`: repoint `docs-json.md`'s two links to `blob/main/src/declarations/stencil-public-docs.ts` at `packages/core/src/declarations/stencil-public-docs.ts`.
