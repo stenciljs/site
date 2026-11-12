@@ -22,11 +22,11 @@ For the reasoning behind each change, see the [list of breaking changes](https:/
 ## 1. Install Stencil v5
 
 ```bash npm2yarn
-npm install @stencil/core@beta --save-dev
+npm install @stencil/core@rc --save-dev
 ```
 
 :::note
-While Stencil v5 is in preview, it's published under the `beta` tag.
+While Stencil v5 is a release candidate, it's published under the `rc` tag.
 :::
 
 If your project uses Stencil's framework output targets, update them too. They support both v4 and v5:

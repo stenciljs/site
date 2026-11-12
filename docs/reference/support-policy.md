@@ -17,7 +17,7 @@ The Stencil team recommends updating to the newest version of Stencil for the la
 
 | Version | Status | Released | Maintenance Ends |
 |:-------:|:------:|:--------:|:----------------:|
-| V5 | Preview | TBD | TBD |
+| V5 | Release candidate | TBD | TBD |
 | V4 | **Active** | Jun 26, 2023 | 6 months after the V5 stable release |
 | V3 | End of Support | Jan 25, 2023 | Dec 26, 2023 |
 | V2 | End of Support | Aug 08, 2020 | Jul 25, 2023 |

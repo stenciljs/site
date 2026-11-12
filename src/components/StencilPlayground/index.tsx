@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 
 // Pinned on purpose: a new @stencil/playground release can change compiler behavior under every
 // example on the site, so bump this deliberately and spot-check the pages that use `:::playground`.
-const PLAYGROUND_VERSION = '5.0.0-beta.32';
+const PLAYGROUND_VERSION = '5.0.0-rc.0';
 const LOADER_URL = `https://cdn.jsdelivr.net/npm/@stencil/playground@${PLAYGROUND_VERSION}/dist/loader-bundle/stencil-playground/stencil-playground.js`;
 
 interface PlaygroundFile {

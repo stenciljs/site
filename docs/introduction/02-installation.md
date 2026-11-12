@@ -53,7 +53,7 @@ bun create stencil@next
 </Tabs>
 
 :::note
-While v5 is in preview, keep the `@next` tag. Without it, you get the Stencil v4 project generator.
+While v5 is a release candidate, keep the `@next` tag. Without it, you get the Stencil v4 project generator.
 :::
 
 `stencil init` is context-aware: run in an empty directory, it scaffolds a new project. Run inside an existing Stencil project, it switches to "add capabilities" mode instead, letting you install and configure integrations (testing, styling, framework output targets) you didn't set up initially - the same picker [`stencil add`](#adding-capabilities-later) shows when you run it with no arguments.
@@ -114,11 +114,11 @@ Run without arguments, `stencil add` prompts you to pick from known integrations
 To get the latest version of `@stencil/core`, run:
 
 ```bash npm2yarn
-npm install @stencil/core@beta --save-exact
+npm install @stencil/core@rc --save-exact
 ```
 
 :::note
-While v5 is in preview, it's published under the `beta` tag. `@latest` installs Stencil v4.
+While v5 is a release candidate, it's published under the `rc` tag. `@latest` installs Stencil v4.
 :::
 
 ## Next Steps
