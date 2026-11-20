@@ -81,19 +81,18 @@ export const config: Config = {
 
 ## CSS Variables
 
-Stencil can document CSS variables if you annotate them with JSDoc-style
-comments in your CSS/SCSS files. If, for instance, you had a component with a
-CSS file like the following:
+Stencil can document CSS variables if you add JSDoc-style comments above
+their declarations in your CSS/SCSS files (see
+[Styling Details](./docs-readme.md#styling-details) for where they're picked
+up). If, for instance, you had a component with a CSS file like the following:
 
 ```css title="src/components/my-button/my-button.css"
 :host {
-  /**
-   * @prop --background: Background of the button
-   * @prop --background-activated: Background of the button when activated
-   * @prop --background-focused: Background of the button when focused
-   */
+  /** Background of the button */
   --background: pink;
+  /** Background of the button when activated */
   --background-activated: aqua;
+  /** Background of the button when focused */
   --background-focused: fuchsia;
 }
 ```

@@ -35,13 +35,11 @@ To add a description to a `@Prop`, simply add a comment on the previous line:
 
 ### CSS Example:
 
-Stencil will also document CSS variables when you specify them via jsdoc-style comments inside your css or scss files:
+Stencil will also document CSS variables when you add a JSDoc-style comment above their declaration in the component's root rule (`:host` for `shadow` or `scoped` components, the component's tag for the others), in your css or scss files:
 
 ```css
- :root {
-   /**
-    * @prop --primary: Primary header color.
-    */
-   --primary: blue;
- }
+:host {
+  /** Primary header color. */
+  --primary: blue;
+}
 ```
