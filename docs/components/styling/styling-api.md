@@ -16,9 +16,7 @@ CSS custom properties (CSS variables) let consumers change specific values in a 
 
 ```css
 :host {
-  /**
-   * @prop --heading-color: Color of the card heading
-   */
+  /** Color of the card heading */
   --heading-color: black;
 }
 
@@ -27,13 +25,28 @@ CSS custom properties (CSS variables) let consumers change specific values in a 
 }
 ```
 
-The `@prop` JSDoc comment documents the property for consumers: Stencil adds it to your component's generated docs (see [Styling Details](../../output-targets/documentation-generation/docs-readme.md#styling-details)). Declaring the property on `:host` gives it a default value. Without that declaration, `var(--heading-color)` still works, but takes whatever value is inherited from the page, if any.
+The doc comment above the declaration documents the property for consumers: Stencil adds it to your component's generated docs (see [Styling Details](../../output-targets/documentation-generation/docs-readme.md#styling-details)). Declaring the property on `:host` gives it a default value. Without that declaration, `var(--heading-color)` still works, but takes whatever value is inherited from the page, if any.
 
 Consumers set their own value on the component:
 
 ```css
 shadow-card {
   --heading-color: blue;
+}
+```
+
+A doc comment above a declaration only works in the component's root rule: `:host` for `shadow` or `scoped` components, or the component's tag for the others. If a property has no declaration there, for example because its default is a `var()` fallback or is set in a more specific rule, use a `@cssprop` tag instead. You can put the comment anywhere in the file:
+
+```css
+/**
+ * @cssprop --card-padding - Space inside the card
+ */
+:host {
+  padding: var(--card-padding, 16px);
+}
+
+:host([size='large']) {
+  --card-padding: 24px;
 }
 ```
 
@@ -66,9 +79,7 @@ export class ShadowCard {
 
 ```css title="shadow-card.css" hidden
 :host {
-  /**
-   * @prop --heading-color: Color of the card heading
-   */
+  /** Color of the card heading */
   --heading-color: black;
 }
 

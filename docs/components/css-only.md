@@ -147,9 +147,23 @@ A native [`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@propert
 
 `@property` rules apply to every CSS-only component in the same file.
 
+### Hiding from the Docs
+
+To keep a custom property, `@property` rule, attribute or slot out of the docs, put `@internal` in the comment above it:
+
+```css
+my-badge {
+  /** @internal Used by the badge's own animation. */
+  --badge-offset: 0px;
+
+  /** @internal */
+  &[debug] { /* ... */ }
+}
+```
+
 ## Adding Descriptions
 
-A doc comment directly above an attribute or slot rule becomes its description:
+A doc comment directly above an attribute or slot rule becomes its description. A comment holding JSDoc tags like `@cssprop` or `@slot` documents what those tags name instead, so it never describes the rule below it:
 
 ```css
 my-badge {

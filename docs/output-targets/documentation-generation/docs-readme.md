@@ -510,21 +510,19 @@ The following table will be generated:
 
 Styling in CSS files can be documented in Stencil components as well.
 One use case for documenting styles using Stencil is to note a CSS variable that a component's styling depends on.
-Using the `@prop` JSDoc in a component's CSS file, Stencil can generate this documentation as well.
+Stencil documents a custom property declared in the component's root rule (`:host` for `shadow` or `scoped` components, the component's tag for the others) when a doc comment sits directly above it.
 
 This information is presented in a table containing the following columns:
 - **Name**: The name of the custom property.
 - **Description**: A description of the custom property, if one was given.
 - **Syntax** and **Default**: The `syntax` and `initial-value` of a native [`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@property) rule for the same property. These two columns only appear when at least one of the component's custom properties has one.
 
-For the following usages of `@prop` in a component's css file:
+For the following component css file:
 
 ```css
 :host {
-  /**
-   * @prop --border-radius: Border radius of the avatar and inner image
-   */
-  border-radius: var(--border-radius);
+  /** Border radius of the avatar and inner image */
+  --border-radius: 50%;
 }
 ```
 The following table will be generated:
@@ -535,6 +533,28 @@ The following table will be generated:
 | Name              | Description                                 |
 | ----------------- | ------------------------------------------- |
 | `--border-radius` | Border radius of the avatar and inner image |
+```
+
+To document a property the component reads but doesn't declare in its root rule, name it with a `@cssprop` tag in any doc comment in the file. `@cssproperty` and `@prop` also work, and the name can be followed by `-` or `:`. A comment holding these tags documents the properties it names instead of the declaration below it:
+
+```css
+/**
+ * @cssprop --border-radius - Border radius of the avatar and inner image
+ */
+:host {
+  border-radius: var(--border-radius, 50%);
+}
+```
+
+If a property is documented both ways, the tag's description wins.
+
+To keep a doc-commented property or `@property` rule out of the docs, put `@internal` in its comment:
+
+```css
+:host {
+  /** @internal Used by the avatar's own layout */
+  --avatar-offset: 0px;
+}
 ```
 
 The styling details section will be placed after the [Shadow Parts Details](#shadow-parts) of the README.
